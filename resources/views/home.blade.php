@@ -20,9 +20,9 @@
         </div>
         <ul>
             <li><a href="{{ url('/') }}">Home</a></li>
-            <li><a href="{{ url('/products') }}">Products</a></li>
+            <li><a href="{{ url('/produk') }}">Produk</a></li>
             <li><a href="{{ url('/about') }}">About</a></li>
-            <li><a href="{{ url('/contact') }}">Contact</a></li>
+            <li><a href="{{ url('/kontak') }}">Kontak</a></li>
         </ul>
     </nav>
 
@@ -33,9 +33,10 @@
             <h1>Selamat Datang di E-Mebel</h1>
             <p>Jelajahi koleksi mebel terbaik untuk rumah dan kantor Anda.</p>
             <div class="buttons">
-                <a href="{{ url('/products') }}" class="btn">Lihat Produk</a>
-                <a href="{{ url('/contact') }}" class="btn">Kontak Kami</a>
+                <a href="{{ url('/produk') }}" class="btn">Lihat Produk</a>
+                <a href="{{ url('/kontak') }}" class="btn">Kontak Kami</a>
             </div>
+                        
             @guest
             <a href="{{ url('login') }}" class="btn login" onclick="openLoginPopup()">Login</a>
             @endguest

@@ -6,6 +6,10 @@ use App\Http\Controllers\AuthController;
 
 
 
+
+
+
+
 Route::get('/', function () {
     return view('home');
 });
@@ -26,6 +30,12 @@ Route::post('/logout', function () {
     return redirect('/'); // Redirect ke halaman utama setelah logout
 })->name('logout');
 
+Route::get('/produk', function () {
+    return view('produk');
+})->name('produk');
+Route::get('/kontak', function () {
+    return view('kontak');
+})->name('kontak');
 // Route::get('/', function () {
 //     return view('welcome');
 // });
