@@ -10,7 +10,7 @@
 
     <!-- Background Image -->
     <div class="background">
-        <!-- <img src="{{ asset('images/bg1.jpg') }}" alt="Hero Image"> -->
+       {{-- <img src="{{ asset('images/bg1.jpg') }}" alt="Hero Image"> --}}
     </div>
 
     <!-- Navbar -->

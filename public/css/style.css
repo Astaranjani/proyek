@@ -308,3 +308,20 @@ body {
         text-align: center;
     }
 }
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.hero {
+    background: url('../images/hero-bg.jpg') no-repeat center center/cover;
+    color: black;
+    padding: 80px 0;
+}
+
+.products .card {
+    transition: transform 0.3s ease-in-out;
+}
+
+.products .card:hover {
+    transform: scale(1.05);
+}

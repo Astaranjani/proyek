@@ -39,6 +39,9 @@ Route::get('/kontak', function () {
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware('auth'); // Pastikan hanya pengguna yang login yang bisa mengakses
 
 Auth::routes();
 
