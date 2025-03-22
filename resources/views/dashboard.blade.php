@@ -34,21 +34,21 @@
         </header>
 
         <section class="container text-center">
-            <div class="row">
+            <div class="item">
                 <div class="col-lg-6">
                     <h2>Ligno Set Sale</h2>
                     <p>Up to 50% Off</p>
                     <button class="btn btn-dark">Shopping Now</button>
                 </div>
                 <div class="col-lg-6">
-                    <img src="{{ asset('images/furniture1.jpg') }}" class="img-fluid" alt="Furniture">
+                    <img src="{{ asset('images/mejabelajar') }}" class="img-fluid" alt="Furniture">
                 </div>
             </div>
         </section>
 
         <section class="container mt-5">
             <h3 class="text-center">Top Products</h3>
-            <div class="row">
+            <div class="item">
                 <div class="col-md-6 text-center">
                     <img src="{{ asset('images/sofa.jpg') }}" class="img-fluid" alt="Sofa">
                     <p>Sofa Minimalis <br> Rp. 900.000</p>
