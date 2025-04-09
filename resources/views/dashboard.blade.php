@@ -36,12 +36,12 @@
         <section class="container text-center">
             <div class="item">
                 <div class="col-lg-6">
+                    <img src="{{ asset('images/sofa.jpg') }}" class="img-fluid" alt="Furniture">
+                </div>
+                <div class="col-lg-6">
                     <h2>Ligno Set Sale</h2>
                     <p>Up to 50% Off</p>
                     <button class="btn btn-dark">Shopping Now</button>
-                </div>
-                <div class="col-lg-6">
-                    <img src="{{ asset('images/mejabelajar') }}" class="img-fluid" alt="Furniture">
                 </div>
             </div>
         </section>
@@ -54,7 +54,7 @@
                     <p>Sofa Minimalis <br> Rp. 900.000</p>
                 </div>
                 <div class="col-md-6 text-center">
-                    <img src="{{ asset('images/bed.jpg') }}" class="img-fluid" alt="Bed">
+                    <img src="{{ asset('images/mejabelajar.jpg') }}" class="img-fluid" alt="Bed">
                     <p>Bigdream Springbed <br> Rp. 3.000.000</p>
                 </div>
             </div>
