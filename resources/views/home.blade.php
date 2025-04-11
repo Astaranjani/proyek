@@ -8,10 +8,6 @@
 </head>
 <body>
 
-    <!-- Background Image -->
-    <div class="background">
-       {{-- <img src="{{ asset('images/bg1.jpg') }}" alt="Hero Image"> --}}
-    </div>
 
     <!-- Navbar -->
     <nav class="navbar">
@@ -27,8 +23,8 @@
     </nav>
 
     <!-- Hero Section -->
-    <header class="hero">
-        <div class="overlay"></div>
+<header class="hero">
+     <div class="overlay"></div>
         <div class="hero-content">
             <h1>Selamat Datang di E-Mebel</h1>
             <p>Jelajahi koleksi mebel terbaik untuk rumah dan kantor Anda.</p>
@@ -61,7 +57,7 @@
             </form>
         @endauth
         </div>
-    </header>
+ </header>
 
     <footer class="footer">
         <div class="footer-container">

@@ -7,8 +7,8 @@
 }
 
 body {
-    background-color: #f4f4f4;
     color: #333;
+    align-items: center;
     line-height: 1.6;
 }
 
@@ -75,8 +75,6 @@ body {
 .hero {
     position: relative;
     height: 100vh;
-    background: url('../images/bg1.jpg') no-repeat center center/cover;
-    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -85,16 +83,25 @@ body {
     padding: 20px;
 }
 
-.overlay {
+.hero .overlay {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: url('/images/bg1.jpg') no-repeat center center;
+    background-size: cover;
+    z-index: -1; /* supaya berada di belakang konten */
+    opacity: 0.8; /* opsional: kasih efek transparan */
 }
 
 .hero-content {
-    position: relative;
-    z-index: 1;
+    display:contents;
+    align-items: center;
+    justify-content: center;
+    z-index: 1; /* pastikan berada di atas background */
+    max-width: 90%;
+    padding: 20px;
     max-width: 90%;
 }
 

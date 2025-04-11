@@ -12,7 +12,7 @@
     <div id="app">
         <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
             <a class="navbar-brand" href="{{ url('/') }}">
-                <img src="{{ asset('images/logo.png') }}" alt="E-Mebel Logo" height="40">
+                <img src="{{ asset('images/logo.jpg') }}" alt="E-Mebel Logo" height="40">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -36,7 +36,7 @@
         <section class="container text-center">
             <div class="item">
                 <div class="col-lg-6">
-                    <img src="{{ asset('images/sofa.jpg') }}" class="img-fluid" alt="Furniture">
+                    <img src="{{ asset('images/sofa.png') }}" class="img-fluid" alt="Furniture" style="width: 1000px; height: auto;">
                 </div>
                 <div class="col-lg-6">
                     <h2>Ligno Set Sale</h2>
@@ -45,16 +45,55 @@
                 </div>
             </div>
         </section>
-
-        <section class="container mt-5">
-            <h3 class="text-center">Top Products</h3>
+        <h1 class="text-center">Top Products</h1>
+        <section class="container">
             <div class="item">
                 <div class="col-md-6 text-center">
-                    <img src="{{ asset('images/sofa.jpg') }}" class="img-fluid" alt="Sofa">
+                    <img src="{{ asset('images/sofa 2.png') }}" class="img-fluid" alt="Sofa" style="width: 1000px; height: auto;">
                     <p>Sofa Minimalis <br> Rp. 900.000</p>
                 </div>
                 <div class="col-md-6 text-center">
-                    <img src="{{ asset('images/mejabelajar.jpg') }}" class="img-fluid" alt="Bed">
+                    <img src="{{ asset('images/Kursi.png') }}" class="img-fluid" alt="Bed" style="width: 1000px; height: auto;">
+                    <p>Bigdream Springbed <br> Rp. 3.000.000</p>
+                </div>
+            </div>
+        </section>
+
+        <h1 class="text-center">Furniture kantoran</h1>
+        <section class="container">
+            <div class="item">
+                <div class="col-md-6 text-center">
+                    <img src="{{ asset('images/sofa 2.png') }}" class="img-fluid" alt="Sofa" style="width: 1000px; height: auto;">
+                    <p>Sofa Minimalis <br> Rp. 900.000</p>
+                </div>
+                <div class="col-md-6 text-center">
+                    <img src="{{ asset('images/Kursi.png') }}" class="img-fluid" alt="Bed" style="width: 1000px; height: auto;">
+                    <p>Bigdream Springbed <br> Rp. 3.000.000</p>
+                </div>
+                <div class="col-md-6 text-center">
+                    <img src="{{ asset('images/sofa 2.png') }}" class="img-fluid" alt="Sofa" style="width: 1000px; height: auto;">
+                    <p>Sofa Minimalis <br> Rp. 900.000</p>
+                </div>
+                <div class="col-md-6 text-center">
+                    <img src="{{ asset('images/Kursi.png') }}" class="img-fluid" alt="Bed" style="width: 1000px; height: auto;">
+                    <p>Bigdream Springbed <br> Rp. 3.000.000</p>
+                </div>
+            </div>
+            <div class="item">
+                <div class="col-md-6 text-center">
+                    <img src="{{ asset('images/sofa 2.png') }}" class="img-fluid" alt="Sofa" style="width: 1000px; height: auto;">
+                    <p>Sofa Minimalis <br> Rp. 900.000</p>
+                </div>
+                <div class="col-md-6 text-center">
+                    <img src="{{ asset('images/Kursi.png') }}" class="img-fluid" alt="Bed" style="width: 1000px; height: auto;">
+                    <p>Bigdream Springbed <br> Rp. 3.000.000</p>
+                </div>
+                <div class="col-md-6 text-center">
+                    <img src="{{ asset('images/sofa 2.png') }}" class="img-fluid" alt="Sofa" style="width: 1000px; height: auto;">
+                    <p>Sofa Minimalis <br> Rp. 900.000</p>
+                </div>
+                <div class="col-md-6 text-center">
+                    <img src="{{ asset('images/Kursi.png') }}" class="img-fluid" alt="Bed" style="width: 1000px; height: auto;">
                     <p>Bigdream Springbed <br> Rp. 3.000.000</p>
                 </div>
             </div>
