@@ -23,6 +23,16 @@
                     <li class="nav-item"><a class="nav-link" href="#">Profil</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Products</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>
+                    @auth
+                    <li class="nav-item">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="btn btn-link nav-link" style="display: inline; padding: 0; border: none; background: none;">
+                                Logout
+                            </button>
+                        </form>
+                    </li>
+                    @endauth
                 </ul>
             </div>
         </nav>
