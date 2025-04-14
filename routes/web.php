@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\OwnerController;
+use App\Http\Controllers\UserController;
+
 
 Route::get('/', function () {
     return view('home');
@@ -40,3 +44,7 @@ Route::get('/produk', function () {
 Route::get('/kontak', function () {
     return view('kontak');
 })->name('kontak');
+
+Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard')->middleware('auth');
+Route::get('/owner/dashboard', [OwnerController::class, 'index'])->name('owner.dashboard')->middleware('auth');
+Route::get('/user/dashboard', [UserController::class, 'index'])->name('user.dashboard')->middleware('auth');
