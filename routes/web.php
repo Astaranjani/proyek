@@ -7,6 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\DashboardController;
 
 
 Route::get('/', function () {
@@ -48,3 +49,4 @@ Route::get('/kontak', function () {
 Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard')->middleware('auth');
 Route::get('/owner/dashboard', [OwnerController::class, 'index'])->name('owner.dashboard')->middleware('auth');
 Route::get('/user/dashboard', [UserController::class, 'index'])->name('user.dashboard')->middleware('auth');
+
