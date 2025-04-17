@@ -7,25 +7,34 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\PelangganController;
+use App\Http\Controllers\Admin\BarangController;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
+// Halaman Utama
 Route::get('/', function () {
     return view('home');
 });
 
-// Redirect ke dashboard setelah login
+// Redirect setelah login
 Route::get('/home', function () {
     return redirect()->route('dashboard');
 })->name('home');
 
-
-// Pastikan hanya pengguna yang sudah login yang bisa mengakses dashboard
+// Dashboard umum (bisa disesuaikan)
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware('auth')->name('dashboard');
 
-// Rute untuk autentikasi
+
+// ===========================
+// Autentikasi
+// ===========================
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -34,10 +43,13 @@ Route::post('/register', [AuthController::class, 'register']);
 
 Route::post('/logout', function () {
     Auth::logout();
-    return redirect('/'); // Redirect ke halaman utama setelah logout
+    return redirect('/');
 })->name('logout');
 
-// Rute halaman lainnya
+
+// ===========================
+// Halaman Umum
+// ===========================
 Route::get('/produk', function () {
     return view('produk');
 })->name('produk');
@@ -46,7 +58,33 @@ Route::get('/kontak', function () {
     return view('kontak');
 })->name('kontak');
 
-Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard')->middleware('auth');
-Route::get('/owner/dashboard', [OwnerController::class, 'index'])->name('owner.dashboard')->middleware('auth');
-Route::get('/user/dashboard', [UserController::class, 'index'])->name('user.dashboard')->middleware('auth');
 
+// ===========================
+// ADMIN
+// ===========================
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard Admin
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+
+    // Barang (CRUD)
+    Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
+    Route::get('/barang/create', [BarangController::class, 'create'])->name('barang.create');
+    Route::post('/barang', [BarangController::class, 'store'])->name('barang.store');
+    // (Optional: edit, update, delete bisa ditambahkan di sini juga)
+});
+
+
+// ===========================
+// OWNER
+// ===========================
+Route::get('/owner/dashboard', [OwnerController::class, 'index'])
+    ->middleware(['auth', 'role:owner'])
+    ->name('owner.dashboard');
+
+
+// ===========================
+// PELANGGAN (USER)
+// ===========================
+Route::get('/pelanggan/dashboard', [PelangganController::class, 'index'])
+    ->middleware(['auth', 'role:pelanggan'])
+    ->name('pelanggan.dashboard');
