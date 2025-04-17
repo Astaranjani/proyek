@@ -18,18 +18,30 @@ class AuthController extends Controller
 
     // Proses login
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
+{
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
 
-        if (Auth::attempt($credentials)) {
-            return redirect()->route('home')->with('success', 'Login berhasil!');
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+
+        $user = Auth::user();
+
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->role === 'owner') {
+            return redirect()->route('owner.dashboard');
+        } else {
+            return redirect()->route('dashboard');
         }
-
-        return back()->withErrors(['email' => 'Email atau password salah'])->withInput();
     }
+
+    return back()->withErrors([
+        'email' => 'Email atau password salah',
+    ])->withInput();
+}
 
     // Menampilkan halaman register
     public function showRegister()
