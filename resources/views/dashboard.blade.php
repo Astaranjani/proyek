@@ -10,6 +10,7 @@
 </head>
 <body>
     <div id="app">
+        {{-- Navbar --}}
         <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
             <a class="navbar-brand" href="{{ url('/') }}">
                 <img src="{{ asset('images/logo.jpg') }}" alt="E-Mebel Logo" height="40">
@@ -37,78 +38,55 @@
             </div>
         </nav>
 
+        {{-- Header --}}
         <header class="text-center my-4">
             <input type="text" class="form-control w-50 mx-auto" placeholder="Search">
             <h1 class="mt-3">Dream house</h1>
             <p>Temukan mebel berkualitas dengan desain elegan untuk hunian yang lebih nyaman</p>
         </header>
 
-        <section class="container text-center">
-            <div class="item">
-                <div class="col-lg-6">
-                    <img src="{{ asset('images/sofa.png') }}" class="img-fluid" alt="Furniture" style="width: 1000px; height: auto;">
-                </div>
-                <div class="col-lg-6">
-                    <h2>Ligno Set Sale</h2>
-                    <p>Up to 50% Off</p>
-                    <button class="btn btn-dark">Shopping Now</button>
-                </div>
-            </div>
-        </section>
-        <h1 class="text-center">Top Products</h1>
-        <section class="container">
-            <div class="item">
-                <div class="col-md-6 text-center">
-                    <img src="{{ asset('images/sofa 2.png') }}" class="img-fluid" alt="Sofa" style="width: 1000px; height: auto;">
-                    <p>Sofa Minimalis <br> Rp. 900.000</p>
-                </div>
-                <div class="col-md-6 text-center">
-                    <img src="{{ asset('images/Kursi.png') }}" class="img-fluid" alt="Bed" style="width: 1000px; height: auto;">
-                    <p>Bigdream Springbed <br> Rp. 3.000.000</p>
-                </div>
+        {{-- Promo --}}
+        <section class="container mt-5">
+            <h2 class="text-center mb-4">Produk Terbaru</h2>
+            <div class="row">
+                @foreach ($barangs as $barang)
+                    <div class="col-md-3 mb-4">
+                        <div class="card h-100">
+                            @if($barang->gambar)
+                                <img src="{{ asset('storage/' . $barang->gambar) }}" class="card-img-top" alt="{{ $barang->nama }}" style="height: 200px; object-fit: cover;">
+                            @else
+                                <img src="{{ asset('images/default.png') }}" class="card-img-top" alt="{{ $barang->nama }}">
+                            @endif
+                            <div class="card-body">
+                                <h5 class="card-title">{{ $barang->nama }}</h5>
+                                <p class="card-text">Rp {{ number_format($barang->harga, 0, ',', '.') }}</p>
+                                <p class="card-text">{{ $barang->deskripsi }}</p>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </section>
 
-        <h1 class="text-center">Furniture kantoran</h1>
+        {{-- Produk Dinamis dari DB --}}
+        <h1 class="text-center mb-4">Top Products</h1>
         <section class="container">
-            <div class="item">
-                <div class="col-md-6 text-center">
-                    <img src="{{ asset('images/sofa 2.png') }}" class="img-fluid" alt="Sofa" style="width: 1000px; height: auto;">
-                    <p>Sofa Minimalis <br> Rp. 900.000</p>
-                </div>
-                <div class="col-md-6 text-center">
-                    <img src="{{ asset('images/Kursi.png') }}" class="img-fluid" alt="Bed" style="width: 1000px; height: auto;">
-                    <p>Bigdream Springbed <br> Rp. 3.000.000</p>
-                </div>
-                <div class="col-md-6 text-center">
-                    <img src="{{ asset('images/sofa 2.png') }}" class="img-fluid" alt="Sofa" style="width: 1000px; height: auto;">
-                    <p>Sofa Minimalis <br> Rp. 900.000</p>
-                </div>
-                <div class="col-md-6 text-center">
-                    <img src="{{ asset('images/Kursi.png') }}" class="img-fluid" alt="Bed" style="width: 1000px; height: auto;">
-                    <p>Bigdream Springbed <br> Rp. 3.000.000</p>
-                </div>
-            </div>
-            <div class="item">
-                <div class="col-md-6 text-center">
-                    <img src="{{ asset('images/sofa 2.png') }}" class="img-fluid" alt="Sofa" style="width: 1000px; height: auto;">
-                    <p>Sofa Minimalis <br> Rp. 900.000</p>
-                </div>
-                <div class="col-md-6 text-center">
-                    <img src="{{ asset('images/Kursi.png') }}" class="img-fluid" alt="Bed" style="width: 1000px; height: auto;">
-                    <p>Bigdream Springbed <br> Rp. 3.000.000</p>
-                </div>
-                <div class="col-md-6 text-center">
-                    <img src="{{ asset('images/sofa 2.png') }}" class="img-fluid" alt="Sofa" style="width: 1000px; height: auto;">
-                    <p>Sofa Minimalis <br> Rp. 900.000</p>
-                </div>
-                <div class="col-md-6 text-center">
-                    <img src="{{ asset('images/Kursi.png') }}" class="img-fluid" alt="Bed" style="width: 1000px; height: auto;">
-                    <p>Bigdream Springbed <br> Rp. 3.000.000</p>
-                </div>
+            <div class="row">
+                @foreach ($barangs as $barang)
+                    <div class="card">
+                        <h5>{{ $barang->nama }}</h5>
+                        <p>Rp {{ number_format($barang->harga) }}</p>
+                        @if($barang->gambar)
+                            <img src="{{ asset('storage/' . $barang->gambar) }}" width="100">
+                        @endif
+                        <p>{{ $barang->deskripsi }}</p>
+                    </div>
+                @endforeach
+
             </div>
         </section>
 
+        {{-- Footer --}}
         <footer class="bg-dark text-white text-center py-3 mt-4">
             &copy; {{ date('Y') }} E-Mebel. All Rights Reserved.
         </footer>
