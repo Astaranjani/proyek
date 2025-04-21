@@ -7,8 +7,15 @@ use App\Models\Barang;
 
 class HomeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function index()
 {
+    if (auth()->user()->role !== 'user') {
+        abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk mengakses halaman ini.');
+    }
     $barangs = Barang::latest()->take(8)->get(); // Ambil 8 produk terbaru
     return view('dashboard', compact('barangs'));
 }
