@@ -18,8 +18,8 @@ use App\Http\Controllers\Admin\BarangController;
 // HALAMAN UTAMA & UMUM
 // ===========================
 Route::get('/', fn () => view('home'));
-Route::get('/home', fn () => redirect()->route('dashboard'))->name('dashboard');
-Route::get('/produk', fn () => view('produk'))->name('produk');
+Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
+Route::get('/produk', [HomeController::class, 'produk'])->name('produk');
 Route::get('/kontak', fn () => view('kontak'))->name('kontak');
 
 // ===========================

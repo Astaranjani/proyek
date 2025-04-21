@@ -19,6 +19,11 @@ class HomeController extends Controller
     $barangs = Barang::latest()->take(8)->get(); // Ambil 8 produk terbaru
     return view('dashboard', compact('barangs'));
 }
+public function produk()
+{
+    $barangs = Barang::all();
+    return view('produk', compact('barangs'));
+}
 }
 
 // class HomeController extends Controller

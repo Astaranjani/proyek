@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Profil Saya</title>
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <!-- ✅ Bootstrap 5 CDN hanya untuk halaman ini -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>

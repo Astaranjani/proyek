@@ -20,7 +20,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ url('/') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('dashboard') }}">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ route('produk') }}">Products</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>                    
