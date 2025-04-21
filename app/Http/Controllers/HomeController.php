@@ -8,10 +8,10 @@ use App\Models\Barang;
 class HomeController extends Controller
 {
     public function index()
-    {
-        $barangs = Barang::latest()->get(); // Ambil semua barang
-        return view('dashboard', compact('barangs'));
-    }
+{
+    $barangs = Barang::latest()->take(8)->get(); // Ambil 8 produk terbaru
+    return view('dashboard', compact('barangs'));
+}
 }
 
 // class HomeController extends Controller

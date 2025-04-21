@@ -61,3 +61,8 @@ Route::get('/owner/dashboard', [OwnerController::class, 'index'])
 Route::get('/dashboard', [HomeController::class, 'index'])
     ->middleware('auth')
     ->name('dashboard');
+
+Route::get('/profile', function () {
+    return view('profile');
+})->middleware('auth')->name('profile');
+    

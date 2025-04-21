@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
+    public function showRegister()
+    {
+        return view('auth.register');
+    }
     /*
     |--------------------------------------------------------------------------
     | Register Controller

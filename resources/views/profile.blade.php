@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Profil Saya</title>
+    
+    <!-- ✅ Bootstrap 5 CDN hanya untuk halaman ini -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+
     <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
         <a class="navbar-brand" href="{{ url('/') }}">
             <img src="{{ asset('images/logo.jpg') }}" alt="E-Mebel Logo" height="40">
@@ -33,6 +35,17 @@
             </ul>
         </div>
     </nav>
-    <p>ini peoduk</p>
+<div class="container mt-5">
+    <h2>Profil Saya</h2>
+    <div class="card mt-3 shadow">
+        <div class="card-body">
+            <p><strong>Nama:</strong> {{ Auth::user()->name }}</p>
+            <p><strong>Email:</strong> {{ Auth::user()->email }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ Bootstrap JS bundle (opsional, hanya jika pakai komponen JS Bootstrap) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

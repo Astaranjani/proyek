@@ -20,10 +20,10 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Profil</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Products</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url('/') }}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('produk') }}">Products</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>                    
                     @auth
                     <li class="nav-item">
                         <form method="POST" action="{{ route('logout') }}">
@@ -46,21 +46,23 @@
         </header>
 
         {{-- Promo --}}
-        <section class="container mt-5">
-            <h2 class="text-center mb-4">Produk Terbaru</h2>
-            <div class="row">
+        <h1 class="text-center my-3">Produk Terbaru</h1>
+        <section class="container mt-4">
+            <div class="row justify-content-center">
                 @foreach ($barangs as $barang)
-                    <div class="col-md-3 mb-4">
-                        <div class="card h-100">
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <div class="card h-100 shadow-sm border-0">
                             @if($barang->gambar)
-                                <img src="{{ asset('storage/' . $barang->gambar) }}" class="card-img-top" alt="{{ $barang->nama }}" style="height: 200px; object-fit: cover;">
-                            @else
-                                <img src="{{ asset('images/default.png') }}" class="card-img-top" alt="{{ $barang->nama }}">
+                                <img src="{{ asset('storage/' . $barang->gambar) }}" 
+                                    class="card-img-top" 
+                                    alt="{{ $barang->nama }}" 
+                                    style="height: 180px; object-fit: cover;">
                             @endif
                             <div class="card-body">
-                                <h5 class="card-title">{{ $barang->nama }}</h5>
-                                <p class="card-text">Rp {{ number_format($barang->harga, 0, ',', '.') }}</p>
-                                <p class="card-text">{{ $barang->deskripsi }}</p>
+                                <h5 class="card-title mb-1" style="font-size: 1rem;">{{ $barang->nama }}</h5>
+                                <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp {{ number_format($barang->harga, 0, ',', '.') }}</p>
+                                <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">{{ Str::limit($barang->deskripsi, 50) }}</p>
+                                <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
                             </div>
                         </div>
                     </div>
@@ -68,8 +70,34 @@
             </div>
         </section>
 
+                
+
         {{-- Produk Dinamis dari DB --}}
-        <h1 class="text-center mb-4">Top Products</h1>
+        <h1 class="text-center mb-4 mt-5">Top Products</h1>
+        <section class="container mt-4">
+            <div class="row justify-content-center">
+                @foreach ($barangs as $barang)
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <div class="card h-100 shadow-sm border-0">
+                            @if($barang->gambar)
+                                <img src="{{ asset('storage/' . $barang->gambar) }}" 
+                                    class="card-img-top" 
+                                    alt="{{ $barang->nama }}" 
+                                    style="height: 180px; object-fit: cover;">
+                            @endif
+                            <div class="card-body">
+                                <h5 class="card-title mb-1" style="font-size: 1rem;">{{ $barang->nama }}</h5>
+                                <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp {{ number_format($barang->harga, 0, ',', '.') }}</p>
+                                <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">{{ Str::limit($barang->deskripsi, 50) }}</p>
+                                <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+
+        {{-- <h1 class="text-center mb-4">Top Products</h1>
         <section class="container">
             <div class="row">
                 @foreach ($barangs as $barang)
@@ -84,7 +112,7 @@
                 @endforeach
 
             </div>
-        </section>
+        </section> --}}
 
         {{-- Footer --}}
         <footer class="bg-dark text-white text-center py-3 mt-4">
