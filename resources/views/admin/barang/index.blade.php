@@ -3,59 +3,191 @@
 @section('title', 'Data Barang')
 
 @section('content')
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Data Barang</h2>
-        <a href="{{ route('admin.barang.create') }}" class="btn btn-primary">+ Tambah Barang</a>
-    </div>
+<div class="flex h-screen bg-gray-50">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#111827] text-white flex flex-col">
+        <div class="p-6 flex items-center">
+            <div class="w-8 h-8 flex items-center justify-center bg-primary rounded-md mr-2">
+                <i class="ri-dashboard-line text-white"></i>
+            </div>
+            <h1 class="text-xl font-bold">E-Mebel</h1>
+        </div>
+    
+        <!-- Menu -->
+        <div class="flex-1 flex flex-col overflow-y-auto">
+            <div class="px-4 py-2">
+                <p class="text-xs text-gray-400 font-medium mb-2">ADMIN MENU</p>
+                <ul class="space-y-1">
+                    <!-- Dashboard Menu -->
+                    <li>
+                        <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2 text-white bg-primary/10 rounded-md">
+                            <div class="w-5 h-5 flex items-center justify-center mr-3">
+                                <i class="ri-dashboard-line"></i>
+                            </div>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+    
+                    <!-- Produk Menu with Submenu -->
+                    <li x-data="{ open: false }">
+                        <button @click="open = !open" class="flex justify-between items-center w-full px-4 py-2 text-white hover:bg-white/5 rounded-md">
+                            <div class="flex items-center">
+                                <i class="ri-product-hunt-line mr-3"></i>
+                                <span>Produk</span>
+                            </div>
+                            <i class="ri-arrow-down-s-line" :class="{ 'rotate-180': open }"></i>
+                        </button>
+                        <!-- Submenu -->
+                        <ul x-show="open" x-cloak class="ml-6 mt-2 space-y-1">
+                            <li>
+                                <a href="{{ route('admin.barang.index') }}" class="flex items-center px-4 py-1 text-gray-300 hover:bg-white/5 rounded-md">
+                                    <span>Data Barang</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('admin.barang.create') }}" class="flex items-center px-4 py-1 text-gray-300 hover:bg-white/5 rounded-md">
+                                    <span>Tambah Barang</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+    
+                    <!-- Transaksi Menu -->
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-2 text-gray-400 hover:bg-white/5 rounded-md">
+                            <div class="w-5 h-5 flex items-center justify-center mr-3">
+                                <i class="ri-order-play-line"></i>
+                            </div>
+                            <span>Transaksi</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+    
+            <!-- Report Section -->
+            <div class="px-4 py-2">
+                <p class="text-xs text-gray-400 font-medium mb-2">REPORTS</p>
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-2 text-gray-400 hover:bg-white/5 rounded-md">
+                            <div class="w-5 h-5 flex items-center justify-center mr-3">
+                                <i class="ri-bar-chart-line"></i>
+                            </div>
+                            <span>Grafik</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-2 text-gray-400 hover:bg-white/5 rounded-md">
+                            <div class="w-5 h-5 flex items-center justify-center mr-3">
+                                <i class="ri-file-line"></i>
+                            </div>
+                            <span>Laporan</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+    
+            <!-- Log Out Section -->
+            <div class="px-4 py-2 mt-auto">
+                <form action="/logout" method="POST">
+                    @csrf
+                    <button type="submit" class="flex items-center px-4 py-2 text-gray-400 hover:bg-white/5 rounded-md w-full">
+                        <div class="w-5 h-5 flex items-center justify-center mr-3">
+                            <i class="ri-logout-circle-r-line"></i>
+                        </div>
+                        <span>Log Out</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </aside>
+    
 
-    {{-- Pesan sukses --}}
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-200 py-4 px-6 flex items-center justify-between">
+            <div class="text-xl font-semibold">Data Barang</div>
+            <div class="flex items-center space-x-4">
+                <div class="w-10 h-10 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-full cursor-pointer">
+                    <i class="ri-notification-3-line"></i>
+                </div>
+                <div class="flex items-center">
+                    <div class="mr-3 text-right">
+                        <div class="text-sm font-medium text-gray-900">Admin</div>
+                        <div class="text-xs text-gray-500">Administrator</div>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                        <img src="https://via.placeholder.com/100" class="w-full h-full object-cover" />
+                    </div>
+                </div>
+            </div>
+        </header>
 
-    {{-- Tabel barang --}}
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th>No</th>
-                    <th>Gambar</th>
-                    <th>Nama</th>
-                    <th>Harga</th>
-                    <th>Stok</th>
-                    <th>Deskripsi</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($barangs as $index => $barang)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td style="width: 120px;">
-                            @if ($barang->gambar)
-                                <img src="{{ asset('storage/' . $barang->gambar) }}" class="img-thumbnail" style="height: 80px; object-fit: cover;">
-                            @else
-                                <img src="{{ asset('images/default.png') }}" class="img-thumbnail" style="height: 80px; object-fit: cover;">
-                            @endif
-                        </td>
-                        <td>{{ $barang->nama }}</td>
-                        <td>Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
-                        <td>{{ $barang->stok }}</td>
-                        <td>{{ Str::limit($barang->deskripsi, 50) }}</td>
-                        <td>
-                            {{-- Tombol Aksi --}}
-                            <a href="#" class="btn btn-sm btn-warning disabled">Edit</a>
-                            <a href="#" class="btn btn-sm btn-danger disabled">Hapus</a>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" class="text-center">Belum ada data barang.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+        <!-- Content -->
+        <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
+            @if(session('success'))
+                <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-2 rounded mb-4">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <div class="flex justify-end mb-4">
+                <a href="{{ route('admin.barang.create') }}" class="bg-primary text-white px-4 py-2 rounded-md">+ Tambah Barang</a>
+            </div>
+
+            <div class="overflow-x-auto bg-white rounded-lg shadow">
+                <table class="min-w-full text-sm text-gray-700">
+                    <thead class="bg-gray-100 text-xs font-semibold uppercase text-gray-600">
+                        <tr>
+                            <th class="px-6 py-3 text-left">No</th>
+                            <th class="px-6 py-3 text-left">Gambar</th>
+                            <th class="px-6 py-3 text-left">Nama</th>
+                            <th class="px-6 py-3 text-left">Harga</th>
+                            <th class="px-6 py-3 text-left">Stok</th>
+                            <th class="px-6 py-3 text-left">Deskripsi</th>
+                            <th class="px-6 py-3 text-left">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($barangs as $index => $barang)
+                            <tr class="border-b">
+                                <td class="px-6 py-3">{{ $barangs->firstItem() + $index }}</td>
+                                <td class="px-6 py-3">
+                                    <img src="{{ $barang->gambar ? asset('storage/' . $barang->gambar) : asset('images/default.png') }}" class="h-16 w-16 object-cover rounded" />
+                                </td>
+                                <td class="px-6 py-3">{{ $barang->nama }}</td>
+                                <td class="px-6 py-3">Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
+                                <td class="px-6 py-3">{{ $barang->stok }}</td>
+                                <td class="px-6 py-3">{{ Str::limit($barang->deskripsi, 50) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <div class="flex space-x-3 items-center">
+                                        <a href="{{ route('admin.barang.edit', $barang->id) }}" class="text-yellow-600 hover:underline">Edit</a>
+                                        <form action="{{ route('admin.barang.destroy', $barang->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus barang ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:underline">Hapus</button>
+                                        </form>
+                                    </div>
+                                </td>
+                                
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="px-6 py-3 text-center text-gray-500">Belum ada data barang.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4">
+                {{ $barangs->links() }}
+            </div>
+        </main>
     </div>
 </div>
+
+<!-- Alpine.js -->
+<script src="https://unpkg.com/alpinejs" defer></script>
 @endsection
