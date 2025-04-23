@@ -3,32 +3,75 @@
 @section('title', 'Dashboard Admin - E-Mebel')
 
 @section('content')
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">E-Mebel Admin</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdmin"
-            aria-controls="navbarAdmin" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<style>
+    .sidebar {
+        height: 100vh;
+        background-color: #343a40;
+        padding-top: 20px;
+        position: fixed;
+        width: 220px;
+    }
 
-        <div class="collapse navbar-collapse" id="navbarAdmin">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{{ route('admin.dashboard') }}">Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.barang.create') }}">Tambah Barang</a>
-                </li>
-            </ul>
-            <form method="POST" action="{{ route('logout') }}" class="d-flex">
-                @csrf
-                <button class="btn btn-outline-light" type="submit">Logout</button>
-            </form>
-        </div>
+    .sidebar a {
+        color: white;
+        padding: 12px 20px;
+        display: block;
+        text-decoration: none;
+    }
+
+    .sidebar a:hover,
+    .sidebar .active {
+        background-color: #a8aaab;
+        color: #fff;
+    }
+
+    .content {
+        margin-left: 220px;
+        padding: 20px;
+    }
+
+    .navbar-custom {
+        margin-left: 220px;
+        background-color: #212529;
+    }
+
+    .navbar-custom .navbar-brand,
+    .navbar-custom .btn {
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            position: relative;
+            height: auto;
+            width: 100%;
+        }
+
+        .content,
+        .navbar-custom {
+            margin-left: 0;
+        }
+    }
+</style>
+
+<div class="sidebar">
+    <h4 class="text-center text-white">E-Mebel Admin</h4>
+    <a href="{{ route('admin.dashboard') }}" class="active">Dashboard</a>
+    <a href="{{ route('admin.barang.create') }}">Tambah Barang</a>
+    <a href="{{ route('admin.barang.index') }}">Data Barang</a>
+    <form method="POST" action="{{ route('logout') }}" class="mt-3">
+        @csrf
+        <button type="submit" class="btn btn-danger w-100">Logout</button>
+    </form>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+    <div class="container-fluid">
+        <span class="navbar-brand">Dashboard Admin</span>
     </div>
 </nav>
 
-<div class="container mt-4">
+<div class="content">
     <h1 class="mb-4">Selamat Datang di Dashboard Admin</h1>
 
     <div class="row">

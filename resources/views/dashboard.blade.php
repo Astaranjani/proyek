@@ -39,7 +39,7 @@
         </nav>
 
         {{-- Header --}}
-        <header class="text-center my-4">
+        <header class="text-center my-0">
             <input type="text" class="form-control w-50 mx-auto" placeholder="Search">
             <h1 class="mt-3">Dream house</h1>
             <p>Temukan mebel berkualitas dengan desain elegan untuk hunian yang lebih nyaman</p>
@@ -50,7 +50,7 @@
         <section class="container mt-4">
             <div class="row justify-content-center">
                 @foreach ($barangs as $barang)
-                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4 transition duration-300 transform hover:scale-110">
                         <div class="card h-100 shadow-sm border-0">
                             @if($barang->gambar)
                                 <img src="{{ asset('storage/' . $barang->gambar) }}" 
