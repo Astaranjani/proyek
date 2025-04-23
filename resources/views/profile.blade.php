@@ -7,8 +7,10 @@
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <!-- ✅ Bootstrap 5 CDN hanya untuk halaman ini -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
 </head>
 <body>
+    
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
         <a class="navbar-brand" href="{{ url('/') }}">
@@ -36,15 +38,56 @@
             </ul>
         </div>
     </nav>
-<div class="container mt-5">
-    <h2>Profil Saya</h2>
-    <div class="card mt-3 shadow">
-        <div class="card-body">
-            <p><strong>Nama:</strong> {{ Auth::user()->name }}</p>
-            <p><strong>Email:</strong> {{ Auth::user()->email }}</p>
+    <div class="profile">
+        <div class="header-bar">Update Profil</div>
+        <div class="profile-form">
+            <div class="image-upload">
+                <img src="{{ asset('images/upload-icon.png') }}" alt="Upload" class="upload-icon">
+            </div>
+            <form action="{{ route('profile') }}" method="POST">
+                @csrf
+                @method('PUT')
+    
+                <input type="text" name="name" placeholder="Nama Lengkap" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="text" name="phone" placeholder="No. Handphone" required>
+                <input type="text" name="gender" placeholder="Jenis Kelamin" required>
+                <input type="text" name="address" placeholder="Alamat" required>
+    
+                <button type="submit" class="save-btn">Save</button>
+            </form>
         </div>
-    </div>
-</div>
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <div class="header-bar">Riwayat Pesanan</div>
+            <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+        </head>
+        <body>
+                <div class="order-status">
+                    <div class="status">
+                        <img src="path_to_icon/belum_bayar_icon.png" alt="Belum Bayar">
+                        <p>Belum Bayar</p>
+                    </div>
+                    <div class="status">
+                        <img src="path_to_icon/dikirim_icon.png" alt="Dikirim">
+                        <p>Dikirim</p>
+                    </div>
+                    <div class="status">
+                        <img src="path_to_icon/selesai_icon.png" alt="Selesai">
+                        <p>Selesai</p>
+                    </div>
+                </div>
+                <div class="header-bar">Kontak Bantuan</div>
+                <div class="contact-info">
+                    <p>📞 0859-6485-5724</p>
+                    <p>📧 emebel@gmail.com</p>
+                </div>
+            </div>
+        </body>
+        </html>
 
 <!-- ✅ Bootstrap JS bundle (opsional, hanya jika pakai komponen JS Bootstrap) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
