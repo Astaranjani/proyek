@@ -65,4 +65,4 @@ Route::get('/dashboard', [HomeController::class, 'index'])
 Route::get('/profile', function () {
     return view('profile');
 })->middleware('auth')->name('profile');
-    
+

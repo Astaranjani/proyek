@@ -1,0 +1,96 @@
+
+.profile-container {
+    background-color: #c6c8c9;
+    padding: 40px 20px;
+    font-family: 'Georgia', serif;
+}
+
+.header-bar {
+    background-color: #c3b8aa;
+    padding: 10px 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.profile-form {
+    max-width: 400px;
+    margin: 0 auto;
+    background-color: #d1d3d4;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.image-upload {
+    margin-bottom: 20px;
+}
+
+.upload-icon {
+    width: 60px;
+    height: 60px;
+}
+
+.profile-form input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.save-btn {
+    margin-top: 15px;
+    background-color: #ccc;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #e7e7e7;
+    border-radius: 12px;
+}
+
+h2, h3 {
+    text-align: center;
+}
+
+.order-status {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 0;
+}
+
+.status {
+    text-align: center;
+}
+
+.status i {
+    font-size: 36px;
+    color: #8b5a2b; /* Warna cokelat */
+}
+
+.contact-info {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.contact-info p {
+    margin: 5px 0;
+}
+
+.contact-info i {
+    margin-right: 8px;
+}
