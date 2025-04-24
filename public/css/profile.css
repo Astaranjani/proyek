@@ -94,3 +94,8 @@ h2, h3 {
 .contact-info i {
     margin-right: 8px;
 }
+
+.status-image {
+    width: 90px;
+    height: 70px;
+}

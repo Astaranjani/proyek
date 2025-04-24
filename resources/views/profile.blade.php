@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
 </head>
 <body>
-    
-
     <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
         <a class="navbar-brand" href="{{ url('/') }}">
             <img src="{{ asset('images/logo.jpg') }}" alt="E-Mebel Logo" height="40">
@@ -38,6 +36,7 @@
             </ul>
         </div>
     </nav>
+
     <div class="profile">
         <div class="header-bar">Update Profil</div>
         <div class="profile-form">
@@ -47,49 +46,44 @@
             <form action="{{ route('profile') }}" method="POST">
                 @csrf
                 @method('PUT')
-    
                 <input type="text" name="name" placeholder="Nama Lengkap" required>
                 <input type="email" name="email" placeholder="Email" required>
                 <input type="text" name="phone" placeholder="No. Handphone" required>
                 <input type="text" name="gender" placeholder="Jenis Kelamin" required>
                 <input type="text" name="address" placeholder="Alamat" required>
-    
                 <button type="submit" class="save-btn">Save</button>
             </form>
         </div>
-        <!DOCTYPE html>
-        <html lang="id">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <div class="header-bar">Riwayat Pesanan</div>
-            <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
-        </head>
-        <body>
-                <div class="order-status">
-                    <div class="status">
-                        <img src="path_to_icon/belum_bayar_icon.png" alt="Belum Bayar">
-                        <p>Belum Bayar</p>
-                    </div>
-                    <div class="status">
-                        <img src="path_to_icon/dikirim_icon.png" alt="Dikirim">
-                        <p>Dikirim</p>
-                    </div>
-                    <div class="status">
-                        <img src="path_to_icon/selesai_icon.png" alt="Selesai">
-                        <p>Selesai</p>
-                    </div>
-                </div>
-                <div class="header-bar">Kontak Bantuan</div>
-                <div class="contact-info">
-                    <p>📞 0859-6485-5724</p>
-                    <p>📧 emebel@gmail.com</p>
-                </div>
-            </div>
-        </body>
-        </html>
 
-<!-- ✅ Bootstrap JS bundle (opsional, hanya jika pakai komponen JS Bootstrap) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <div class="header-bar">Riwayat Pesanan</div>
+        <div class="order-status">
+            <!-- Status Belum Bayar -->
+            <div class="status">
+                <img src="{{ asset('images/dompet.png') }}" alt="Belum Bayar" class="status-image">
+                <p>Belum Bayar</p>
+            </div>
+
+            <!-- Status Dikirim -->
+            <div class="status">
+                <img src="{{  asset('images/bus kurir.png') }}" alt="Belum Bayar" class="status-image">
+                <p>Dikirim</p>
+            </div>
+
+            <!-- Status Selesai -->
+            <div class="status">
+                <img src="={{ asset('images/selesai.png') }}" alt="Selesai" class="status-image">
+                <p>Selesai</p>
+            </div>
+        </div>
+
+        <div class="header-bar">Kontak Bantuan</div>
+        <div class="contact-info">
+            <p>📞 0859-6485-5724</p>
+            <p>📧 emebel@gmail.com</p>
+        </div>
+    </div>
+
+    <!-- ✅ Bootstrap JS bundle (opsional, hanya jika pakai komponen JS Bootstrap) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

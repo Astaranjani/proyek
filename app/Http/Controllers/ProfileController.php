@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // Tambahkan ini
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
     // Menampilkan halaman form update profil
     public function edit()
     {
-        return view('profile.edit'); // Pastikan file Blade ini ada
+        return view('profile.edit');
     }
 
     // Menyimpan data hasil update profil
@@ -23,13 +24,26 @@ class ProfileController extends Controller
             'phone' => 'required|string|max:20',
             'gender' => 'required|string|max:10',
             'address' => 'required|string|max:255',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Simpan ke database (contoh: user login)
-        $user = Auth::user(); // Ambil pengguna yang diautentikasi
-        $user->fill($validated); // Mengisi atribut dengan data yang divalidasi
-        $user->save(); // Simpan perubahan ke database
-        
+        $user = Auth::user();
+
+        // Jika ada upload foto
+        if ($request->hasFile('photo')) {
+            // Hapus foto lama jika ada
+            if ($user->photo && Storage::exists('public/photos/' . $user->photo)) {
+                Storage::delete('public/photos/' . $user->photo);
+            }
+
+            // Simpan foto baru
+            $photo = $request->file('photo')->store('public/photos');
+            $validated['photo'] = basename($photo); // Simpan nama file ke DB
+        }
+
+        $user->fill($validated);
+        $user->save();
+
         return redirect()->route('profile.edit')->with('success', 'Profil berhasil diperbarui.');
     }
 }
