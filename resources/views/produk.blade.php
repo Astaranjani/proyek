@@ -9,35 +9,40 @@
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 <body>
-    <div id="app">
-        {{-- Navbar --}}
-        <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
-            <a class="navbar-brand" href="{{ url('/') }}">
-                <img src="{{ asset('images/logo.jpg') }}" alt="E-Mebel Logo" height="40">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('dashboard') }}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('produk') }}">Products</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>                    
-                    @auth
-                    <li class="nav-item">
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="btn btn-link nav-link" style="display: inline; padding: 0; border: none; background: none;">
-                                Logout
-                            </button>
-                        </form>
-                    </li>
-                    @endauth
-                </ul>
-            </div>
-        </nav>
-
+    <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
+        <a class="navbar-brand" href="{{ url('/') }}">
+            <img src="{{ asset('images/logo.jpg') }}" alt="E-Mebel Logo" height="40">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item"><a class="nav-link" href="{{ url('dashboard') }}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('produk') }}">Products</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>                    
+                @auth
+                <li class="nav-item">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="btn btn-link nav-link" style="padding: 0; border: none; background: none;">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+                <li class="nav-item dropdown ms-2">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="{{ asset('images/icon profil.png') }}" alt="Profil" class="rounded-circle" style="width: 35px; height: 35px; object-fit: cover;">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                        <li class="dropdown-item text-center fw-semibold">{{ Auth::user()->name }}</li>
+                    </ul>
+                </li>
+                @endauth
+            </ul>
+        </div>
+    </nav>
        
 
         {{-- Promo --}}
