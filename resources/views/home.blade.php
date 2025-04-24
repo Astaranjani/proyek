@@ -68,7 +68,7 @@ html {
 </head>
 <body class="bg-white">
 <header class="w-full bg-white py-4 px-6 md:px-12 flex items-center justify-between">
-<a href="{{ url('/') }}" class="text-3xl font-['Pacifico'] text-primary">logo</a>
+<a href="{{ url('/') }}" class="text-3xl font-['Pacifico'] text-primary">E mebel</a>
 <nav class="hidden md:flex items-center space-x-8">
 <a href="{{ url('/') }}" class="nav-link text-gray-800 hover:text-primary">Home</a>
 <a href="#about" class="nav-link text-gray-800 hover:text-primary transition-all">About</a> 
@@ -83,13 +83,13 @@ html {
 <main>
 <section class="w-full min-h-[600px] flex flex-col md:flex-row items-center px-6 md:px-12 py-16 md:py-24">
 <div class="w-full md:w-1/2 pr-0 md:pr-12 mb-12 md:mb-0">
-<h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">E-mebel</h1>
+<h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">Emebel</h1>
 <p class="text-gray-600 text-lg mb-8">
 Jelajahi keperluan furnitur rumah tangga anda, butuh mebel atau furniture? Yaaa Emebel Jagonyaa................
 </p>
 <div class="flex flex-wrap gap-4">
 <a href="{{ route('login') }}" class="bg-primary text-white py-3 px-8 !rounded-button whitespace-nowrap hover:bg-opacity-90 transition-all">Get Started</a>
-<a href="{{ url('/learn-more') }}" class="border border-gray-300 text-gray-700 py-3 px-8 !rounded-button whitespace-nowrap hover:border-primary hover:text-primary transition-all">Learn More</a>
+<a href="{{ route('register') }}" class="border border-gray-300 text-gray-700 py-3 px-8 !rounded-button whitespace-nowrap hover:border-primary hover:text-primary transition-all">Register</a>
 </div>
 </div>
 <div class="w-full md:w-1/2">
@@ -139,34 +139,36 @@ class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
   
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
     <div class="group relative overflow-hidden rounded-2xl">
-      <img src="{{ asset('images/amau.old2.jpg') }}" alt="amau.kan">
+      <img src="{{ asset('images/KhoerulParoid.jpg') }}" alt="Khoerul Paroid" class="w-full h-64 object-cover">
       <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
         <div class="text-center text-white p-6">
           <h3 class="text-xl font-semibold mb-2">Khoerul Paroid</h3>
-          <p class="text-sm">management Developer</p>
+          <p class="text-sm">Management Developer</p>
         </div>
       </div>
     </div>
-    
+  
     <div class="group relative overflow-hidden rounded-2xl">
-      <img src="{{ asset('images/amau.old2.jpg') }}" alt="amau.kan">
+      <img src="{{ asset('images/PutriAyuFadhilah.jpg') }}" alt="Putri Ayu Fadhillah" class="w-full h-64 object-cover">
       <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
         <div class="text-center text-white p-6">
-          <h3 class="text-xl font-semibold mb-2">Khoerul Paroid</h3>
-          <p class="text-sm">developer mobile</p>
+          <h3 class="text-xl font-semibold mb-2">Putri Ayu Fadhillah</h3>
+          <p class="text-sm">Desainer Engineering</p>
         </div>
       </div>
     </div>
+  
     <div class="group relative overflow-hidden rounded-2xl">
-      <img src="{{ asset('images/amau.old2.jpg') }}" alt="amau.kan">
+      <img src="{{ asset('images/HamzahFaujiPratama.jpg') }}" alt="Hamzah Fauji Pratama" class="w-full h-64 object-cover">
       <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
         <div class="text-center text-white p-6">
-          <h3 class="text-xl font-semibold mb-2">Khoerul Paroid</h3>
-          <p class="text-sm">Marketing Enginering</p>
+          <h3 class="text-xl font-semibold mb-2">Hamzah Fauji Pratama</h3>
+          <p class="text-sm">Dokumenter Developer</p>
         </div>
       </div>
     </div>
   </div>
+  
 </section>
 <section class="w-full px-6 md:px-12 py-16 bg-primary/5">
   <div class="max-w-4xl mx-auto">
@@ -272,11 +274,11 @@ class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
       <a
         href="{{ url('/') }}"
         class="text-3xl font-['Pacifico'] text-primary mb-4 block"
-        >logo</a
+        >E mebel</a
       >
       <p class="text-gray-600">
-        Transforming digital experiences through nature-inspired design and
-        innovation.
+        Kenyamanan anda prioritas kami, 
+        kepuasan anda tujuan kami.
       </p>
     </div>
     <div>
@@ -336,14 +338,14 @@ class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
       <ul class="space-y-2">
         <li class="flex items-center gap-2">
           <i class="ri-map-pin-line"></i>
-          <span class="text-gray-600">123 Nature Street, Digital City</span>
+          <span class="text-gray-600">departement mebel, electronic mebel</span>
         </li>
         <li class="flex items-center gap-2">
           <i class="ri-mail-line"></i>
           <a
             href="mailto:hello@example.com"
             class="text-gray-600 hover:text-primary transition-colors"
-            >hello@example.com</a
+            >Emebel@gmail.com</a
           >
         </li>
         <li class="flex items-center gap-2">
@@ -351,7 +353,7 @@ class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
           <a
             href="tel:+1234567890"
             class="text-gray-600 hover:text-primary transition-colors"
-            >+1 (234) 567-890</a
+            >+62 858-567-890</a
           >
         </li>
       </ul>
@@ -362,7 +364,7 @@ class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
       class="flex flex-col md:flex-row justify-between items-center gap-4"
     >
       <p class="text-gray-600 text-sm">
-        &copy; 2025 logo. All rights reserved.
+        &copy; 2025 Emebel. departement.
       </p>
       <div class="flex items-center gap-4">
         <a
