@@ -21,7 +21,7 @@
                 <li class="nav-item"><a class="nav-link" href="{{ url('dashboard') }}">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('produk') }}">Products</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>                    
+                <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>
                 @auth
                 <li class="nav-item">
                     <form method="POST" action="{{ route('logout') }}">
@@ -37,161 +37,107 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                         <li class="dropdown-item text-center fw-semibold">{{ Auth::user()->name }}</li>
-                    </ul> 
+                    </ul>
                 </li>
                 @endauth
             </ul>
         </div>
     </nav>
-
-        {{-- Header --}}
-        <header class="text-center my-0">
-            <input type="text" class="form-control w-50 mx-auto" placeholder="Search">
-            <h1 class="mt-3">Dream house</h1>
-            <p>Temukan mebel berkualitas dengan desain elegan untuk hunian yang lebih nyaman</p>
-        </header>
-
-        {{-- Promo --}}
-        <h1 class="text-center my-3">Produk Terbaru</h1>
-        <section class="container my-5">
-            <div class="row justify-content-start flex-nowrap overflow-auto">
-                <!-- Produk 1 -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="{{ asset('images/lemari.jpeg') }}" class="img-fluid rounded shadow-sm" alt="Lemari Minimalis">
-                        <div class="card-body">
-                            <h5 class="card-title mb-1" style="font-size: 1rem;">Lemari Minimalis</h5>
-                            <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp 2.500.000</p>
-                            <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">Lemari dengan desain minimalis, cocok untuk ruang tamu.</p>
-                            <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
-                        </div>
-                    </div>
-                </div>
-        
-                <!-- Produk 2 -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="{{ asset('images/meja makan.jpg') }}" class="img-fluid rounded shadow-sm" alt="Meja Makan">
-                        <div class="card-body">
-                            <h5 class="card-title mb-1" style="font-size: 1rem;">Meja Makan</h5>
-                            <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp 1.200.000</p>
-                            <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">Meja makan kayu jati yang elegan dan pasti kualitas mantap.</p>
-                            <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
-                        </div>
-                    </div>
-                </div>
-        
-                <!-- Produk 3 -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="{{ asset('images/rak buku.jpg') }}" class="img-fluid rounded shadow-sm" alt="Rak Buku">
-                        <div class="card-body">
-                            <h5 class="card-title mb-1" style="font-size: 1rem;">Rak Buku</h5>
-                            <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp 800.000</p>
-                            <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">Rak buku minimalis cocok untuk ruang belajar membuat belajar menjadi nyaman.</p>
-                            <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
-                        </div>
-                    </div>
-                </div>
-        
-                <!-- Produk 4 -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="{{ asset('images/lampu hias.jpg') }}" class="img-fluid rounded shadow-sm" alt="Lampu Hias">
-                        <div class="card-body">
-                            <h5 class="card-title mb-1" style="font-size: 1rem;">Lampu Hias</h5>
-                            <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp 350.000</p>
-                            <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">Lampu hias unik yang memberi suasana hangat pada ruangan.</p>
-                            <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
-                        </div>
-                    </div>
-                </div>
-        
-                <!-- Produk 5 -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="{{ asset('images/kursi santai.jpg') }}" class="img-fluid rounded shadow-sm" alt="Kursi Santai">
-                        <div class="card-body">
-                            <h5 class="card-title mb-1" style="font-size: 1rem;">Kursi Santai</h5>
-                            <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp 1.000.000</p>
-                            <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">Kursi yang sangat santai nyaman untuk relaksasi di ruang tamu.</p>
-                            <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
-                        </div>
+    
+    {{-- Header --}}
+    <header class="text-center my-0">
+        {{-- Isi header jika ada --}}
+    </header>
+    
+    {{-- Promo --}}
+    <h1 class="text-center my-3">Produk Terbaru</h1>
+    <section class="container mt-4">
+        <div class="row justify-content-start flex-nowrap overflow-auto">
+            <!-- Produk statis -->
+            @php
+                $produkStatis = [
+                    ['gambar' => 'lemari.jpeg', 'nama' => 'Lemari Minimalis', 'harga' => 2500000, 'deskripsi' => 'Lemari dengan desain minimalis, cocok untuk ruang tamu.'],
+                    ['gambar' => 'meja makan.jpg', 'nama' => 'Meja Makan', 'harga' => 1200000, 'deskripsi' => 'Meja makan kayu jati yang elegan dan pasti kualitas mantap.'],
+                    ['gambar' => 'rak buku.jpg', 'nama' => 'Rak Buku', 'harga' => 800000, 'deskripsi' => 'Rak buku minimalis cocok untuk ruang belajar membuat belajar menjadi nyaman.'],
+                    ['gambar' => 'lampu hias.jpg', 'nama' => 'Lampu Hias', 'harga' => 350000, 'deskripsi' => 'Lampu hias unik yang memberi suasana hangat pada ruangan.'],
+                    ['gambar' => 'kursi santai.jpg', 'nama' => 'Kursi Santai', 'harga' => 1000000, 'deskripsi' => 'Kursi yang sangat santai nyaman untuk relaksasi di ruang tamu.'],
+                ];
+            @endphp
+            @foreach($produkStatis as $produk)
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="{{ asset('images/' . $produk['gambar']) }}" class="img-fluid rounded shadow-sm" alt="{{ $produk['nama'] }}">
+                    <div class="card-body">
+                        <h5 class="card-title mb-1" style="font-size: 1rem;">{{ $produk['nama'] }}</h5>
+                        <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp {{ number_format($produk['harga'], 0, ',', '.') }}</p>
+                        <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">{{ $produk['deskripsi'] }}</p>
+                        <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
                     </div>
                 </div>
             </div>
-        </section>
-        {{-- Produk Dinamis dari DB --}}
-        <h1 class="text-center mb-4 mt-5">Top Products</h1>
-        <section class="container my-5">
-            <div class="row justify-content-start flex-nowrap overflow-auto">
-                <!-- Produk 1 -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="{{ asset('images/meja rias.jpg') }}" class="img-fluid rounded shadow-sm" alt="Meja rias">
-                        <div class="card-body">
-                            <h5 class="card-title mb-1" style="font-size: 1rem;">Meja rias</h5>
-                            <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp 800.000</p>
-                            <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">Meja rias cocok untuk di taruh di kamar membuat kamar jadi elegan.</p>
-                            <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
-                        </div>
-                    </div>
-                </div>
-        
-                <!-- Produk 2 -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="{{ asset('images/sofa.jpg') }}" class="img-fluid rounded shadow-sm" alt="Sofa santai">
-                        <div class="card-body">
-                            <h5 class="card-title mb-1" style="font-size: 1rem;">Sofa santai</h5>
-                            <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp 1.000.000</p>
-                            <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">Sofa santai membuat kegiatan santaimu menjadi nyaman dengan sofa ini.</p>
-                            <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
-                        </div>
-                    </div>
-                </div>
-        
-                <!-- Produk 3 -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="{{ asset('images/kasur.jpg') }}" class="img-fluid rounded shadow-sm" alt="Kasur">
-                        <div class="card-body">
-                            <h5 class="card-title mb-1" style="font-size: 1rem;">Kasur Queen</h5>
-                            <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp 2.000.000</p>
-                            <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">Membuat tidurmu menjadi nyenyak dengan kasur yang cantik ini.</p>
-                            <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
-                        </div>
-                    </div>
-                </div>
-        
-                <!-- Produk 4 -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="{{ asset('images/lampu hias.jpg') }}" class="img-fluid rounded shadow-sm" alt="Lampu Hias">
-                        <div class="card-body">
-                            <h5 class="card-title mb-1" style="font-size: 1rem;">Lampu Hias</h5>
-                            <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp 350.000</p>
-                            <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">Lampu hias unik yang memberi suasana hangat pada ruangan.</p>
-                            <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
-                        </div>
-                    </div>
-                </div>
-        
-                <!-- Produk 5 -->
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="{{ asset('images/kursi santai.jpg') }}" class="img-fluid rounded shadow-sm" alt="Kursi Santai">
-                        <div class="card-body">
-                            <h5 class="card-title mb-1" style="font-size: 1rem;">Kursi Santai</h5>
-                            <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp 1.000.000</p>
-                            <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">Kursi yang sangat santai nyaman untuk relaksasi di ruang tamu.</p>
-                            <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
-                        </div>
+            @endforeach
+        </div>
+    </section>
+    
+    {{-- Produk Dinamis dari DB --}}
+    <h1 class="text-center mb-4 mt-5">Top Products</h1>
+    <section class="container mt-4">
+        <div class="row justify-content-center">
+            @foreach ($barangs as $barang)
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    @if($barang->gambar)
+                        <img src="{{ asset('storage/' . $barang->gambar) }}" 
+                            class="card-img-top" 
+                            alt="{{ $barang->nama }}" 
+                            style="height: 180px; object-fit: cover;">
+                    @endif
+                    <div class="card-body">
+                        <h5 class="card-title mb-1" style="font-size: 1rem;">{{ $barang->nama }}</h5>
+                        <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp {{ number_format($barang->harga, 0, ',', '.') }}</p>
+                        <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">{{ Str::limit($barang->deskripsi, 50) }}</p>
+                        <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
                     </div>
                 </div>
             </div>
-        </section>
+            @endforeach
+        </div>
+    </section>
+    
         
+        {{-- <section class="container mt-4">
+            <div class="row justify-content-center">
+                @forelse ($barangs as $barang)
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4 transition duration-300 transform hover:scale-110">
+                        <div class="card h-100 shadow-sm border-0">
+                            @if($barang->gambar)
+                                <img src="{{ asset('storage/' . $barang->gambar) }}" 
+                                    class="card-img-top" 
+                                    alt="{{ $barang->nama }}" 
+                                    style="height: 180px; object-fit: cover;">
+                            @endif
+                            <div class="card-body">
+                                <h5 class="card-title mb-1" style="font-size: 1rem;">{{ $barang->nama }}</h5>
+                                <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">
+                                    Rp {{ number_format($barang->harga, 0, ',', '.') }}
+                                </p>
+                                <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">
+                                    {{ Str::limit($barang->deskripsi, 50) }}
+                                </p>
+                                <a href="{{ route('barang.show', $barang->id) }}" class="btn btn-sm btn-outline-primary w-100">
+                                    Lihat Detail
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-12 text-center">
+                        <p class="text-muted">Belum ada produk yang tersedia.</p>
+                    </div>
+                @endforelse
+            </div>
+        </section>
+         --}}
 
         {{-- <h1 class="text-center mb-4">Top Products</h1>
         <section class="container">
