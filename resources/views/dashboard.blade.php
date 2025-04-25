@@ -37,7 +37,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                         <li class="dropdown-item text-center fw-semibold">{{ Auth::user()->name }}</li>
-                    </ul> 
+                    </ul>
                 </li>
                 @endauth
             </ul>
