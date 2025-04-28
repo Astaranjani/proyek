@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TailAdmin Dashboard</title>
+    <title>Admin Emebel</title>
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <script>
       tailwind.config = {
@@ -37,6 +37,8 @@
       rel="stylesheet"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js" defer></script>
+
     <style>
       :where([class^="ri-"])::before { content: "\f3c2"; }
       input[type="number"]::-webkit-inner-spin-button,
@@ -56,7 +58,7 @@
         <div class="w-8 h-8 flex items-center justify-center bg-primary rounded-md mr-2">
             <i class="ri-dashboard-line text-white"></i>
         </div>
-        <h1 class="text-xl font-bold">E-Mebel</h1>
+        <h1 class="text-xl font-bold">EMebel</h1>
     </div>
 
     <!-- Menu -->
@@ -64,18 +66,18 @@
         <div class="px-4 py-2">
             <p class="text-xs text-gray-400 font-medium mb-2">ADMIN MENU</p>
             <ul class="space-y-1">
-                <!-- Dashboard Menu -->
+
+                <!-- Dashboard -->
                 <li>
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2 text-white bg-primary/10 rounded-md">
-                        <div class="w-5 h-5 flex items-center justify-center mr-3">
-                            <i class="ri-dashboard-line"></i>
-                        </div>
+                    <a href="{{ route('admin.dashboard') }}"
+                        class="flex items-center px-4 py-2 rounded-md {{ request()->routeIs('admin.dashboard') ? 'text-white bg-primary/10' : 'text-gray-400 hover:bg-white/5' }}">
+                        <i class="ri-dashboard-line mr-3"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
 
-                <!-- Produk Menu with Submenu -->
-                <li x-data="{ open: false }">
+                <!-- Produk (dengan Submenu) -->
+                <li x-data="{ open: false }" x-init="open = window.location.href.includes('barang')">
                     <button @click="open = !open" class="flex justify-between items-center w-full px-4 py-2 text-white hover:bg-white/5 rounded-md">
                         <div class="flex items-center">
                             <i class="ri-product-hunt-line mr-3"></i>
@@ -83,70 +85,67 @@
                         </div>
                         <i class="ri-arrow-down-s-line" :class="{ 'rotate-180': open }"></i>
                     </button>
-                    <!-- Submenu -->
                     <ul x-show="open" x-cloak class="ml-6 mt-2 space-y-1">
                         <li>
-                            <a href="{{ route('admin.barang.index') }}" class="flex items-center px-4 py-1 text-gray-300 hover:bg-white/5 rounded-md">
+                            <a href="{{ route('admin.barang.index') }}" class="flex items-center px-4 py-1 text-gray-300 hover:bg-white/5 rounded-md {{ request()->routeIs('admin.barang.index') ? 'bg-primary/10 text-white' : '' }}">
                                 <span>Data Barang</span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('admin.barang.create') }}" class="flex items-center px-4 py-1 text-gray-300 hover:bg-white/5 rounded-md">
+                            <a href="{{ route('admin.barang.create') }}" class="flex items-center px-4 py-1 text-gray-300 hover:bg-white/5 rounded-md {{ request()->routeIs('admin.barang.create') ? 'bg-primary/10 text-white' : '' }}">
                                 <span>Tambah Barang</span>
                             </a>
                         </li>
                     </ul>
-                </li>
+                </li>                
 
-                <!-- Transaksi Menu -->
+                <!-- Transaksi -->
                 <li>
-                    <a href="#" class="flex items-center px-4 py-2 text-gray-400 hover:bg-white/5 rounded-md">
-                        <div class="w-5 h-5 flex items-center justify-center mr-3">
-                            <i class="ri-order-play-line"></i>
-                        </div>
+                    <a href="#"
+                        class="flex items-center px-4 py-2 rounded-md {{ request()->is('admin/transaksi*') ? 'text-white bg-primary/10' : 'text-gray-400 hover:bg-white/5' }}">
+                        <i class="ri-order-play-line mr-3"></i>
                         <span>Transaksi</span>
                     </a>
                 </li>
+
             </ul>
         </div>
 
-        <!-- Report Section -->
+        <!-- REPORTS -->
         <div class="px-4 py-2">
             <p class="text-xs text-gray-400 font-medium mb-2">REPORTS</p>
             <ul class="space-y-1">
                 <li>
-                    <a href="#" class="flex items-center px-4 py-2 text-gray-400 hover:bg-white/5 rounded-md">
-                        <div class="w-5 h-5 flex items-center justify-center mr-3">
-                            <i class="ri-bar-chart-line"></i>
-                        </div>
+                    <a href="#"
+                        class="flex items-center px-4 py-2 rounded-md text-gray-400 hover:bg-white/5">
+                        <i class="ri-bar-chart-line mr-3"></i>
                         <span>Grafik</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-4 py-2 text-gray-400 hover:bg-white/5 rounded-md">
-                        <div class="w-5 h-5 flex items-center justify-center mr-3">
-                            <i class="ri-file-line"></i>
-                        </div>
+                    <a href="{{ route('admin.laporan.barang') }}"
+                       class="flex items-center px-4 py-2 rounded-md {{ request()->routeIs('admin.laporan.barang') ? 'text-white bg-primary/10' : 'text-gray-400 hover:bg-white/5' }}">
+                        <i class="ri-file-line mr-3"></i>
                         <span>Laporan</span>
                     </a>
                 </li>
             </ul>
         </div>
 
-        <!-- Log Out Section -->
+        <!-- Logout -->
         <div class="px-4 py-2 mt-auto">
             <form action="/logout" method="POST">
                 @csrf
-                <button type="submit" class="flex items-center px-4 py-2 text-gray-400 hover:bg-white/5 rounded-md w-full">
-                    <div class="w-5 h-5 flex items-center justify-center mr-3">
-                        <i class="ri-logout-circle-r-line"></i>
-                    </div>
+                <button type="submit"
+                    class="flex items-center w-full px-4 py-2 rounded-md text-gray-400 hover:bg-white/5">
+                    <i class="ri-logout-circle-r-line mr-3"></i>
                     <span>Log Out</span>
                 </button>
             </form>
         </div>
     </div>
 </aside>
+
     <!-- Main Content -->
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- Header -->
@@ -224,14 +223,16 @@
                             <i class="ri-archive-line text-primary"></i>
                         </div>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900">2.450</h3>
-                    <div class="flex items-center justify-between">
-                        <p class="text-sm text-gray-500">Total Produk</p>
+                    <h3 class="text-2xl font-bold text-gray-900">{{ $jumlahBarang }} Barang</h3>
+                    <p class="text-md text-gray-700 mt-1">Total Stok: {{ $totalStok }}</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <p class="text-sm text-gray-500">Statistik Barang</p>
                         <span class="text-xs font-medium text-green-500 flex items-center">
                             2,59% <i class="ri-arrow-up-line ml-1"></i>
                         </span>
                     </div>
                 </div>
+                           
                 
                 <!-- Users Card -->
                 <div class="bg-white rounded-lg p-6 shadow-sm">
@@ -240,14 +241,14 @@
                             <i class="ri-user-line text-primary"></i>
                         </div>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900">3.456</h3>
+                    <h3 class="text-2xl font-bold text-gray-900">{{ $jumlahPengguna }}</h3>
                     <div class="flex items-center justify-between">
                         <p class="text-sm text-gray-500">Total Pengguna</p>
                         <span class="text-xs font-medium text-green-500 flex items-center">
                             0,95% <i class="ri-arrow-up-line ml-1"></i>
                         </span>
                     </div>
-                </div>
+                </div>                              
             </div>
             
             <!-- Charts Section -->
