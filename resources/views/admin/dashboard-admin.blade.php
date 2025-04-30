@@ -76,7 +76,7 @@
                     </a>
                 </li>
 
-                <!-- Produk (dengan Submenu) -->
+                <!-- Produk -->
                 <li x-data="{ open: false }" x-init="open = window.location.href.includes('barang')">
                     <button @click="open = !open" class="flex justify-between items-center w-full px-4 py-2 text-white hover:bg-white/5 rounded-md">
                         <div class="flex items-center">
@@ -97,12 +97,12 @@
                             </a>
                         </li>
                     </ul>
-                </li>                
+                </li>
 
                 <!-- Transaksi -->
                 <li>
-                    <a href="#"
-                        class="flex items-center px-4 py-2 rounded-md {{ request()->is('admin/transaksi*') ? 'text-white bg-primary/10' : 'text-gray-400 hover:bg-white/5' }}">
+                    <a href="{{ route('admin.transaksi.index') }}"
+                        class="flex items-center px-4 py-2 rounded-md {{ request()->routeIs('admin.transaksi.index') ? 'text-white bg-primary/10' : 'text-gray-400 hover:bg-white/5' }}">
                         <i class="ri-order-play-line mr-3"></i>
                         <span>Transaksi</span>
                     </a>
@@ -126,7 +126,7 @@
                     <a href="{{ route('admin.laporan.barang') }}"
                        class="flex items-center px-4 py-2 rounded-md {{ request()->routeIs('admin.laporan.barang') ? 'text-white bg-primary/10' : 'text-gray-400 hover:bg-white/5' }}">
                         <i class="ri-file-line mr-3"></i>
-                        <span>Laporan</span>
+                        <span>Laporan Barang</span>
                     </a>
                 </li>
             </ul>
@@ -134,7 +134,7 @@
 
         <!-- Logout -->
         <div class="px-4 py-2 mt-auto">
-            <form action="/logout" method="POST">
+            <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit"
                     class="flex items-center w-full px-4 py-2 rounded-md text-gray-400 hover:bg-white/5">
@@ -145,6 +145,7 @@
         </div>
     </div>
 </aside>
+
 
     <!-- Main Content -->
     <div class="flex-1 flex flex-col overflow-hidden">

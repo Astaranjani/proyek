@@ -126,8 +126,8 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('laporan.barang') }}"
-                           class="flex items-center px-4 py-2 rounded-md {{ request()->routeIs('laporan.barang') ? 'text-white bg-primary/10' : 'text-gray-400 hover:bg-white/5' }}">
+                        <a href="{{ route('admin.laporan.barang') }}"
+                           class="flex items-center px-4 py-2 rounded-md {{ request()->routeIs('admin.laporan.barang') ? 'text-white bg-primary/10' : 'text-gray-400 hover:bg-white/5' }}">
                             <i class="ri-file-line mr-3"></i>
                             <span>Laporan</span>
                         </a>

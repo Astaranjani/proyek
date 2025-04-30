@@ -5,9 +5,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\DashboardAdminController;
-use App\Http\Controllers\OwnerController;
-use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\Admin\BarangController;
+use App\Http\Controllers\Admin\TransaksiController;
+use App\Http\Controllers\Admin\LaporanController;
+use App\Http\Controllers\OwnerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,17 +38,35 @@ Route::get('/logout', function () {
 // ===========================
 // ADMIN
 // ===========================
+
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+
     // Dashboard Admin
     Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('dashboard');
 
     // Barang (CRUD)
-    Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
-    Route::get('/barang/create', [BarangController::class, 'create'])->name('barang.create');
-    Route::post('/barang', [BarangController::class, 'store'])->name('barang.store');
-    Route::delete('/barang/{id}', [BarangController::class, 'destroy'])->name('barang.destroy');
-    Route::get('/barang/{id}/edit', [BarangController::class, 'edit'])->name('barang.edit');
-    Route::put('/barang/{id}', [BarangController::class, 'update'])->name('barang.update');
+    Route::resource('barang', BarangController::class);
+// });
+
+
+// Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+    
+//     // Dashboard Admin
+//     Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('dashboard');
+
+//     // Barang (CRUD)
+//     Route::resource('/barang', BarangController::class, [
+//         'as' => 'admin' // otomatis bikin admin.barang.index, admin.barang.create, dst
+//     ]);
+//     Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
+//     Route::get('/barang/create', [BarangController::class, 'create'])->name('barang.create');
+//     Route::get('/barang/{barang}/edit', [BarangController::class, 'edit'])->name('barang.edit');
+//     Route::get('/barang/{barang}/destroy', [BarangController::class, 'destroy'])->name('barang.destroy');
+
+
+
+    // // Transaksi
+    Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
 
     // Laporan Barang
     Route::get('/laporan/barang', [LaporanController::class, 'laporanBarang'])->name('laporan.barang');
