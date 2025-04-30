@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\TransaksiController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OwnerController;
+use App\Http\Controllers\KeranjangController;
 
 /*
 |--------------------------------------------------------------------------
@@ -87,5 +88,10 @@ Route::middleware('auth')->prefix('owner')->name('owner.')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
     Route::get('/profile', fn () => view('profile'))->name('profile');
+    Route::get('/produk/{barang}', [HomeController::class, 'detail'])->name('produk.detail');
+    Route::post('/keranjang/tambah', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
+    Route::post('/keranjang/hapus', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
+    Route::get('/checkout', [KeranjangController::class, 'checkout'])->name('keranjang.checkout');
+
 });
 

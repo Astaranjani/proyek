@@ -24,6 +24,12 @@ public function produk()
     $barangs = Barang::all();
     return view('produk', compact('barangs'));
 }
+public function detail($id)
+{
+    $barang = Barang::findOrFail($id);
+    return view('detail', compact('barang'));
+}
+
 }
 
 // class HomeController extends Controller

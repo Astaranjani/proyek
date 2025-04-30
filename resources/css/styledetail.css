@@ -1,0 +1,57 @@
+        body {
+            background-color: #f9f9f9;
+        }
+
+        .navbar {
+            background-color: #000;
+        }
+
+        .navbar a {
+            color: white !important;
+            margin: 0 15px;
+        }
+
+        .hero {
+            background-color: #dfe3db;
+            padding: 40px 0;
+        }
+
+        .product-image {
+            max-height: 250px;
+            object-fit: cover;
+        }
+
+        .rating i {
+            color: gold;
+        }
+
+        .btn-custom {
+            background-color: #555;
+            color: white;
+            border: none;
+        }
+
+        .btn-custom:hover {
+            background-color: #333;
+        }
+
+        footer {
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+            margin-top: 40px;
+        }
+        .keranjang-wrapper {
+            border-top: 2px solid #ccc;
+            margin-top: 40px;
+        }
+        
+        .keranjang-wrapper img {
+            border-radius: 6px;
+        }
+        
+        .fw-bold {
+            font-weight: bold;
+        }
+        
