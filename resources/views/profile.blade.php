@@ -24,7 +24,7 @@
                 <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>                    
                 @auth
                 <li class="nav-item">
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="GET" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="btn btn-link nav-link" style="padding: 0; border: none; background: none;">
                             Logout

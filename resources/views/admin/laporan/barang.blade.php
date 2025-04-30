@@ -129,7 +129,7 @@
         </div>
 
         <div class="px-4 py-2 mt-auto">
-            <form action="/logout" method="POST">
+            <form action="/logout" method="GET">
                 @csrf
                 <button type="submit"
                         class="flex items-center w-full px-4 py-2 rounded-md text-gray-400 hover:bg-white/5">

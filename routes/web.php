@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\BarangController;
 use App\Http\Controllers\Admin\TransaksiController;
 use App\Http\Controllers\Admin\LaporanController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OwnerController;
 
 /*
@@ -87,3 +88,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
     Route::get('/profile', fn () => view('profile'))->name('profile');
 });
+

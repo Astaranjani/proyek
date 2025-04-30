@@ -137,7 +137,7 @@
     
             <!-- Log Out Section -->
             <div class="px-4 py-2 mt-auto">
-                <form action="/logout" method="POST">
+                <form action="/logout" method="GET">
                     @csrf
                     <button type="submit" class="flex items-center px-4 py-2 text-gray-400 hover:bg-white/5 rounded-md w-full">
                         <div class="w-5 h-5 flex items-center justify-center mr-3">
