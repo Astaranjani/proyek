@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\KeranjangController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -92,6 +93,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/keranjang/tambah', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
     Route::post('/keranjang/hapus', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
     Route::get('/checkout', [KeranjangController::class, 'checkout'])->name('keranjang.checkout');
-
+    Route::post('/keranjang/checkout', [KeranjangController::class, 'checkout'])->name('keranjang.checkout');
+    Route::get('/profile', [UserController::class, 'edit'])->name('profile');
+    Route::put('/profile', [UserController::class, 'update']);
+    Route::get('/profile/edit', [UserController::class, 'edit'])->name('profile.edit');
 });
 

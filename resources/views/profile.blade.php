@@ -55,7 +55,7 @@
                 @endif
             </div>
 
-            <form action="{{ route('profile') }}" method="POST" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('profile') }}">
                 @csrf
                 @method('PUT')
 

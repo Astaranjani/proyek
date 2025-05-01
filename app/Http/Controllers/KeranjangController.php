@@ -48,4 +48,5 @@ public function checkout()
 
     return view('keranjang.checkout', compact('cart'));
 }
+
 }

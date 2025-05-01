@@ -48,36 +48,7 @@
     <header class="text-center my-0">
         {{-- Isi header jika ada --}}
     </header>
-    
-    {{-- Promo --}}
-    <h1 class="text-center my-3">Produk Terbaru</h1>
-    <section class="container mt-4">
-        <div class="row justify-content-start flex-nowrap overflow-auto">
-            <!-- Produk statis -->
-            @php
-                $produkStatis = [
-                    ['gambar' => 'lemari.jpeg', 'nama' => 'Lemari Minimalis', 'harga' => 2500000, 'deskripsi' => 'Lemari dengan desain minimalis, cocok untuk ruang tamu.'],
-                    ['gambar' => 'meja makan.jpg', 'nama' => 'Meja Makan', 'harga' => 1200000, 'deskripsi' => 'Meja makan kayu jati yang elegan dan pasti kualitas mantap.'],
-                    ['gambar' => 'rak buku.jpg', 'nama' => 'Rak Buku', 'harga' => 800000, 'deskripsi' => 'Rak buku minimalis cocok untuk ruang belajar membuat belajar menjadi nyaman.'],
-                    ['gambar' => 'lampu hias.jpg', 'nama' => 'Lampu Hias', 'harga' => 350000, 'deskripsi' => 'Lampu hias unik yang memberi suasana hangat pada ruangan.'],
-                    ['gambar' => 'kursi santai.jpg', 'nama' => 'Kursi Santai', 'harga' => 1000000, 'deskripsi' => 'Kursi yang sangat santai nyaman untuk relaksasi di ruang tamu.'],
-                ];
-            @endphp
-            @foreach($produkStatis as $produk)
-            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                <div class="card h-100 shadow-sm border-0">
-                    <img src="{{ asset('images/' . $produk['gambar']) }}" class="img-fluid rounded shadow-sm" alt="{{ $produk['nama'] }}">
-                    <div class="card-body">
-                        <h5 class="card-title mb-1" style="font-size: 1rem;">{{ $produk['nama'] }}</h5>
-                        <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp {{ number_format($produk['harga'], 0, ',', '.') }}</p>
-                        <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">{{ $produk['deskripsi'] }}</p>
-                        <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </section>
+
     
     {{-- Produk Dinamis dari DB --}}
     <h1 class="text-center mb-4 mt-5">Top Products</h1>

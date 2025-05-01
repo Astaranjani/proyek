@@ -15,35 +15,34 @@ class ProfileController extends Controller
     }
 
     // Menyimpan data hasil update profil
-    public function update(Request $request)
-    {
-        // Validasi data
-        $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'email' => 'required|email',
-            'phone' => 'required|string|max:20',
-            'gender' => 'required|string|max:10',
-            'address' => 'required|string|max:255',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+    public function updateProfile(Request $request)
+{
+    $user = Auth::user();
 
-        $user = Auth::user();
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email',
+        'phone' => 'required|string|max:15',
+        'gender' => 'required|string|max:10',
+        'address' => 'required|string',
+        'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
 
-        // Jika ada upload foto
-        if ($request->hasFile('photo')) {
-            // Hapus foto lama jika ada
-            if ($user->photo && Storage::exists('public/photos/' . $user->photo)) {
-                Storage::delete('public/photos/' . $user->photo);
-            }
+    $user->name = $request->name;
+    $user->email = $request->email;
+    $user->phone = $request->phone;
+    $user->gender = $request->gender;
+    $user->address = $request->address;
 
-            // Simpan foto baru
-            $photo = $request->file('photo')->store('public/photos');
-            $validated['photo'] = basename($photo); // Simpan nama file ke DB
-        }
-
-        $user->fill($validated);
-        $user->save();
-
-        return redirect()->route('profile.edit')->with('success', 'Profil berhasil diperbarui.');
+    if ($request->hasFile('profile_image')) {
+        // Menangani upload gambar profil
+        $imagePath = $request->file('profile_image')->store('profile_images', 'public');
+        $user->profile_image = $imagePath;
     }
+
+    $user->save();
+
+    return redirect()->route('profile')->with('success', 'Profil berhasil diperbarui');
+}
+
 }
