@@ -2,91 +2,123 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Detail Produk</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
     <title>{{ $barang->nama }}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
-{{-- Deskripsi --}}
-@extends('layouts.app')
 
-@section('title', $barang->nama)
+<body>
+    {{-- Navbar --}}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
+        <a class="navbar-brand" href="{{ url('/') }}">
+            <img src="{{ asset('images/logo.jpg') }}" alt="E-Mebel Logo" height="40">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item"><a class="nav-link" href="{{ url('dashboard') }}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('produk') }}">Products</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>
+                @auth
+                <li class="nav-item">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="btn btn-link nav-link" style="padding: 0; border: none; background: none;">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+                <li class="nav-item dropdown ms-2">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="{{ asset('images/icon profil.png') }}" alt="Profil" class="rounded-circle" style="width: 35px; height: 35px; object-fit: cover;">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                        <li class="dropdown-item text-center fw-semibold">{{ Auth::user()->name }}</li>
+                    </ul>
+                </li>
+                @endauth
+            </ul>
+        </div>
+    </nav>
 
-@section('content')
-<section class="product-wrapper">
-    <div class="container">
-        <div class="row align-items-center">
-            {{-- Gambar Produk --}}
-            <div class="col-md-6 mb-4 mb-md-0">
-                <img src="{{ asset('storage/' . $barang->gambar) }}" alt="{{ $barang->nama }}" class="product-image w-100">
-            </div>
-
-            {{-- Info Produk --}}
-            <div class="col-md-6 product-info">
-                <h2>{{ $barang->nama }}</h2>
-                <div class="price mb-2">Rp {{ number_format($barang->harga, 0, ',', '.') }}</div>
-                <div class="rating mb-3">
-                    <i class="bi bi-star-fill"></i> 4
+    {{-- Konten --}}
+    <section class="product-wrapper">
+        <div class="container">
+            <div class="row align-items-center">
+                {{-- Gambar Produk --}}
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <img src="{{ asset('storage/' . $barang->gambar) }}" alt="{{ $barang->nama }}" class="product-image w-100">
                 </div>
-                <p><strong>Kategori</strong> : {{ $barang->kategori }}</p>
-                <p><strong>Stok</strong> : {{ $barang->stok }}</p>
-                <p><strong>Merek</strong> : {{ $barang->merek }}</p>
-                <p class="mt-3">{!! nl2br(e($barang->deskripsi)) !!}</p>
 
-                <form action="{{ route('keranjang.tambah') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="barang_id" value="{{ $barang->id }}">
-                    <div class="d-flex gap-2 mt-4">
-                        <button class="btn btn-custom" type="submit">+ Keranjang</button>
-                        <button class="btn btn-dark" type="button">Beli Sekarang</button>
+                {{-- Info Produk --}}
+                <div class="col-md-6 product-info">
+                    <h2 style="font-size: 2.1rem;">{{ $barang->nama }}</h2>
+                    <div class="price mb-2">Rp {{ number_format($barang->harga, 0, ',', '.') }}</div>
+                    <div class="rating mb-3">
+                        <i class="bi bi-star-fill"></i> 4
                     </div>
+                    <p><strong>Kategori</strong> : {{ $barang->kategori }}</p>
+                    <p><strong>Stok</strong> : {{ $barang->stok }}</p>
+                    <p><strong>Merek</strong> : {{ $barang->merek }}</p>
+                    <p class="mt-3">{!! nl2br(e($barang->deskripsi)) !!}</p>
+
+                    <form action="{{ route('keranjang.tambah') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="barang_id" value="{{ $barang->id }}">
+                        <div class="d-flex gap-2 mt-4">
+                            <button class="btn btn-custom" type="submit">+ Keranjang</button>
+                            <button class="btn btn-dark" type="button">Beli Sekarang</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- Keranjang --}}
+    <section class="keranjang-wrapper bg-light py-4">
+        <div class="container">
+            <h4 class="mb-3 fw-bold">Keranjang Saya</h4>
+            @php $cart = session('cart', []); @endphp
+            @foreach ($cart as $id => $item)
+            <div class="d-flex align-items-center border-bottom py-3 justify-content-between">
+                <div class="d-flex align-items-center">
+                    <input type="checkbox" class="form-check-input me-3">
+                    <img src="{{ asset('storage/' . $item['gambar']) }}" alt="{{ $item['nama'] }}" width="100" class="me-3">
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: bold">{{ $item['nama'] }}</div>
+                        <div>Rp. {{ number_format($item['harga'], 0, ',', '.') }}</div>
+                    </div>
+                </div>
+
+                {{-- Tombol Hapus --}}
+                <form action="{{ route('keranjang.hapus') }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus barang ini dari keranjang?');">
+                    @csrf
+                    <input type="hidden" name="barang_id" value="{{ $id }}">
+                    <button class="btn btn-danger btn-sm">Hapus</button>
                 </form>
             </div>
-        </div>
-    </div>
-</section>
+            @endforeach
 
-{{-- Keranjang --}}
-<section class="keranjang-wrapper bg-light py-4">
-    <div class="container">
-        <h4 class="mb-3 fw-bold">Keranjang Saya</h4>
-        @php $cart = session('cart', []); @endphp
-        @foreach ($cart as $id => $item)
-    <div class="d-flex align-items-center border-bottom py-3 justify-content-between">
-        <div class="d-flex align-items-center">
-            <input type="checkbox" class="form-check-input me-3">
-            <img src="{{ asset('storage/' . $item['gambar']) }}" alt="{{ $item['nama'] }}" width="100" class="me-3">
-            <div>
-                <div class="fw-bold">{{ $item['nama'] }}</div>
-                <div>Rp. {{ number_format($item['harga'], 0, ',', '.') }}</div>
+            <div class="text-end mt-3">
+                <a href="{{ route('keranjang.checkout') }}" class="btn btn-success">
+                    Checkout ({{ count($cart) }})
+                </a>
             </div>
         </div>
-        {{-- Tombol Hapus --}}
-        <form action="{{ route('keranjang.hapus') }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus barang ini dari keranjang?');">
-            @csrf
-            <input type="hidden" name="barang_id" value="{{ $id }}">
-            <button class="btn btn-danger btn-sm">Hapus</button>
-        </form>
-    </div>
-    <div class="text-end mt-3">
-        <a href="{{ route('keranjang.checkout') }}" class="btn btn-success">
-            Checkout ({{ count($cart) }})
-        </a>
-    </div>    
-@endforeach
+    </section>
 
-{{-- Footer --}}
-<footer>
-    &copy; {{ date('Y') }} E-Mebel. All Rights Reserved.
-</footer>
+    {{-- Footer --}}
+    <footer class="text-center mt-5 mb-3 text-muted">
+        &copy; {{ date('Y') }} E-Mebel. All Rights Reserved.
+    </footer>
 
-</body>
-</html>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function previewImage(event) {
             const reader = new FileReader();
@@ -99,4 +131,3 @@
     </script>
 </body>
 </html>
-

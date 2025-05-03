@@ -57,7 +57,7 @@
             <div class="w-8 h-8 flex items-center justify-center bg-primary rounded-md mr-2">
                 <i class="ri-dashboard-line text-white"></i>
             </div>
-            <h1 class="text-xl font-bold">E-Mebel</h1>
+            <h1 class="text-xl font-bold">EMebel</h1>
         </div>
     
         <!-- Menu -->

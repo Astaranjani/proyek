@@ -134,7 +134,7 @@
 
         <!-- Logout -->
         <div class="px-4 py-2 mt-auto">
-            <form action="{{ route('logout') }}" method="POST">
+            <form action="{{ route('logout') }}" method="GET">
                 @csrf
                 <button type="submit"
                     class="flex items-center w-full px-4 py-2 rounded-md text-gray-400 hover:bg-white/5">
@@ -210,7 +210,7 @@
                     </div>
                     <h3 class="text-2xl font-bold text-gray-900">Rp 45,2K</h3>
                     <div class="flex items-center justify-between">
-                        <p class="text-sm text-gray-500">Total Keuntungan</p>
+                        <p class="text-sm text-gray-500">Pemasukan</p>
                         <span class="text-xs font-medium text-green-500 flex items-center">
                             4,35% <i class="ri-arrow-up-line ml-1"></i>
                         </span>
@@ -253,57 +253,155 @@
             </div>
             
             <!-- Charts Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                <!-- Main Chart (2 columns wide) -->
-                <div class="bg-white rounded-lg p-6 shadow-sm lg:col-span-2">
-                    <div class="flex justify-between items-center mb-6">
-                        <div class="flex space-x-4">
-                            <div class="flex items-center">
-                                <span class="w-3 h-3 rounded-full bg-primary mr-2"></span>
-                                <span class="text-sm font-medium">Total Pendapatan</span>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="w-3 h-3 rounded-full bg-blue-300 mr-2"></span>
-                                <span class="text-sm font-medium">Total Penjualan</span>
-                            </div>
-                        </div>
-                        <div class="text-sm text-gray-500">
-                            12.04.2022 - 12.05.2022
-                        </div>
-                    </div>
-                    <div id="mainChart" class="chart-container"></div>
-                    <div class="flex justify-center mt-4">
-                        <div class="flex space-x-4">
-                            <button class="px-4 py-1 text-sm rounded-full hover:bg-gray-100">Hari</button>
-                            <button class="px-4 py-1 text-sm rounded-full bg-gray-100 text-primary">Minggu</button>
-                            <button class="px-4 py-1 text-sm rounded-full hover:bg-gray-100">Bulan</button>
-                        </div>
+            {{-- Chart Section --}}
+            <div class="bg-white rounded-lg p-6 shadow-sm">
+                {{-- Tombol Filter Chart Dinamis --}}
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-semibold">Statistik Pemasukan</h2>
+                    <div class="flex space-x-4">
+                        <button onclick="showChart('hari')" class="px-4 py-1 text-sm rounded-full bg-gray-100 text-primary">Hari</button>
+                        <button onclick="showChart('minggu')" class="px-4 py-1 text-sm rounded-full hover:bg-gray-100">Minggu</button>
+                        <button onclick="showChart('bulan')" class="px-4 py-1 text-sm rounded-full hover:bg-gray-100">Bulan</button>
                     </div>
                 </div>
-                
-                <!-- Weekly Profit Chart -->
-                <div class="bg-white rounded-lg p-6 shadow-sm">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-semibold">Keuntungan minggu ini</h3>
-                        <div class="relative">
-                            <button class="flex items-center text-sm text-gray-500 hover:text-gray-700">
-                                Minggu Ini <i class="ri-arrow-down-s-line ml-1"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="flex space-x-4 mb-4">
-                        <div class="flex items-center">
-                            <span class="w-3 h-3 rounded-full bg-primary mr-2"></span>
-                            <span class="text-sm">Penjualan</span>
-                        </div>
-                        <div class="flex items-center">
-                            <span class="w-3 h-3 rounded-full bg-blue-300 mr-2"></span>
-                            <span class="text-sm">Pendapatan</span>
-                        </div>
-                    </div>
-                    <div id="weeklyChart" class="chart-container"></div>
+
+                {{-- Chart Container --}}
+                <div class="mt-4">
+                    <canvas id="chartPemasukanPerHari" class="chart-view"></canvas>
+                    <canvas id="chartPemasukanPerMinggu" class="chart-view hidden"></canvas>
+                    <canvas id="chartPemasukan" class="chart-view hidden"></canvas>
                 </div>
+
+                <script>
+                    function showChart(chartId) {
+                        document.querySelectorAll('.chart-view').forEach(el => el.classList.add('hidden'));
+                        document.getElementById('chartPemasukanPerHari').classList.toggle('hidden', chartId !== 'hari');
+                        document.getElementById('chartPemasukanPerMinggu').classList.toggle('hidden', chartId !== 'minggu');
+                        document.getElementById('chartPemasukan').classList.toggle('hidden', chartId !== 'bulan');
+                    }
+
+                    // Chart Hari
+                    const chartHari = new Chart(document.getElementById('chartPemasukanPerHari'), {
+                        type: 'line',
+                        data: {
+                            labels: [
+                                @foreach ($pemasukan_hari as $key => $value)
+                                    '{{ \Carbon\Carbon::createFromFormat('Y-m-d', $key)->isoFormat('D MMM Y') }}',
+                                @endforeach
+                            ],
+                            datasets: [{
+                                label: "Pemasukan per Hari",
+                                backgroundColor: 'rgb(75, 192, 192)',
+                                borderColor: 'rgb(75, 192, 192)',
+                                data: [
+                                    @foreach ($pemasukan_hari as $value)
+                                        {{ $value }},
+                                    @endforeach
+                                ],
+                                fill: false,
+                                tension: 0.1
+                            }]
+                        }
+                    });
+
+                    // Chart Minggu
+                    const chartMinggu = new Chart(document.getElementById('chartPemasukanPerMinggu'), {
+                        type: 'line',
+                        data: {
+                            labels: [
+                                @foreach ($pemasukan_minggu as $key => $value)
+                                    '{{ \Carbon\Carbon::createFromFormat('Y-m-d', $key)->isoFormat('D MMM Y') }}',
+                                @endforeach
+                            ],
+                            datasets: [{
+                                label: "Pemasukan per Minggu",
+                                backgroundColor: 'rgb(54, 162, 235)',
+                                borderColor: 'rgb(54, 162, 235)',
+                                data: [
+                                    @foreach ($pemasukan_minggu as $value)
+                                        {{ $value }},
+                                    @endforeach
+                                ],
+                                fill: false,
+                                tension: 0.1
+                            }]
+                        }
+                    });
+
+                    // Chart Bulan
+                    const chartBulan = new Chart(document.getElementById('chartPemasukan'), {
+                        type: 'line',
+                        data: {
+                            labels: [
+                                @foreach ($pemasukan_bulan as $key => $value)
+                                    '{{ \Carbon\Carbon::createFromFormat('Y-m-d', $key)->isoFormat('D MMM Y') }}',
+                                @endforeach
+                            ],
+                            datasets: [{
+                                label: "Pemasukan per Bulan",
+                                backgroundColor: 'rgb(255, 99, 132)',
+                                borderColor: 'rgb(255, 99, 132)',
+                                data: [
+                                    @foreach ($pemasukan_bulan as $value)
+                                        {{ $value }},
+                                    @endforeach
+                                ],
+                                fill: false,
+                                tension: 0.1
+                            }]
+                        }
+                    });
+                </script>
+
+                {{-- Form Filter Tanggal --}}
+                <form method="GET" action="{{ route('admin.dashboard') }}" class="mt-6 flex items-center space-x-2">
+                    <label for="start_date" class="text-sm">Dari:</label>
+                    <input type="date" id="start_date" name="start_date" class="border rounded px-2 py-1 text-sm" value="{{ request('start_date') }}">
+
+                    <label for="end_date" class="text-sm">Sampai:</label>
+                    <input type="date" id="end_date" name="end_date" class="border rounded px-2 py-1 text-sm" value="{{ request('end_date') }}">
+
+                    <button type="submit" class="px-3 py-1 bg-primary text-white text-sm rounded">Tampilkan</button>
+                </form>
+
+                {{-- Chart Hasil Filter Tanggal --}}
+                @if (count($customData))
+                    <div class="mt-6">
+                        <h4 class="text-base font-semibold mb-2">Pemasukan dari {{ request('start_date') }} sampai {{ request('end_date') }}</h4>
+                        <canvas id="chartCustom"></canvas>
+                        <script>
+                            const chartCustom = new Chart(document.getElementById('chartCustom'), {
+                                type: 'bar',
+                                data: {
+                                    labels: [
+                                        @foreach ($customData as $tanggal => $value)
+                                            '{{ \Carbon\Carbon::parse($tanggal)->isoFormat('D MMM Y') }}',
+                                        @endforeach
+                                    ],
+                                    datasets: [{
+                                        label: 'Pemasukan',
+                                        data: [
+                                            @foreach ($customData as $value)
+                                                {{ $value }},
+                                            @endforeach
+                                        ],
+                                        backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                                        borderColor: 'rgba(153, 102, 255, 1)',
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    plugins: {
+                                        legend: { display: true }
+                                    }
+                                }
+                            });
+                        </script>
+                    </div>
+                @endif
             </div>
+            <br>
         <!-- Bottom Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Visitors Analytics -->

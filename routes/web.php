@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\KeranjangController;
+use App\Http\Controllers\PembayaranController;
 
 /*
 |--------------------------------------------------------------------------
@@ -95,3 +96,8 @@ Route::middleware('auth')->group(function () {
 
 });
 
+// ===========================
+// PEMBAYARAN
+// ===========================
+Route::get('/checkout', [PembayaranController::class, 'index'])->name('keranjang.checkout');
+Route::post('/checkout', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
