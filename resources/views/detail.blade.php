@@ -23,10 +23,11 @@
                 <li class="nav-item"><a class="nav-link" href="{{ url('dashboard') }}">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('produk') }}">Products</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('keranjang') }}">Lihat Keranjang</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>
                 @auth
                 <li class="nav-item">
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="GET" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="btn btn-link nav-link" style="padding: 0; border: none; background: none;">
                             Logout

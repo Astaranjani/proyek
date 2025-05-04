@@ -7,6 +7,11 @@ use App\Models\Barang;
 
 class KeranjangController extends Controller
 {
+    public function index()
+    {
+        $cart = session()->get('cart', []);
+        return view('keranjang', compact('cart'));
+    }
     public function tambah(Request $request)
     {
         // Ambil barang berdasarkan ID
@@ -46,6 +51,18 @@ public function checkout()
         return redirect()->back()->with('error', 'Keranjang masih kosong!');
     }
 
-    return view('keranjang.checkout', compact('cart'));
+    // Hitung total jumlah item secara aman
+    $totalJumlah = 0;
+    $totalHarga = 0;
+
+    foreach ($cart as $item) {
+        $jumlah = $item['jumlah'] ?? 0;
+        $harga = $item['harga'] ?? 0;
+
+        $totalJumlah += $jumlah;
+        $totalHarga += $jumlah * $harga;
+    }
+
+    return view('keranjang.checkout', compact('cart', 'totalJumlah', 'totalHarga'));
 }
 }

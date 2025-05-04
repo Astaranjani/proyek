@@ -21,7 +21,8 @@
                 <li class="nav-item"><a class="nav-link" href="{{ url('dashboard') }}">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('produk') }}">Products</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>                    
+                <li class="nav-item"><a class="nav-link" href="{{ route('keranjang') }}">Lihat Keranjang</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>
                 @auth
                 <li class="nav-item">
                     <form method="GET" action="{{ route('logout') }}">
@@ -43,8 +44,6 @@
             </ul>
         </div>
     </nav>
-       
-
         {{-- Promo --}}
         <h1 class="text-center my-3">Produk Terbaru</h1>
         <section class="container mt-4">
@@ -62,7 +61,7 @@
                                 <h5 class="card-title mb-1" style="font-size: 1rem;">{{ $barang->nama }}</h5>
                                 <p class="card-text text-primary fw-bold mb-1" style="font-size: 0.9rem;">Rp {{ number_format($barang->harga, 0, ',', '.') }}</p>
                                 <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">{{ Str::limit($barang->deskripsi, 50) }}</p>
-                                <a href="#" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
+                                <a href="{{ route('produk.detail', $barang->id) }}" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
                             </div>
                         </div>
                     </div>
