@@ -71,6 +71,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     // // Transaksi
     Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
+   
 
     // Laporan Barang
     Route::get('/laporan/barang', [LaporanController::class, 'laporanBarang'])->name('laporan.barang');
@@ -105,3 +106,4 @@ Route::middleware('auth')->group(function () {
 // ===========================
 Route::get('/checkout', [PembayaranController::class, 'index'])->name('keranjang.checkout');
 Route::post('/checkout', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
+Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang');

@@ -21,7 +21,8 @@
                 <li class="nav-item"><a class="nav-link" href="{{ url('dashboard') }}">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('produk') }}">Products</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>                    
+                <li class="nav-item"><a class="nav-link" href="{{ route('keranjang') }}">Lihat Keranjang</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>
                 @auth
                 <li class="nav-item">
                     <form method="GET" action="{{ route('logout') }}">
@@ -43,7 +44,6 @@
             </ul>
         </div>
     </nav>
-
     <div class="profile px-4 py-5">
         <div class="header-bar mb-3">Update Profil</div>
         <div class="profile-form">
