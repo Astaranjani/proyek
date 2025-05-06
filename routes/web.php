@@ -102,8 +102,11 @@ Route::middleware('auth')->group(function () {
 // ===========================
 // PEMBAYARAN
 // ===========================
-Route::get('/checkout', [PembayaranController::class, 'index'])->name('keranjang.checkout');
-Route::post('/checkout', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
+Route::get('/keranjang/checkout', [KeranjangController::class, 'checkout'])->name('pembayaran');
+
+Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
+Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
+
 Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang');
 
 // ===========================
@@ -115,3 +118,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile', [ProfileController::class, 'update']);
 
 });
+
+
+Route::post('/payment/midtrans-callback', [App\Http\Controllers\PaymentController::class, 'midtransCallback']);

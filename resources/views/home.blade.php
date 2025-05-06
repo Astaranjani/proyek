@@ -143,7 +143,7 @@ class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
       <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
         <div class="text-center text-white p-6">
           <h3 class="text-xl font-semibold mb-2">Khoerul Paroid</h3>
-          <p class="text-sm">Management Developer</p>
+          <p class="text-sm">Developer</p>
         </div>
       </div>
     </div>
@@ -153,7 +153,7 @@ class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
       <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
         <div class="text-center text-white p-6">
           <h3 class="text-xl font-semibold mb-2">Putri Ayu Fadhillah</h3>
-          <p class="text-sm">Desainer Engineering</p>
+          <p class="text-sm">Spesialis Designer</p>
         </div>
       </div>
     </div>
@@ -164,6 +164,7 @@ class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
         <div class="text-center text-white p-6">
           <h3 class="text-xl font-semibold mb-2">Hamzah Fauji Pratama</h3>
           <p class="text-sm">Dokumenter Developer</p>
+          <p class="text-sm">AFK</p>
         </div>
       </div>
     </div>

@@ -14,24 +14,27 @@ class KeranjangController extends Controller
     }
     public function tambah(Request $request)
     {
-        // Ambil barang berdasarkan ID
         $barang = Barang::findOrFail($request->barang_id);
-
-        // Ambil data keranjang dari session
+    
         $cart = session()->get('cart', []);
-
-        // Tambahkan atau timpa barang berdasarkan ID
-        $cart[$barang->id] = [
-            'nama' => $barang->nama,
-            'harga' => $barang->harga,
-            'gambar' => $barang->gambar,
-        ];
-
-        // Simpan kembali ke session
+    
+        // Cek apakah barang sudah ada di keranjang
+        if (isset($cart[$barang->id])) {
+            $cart[$barang->id]['jumlah'] += 1; // Tambah jumlah
+        } else {
+            $cart[$barang->id] = [
+                'nama' => $barang->nama,
+                'harga' => $barang->harga,
+                'gambar' => $barang->gambar,
+                'jumlah' => 1, // Tambahkan jumlah
+            ];
+        }
+    
         session()->put('cart', $cart);
-
+    
         return redirect()->back()->with('success', 'Barang ditambahkan ke keranjang!');
     }
+    
     public function hapus(Request $request)
 {
     $cart = session()->get('cart', []);
@@ -63,7 +66,7 @@ public function checkout()
         $totalHarga += $jumlah * $harga;
     }
 
-    return view('keranjang.checkout', compact('cart', 'totalJumlah', 'totalHarga'));
+    return view('pembayaran', compact('cart', 'totalJumlah', 'totalHarga'));
 }
 
 }

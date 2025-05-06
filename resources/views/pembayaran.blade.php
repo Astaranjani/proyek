@@ -3,79 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <title>Halaman Pembayaran</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- Midtrans Snap -->
+    <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+
+    <style>
+        body {
+            background-color: #f1f3f5;
+        }
+
+        .card-custom {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+        }
+
+        h2 {
+            font-weight: bold;
+            color: #343a40;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .btn-primary {
+            background-color: #0d6efd;
+            border: none;
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+        }
+
+        .alert {
+            border-radius: 10px;
+        }
+
+        .text-end {
+            text-align: right;
+        }
+    </style>
 </head>
 <body>
     <div class="container my-5">
-        <h2 class="mb-4">Pembayaran</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <div class="card card-custom">
+                    <h2 class="mb-4 text-center">Pembayaran</h2>
 
-        @php
-            $cart = session('cart', []);
-            $total = 0;
-        @endphp
+                    @php
+                        $cart = session('cart', []);
+                        $total = 0;
+                    @endphp
 
-        @if(count($cart) > 0)
-            <div class="table-responsive">
-                <table class="table table-bordered align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Produk</th>
-                            <th>Harga</th>
-                            <th>Jumlah</th>
-                            <th>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($cart as $item)
-                            @php
-                                $subtotal = $item['harga'] * $item['jumlah'];
-                                $total += $subtotal;
-                            @endphp
-                            <tr>
-                                <td>{{ $item['nama'] }}</td>
-                                <td>Rp {{ number_format($item['harga'], 0, ',', '.') }}</td>
-                                <td>{{ $item['jumlah'] }}</td>
-                                <td>Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
-                            </tr>
-                        @endforeach
-                        <tr>
-                            <td colspan="3" class="text-end fw-bold">Total</td>
-                            <td class="fw-bold">Rp {{ number_format($total, 0, ',', '.') }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                    @if(count($cart) > 0)
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Produk</th>
+                                        <th>Harga</th>
+                                        <th>Jumlah</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($cart as $item)
+                                        @php
+                                            $jumlah = $item['jumlah'] ?? 1;
+                                            $subtotal = $item['harga'] * $jumlah;
+                                            $total += $subtotal;
+                                        @endphp
+                                        <tr>
+                                            <td>{{ $item['nama'] }}</td>
+                                            <td>Rp {{ number_format($item['harga'], 0, ',', '.') }}</td>
+                                            <td>{{ $jumlah }}</td>
+                                            <td>Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
+                                        </tr>
+                                    @endforeach
+                                    <tr class="table-secondary fw-bold">
+                                        <td colspan="3" class="text-end">Total</td>
+                                        <td>Rp {{ number_format($total, 0, ',', '.') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button class="btn btn-primary" id="pay-button">Bayar Sekarang</button>
+                        </div>
+
+                        <form action="{{ route('pembayaran.proses') }}" method="POST" class="mt-4" id="payment-form" style="display: none;">
+                            @csrf
+                            <input type="hidden" name="snap_token" id="snap_token">
+                            <button type="submit" class="btn btn-primary">Proses Pembayaran</button>
+                        </form>
+                    @else
+                        <div class="alert alert-warning text-center">
+                            Keranjang kosong. Silakan tambahkan produk terlebih dahulu.
+                        </div>
+                    @endif
+                </div>
             </div>
-
-            {{-- Form Pembayaran --}}
-            <form action="{{ route('pembayaran.proses') }}" method="POST" class="mt-4">
-                @csrf
-                <div class="mb-3">
-                    <label for="nama" class="form-label">Nama Lengkap</label>
-                    <input type="text" name="nama" id="nama" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label for="alamat" class="form-label">Alamat Pengiriman</label>
-                    <textarea name="alamat" id="alamat" rows="3" class="form-control" required></textarea>
-                </div>
-{{-- /*************  ✨ Windsurf Command 🌟  *************/ --}}
-                <div class="mb-3">
-                    <label for="metode" class="form-label">Metode Pembayaran</label>
-                    <select name="metode" id="metode" class="form-select" required>
-                        {{-- <option value="transfer">Transfer Bank</option> --}}
-                        <option value="cod">Cash on Delivery (COD)</option>
-                        <option value="bayar">Bayar</option>
-                        {{-- <option value="qris">QRIS</option> --}}
-                    </select>
-                </div>
-{{-- /*******  6d34bc7a-e234-4381-a35d-f160c9a192aa  *******/ --}}
-
-                <button type="submit" class="btn btn-primary">Bayar Sekarang</button>
-            </form>
-        @else
-            <div class="alert alert-warning">
-                Keranjang kosong. Silakan tambahkan produk terlebih dahulu.
-            </div>
-        @endif
+        </div>
     </div>
+
+    <!-- Midtrans Script -->
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}">
+    </script>
+    <script>
+        const payButton = document.querySelector('#pay-button');
+        payButton.addEventListener('click', function(e) {
+            e.preventDefault();
+    
+            snap.pay('{{ $snapToken }}', {
+                // Optional
+                onSuccess: function(result) {
+                    /* You may add your own js here, this is just example */
+                    // document.getElementById('result-json').innerHTML += JSON.stringify(result, null, 2);
+                    console.log(result)
+                },
+                // Optional
+                onPending: function(result) {
+                    /* You may add your own js here, this is just example */
+                    // document.getElementById('result-json').innerHTML += JSON.stringify(result, null, 2);
+                    console.log(result)
+                },
+                // Optional
+                onError: function(result) {
+                    /* You may add your own js here, this is just example */
+                    // document.getElementById('result-json').innerHTML += JSON.stringify(result, null, 2);
+                    console.log(result)
+                }
+            });
+        });
+    </script>
 </body>
 </html>

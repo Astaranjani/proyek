@@ -71,7 +71,7 @@
                 @endforeach
 
                 <div class="text-end mt-3">
-                    <a href="{{ route('keranjang.checkout') }}" class="btn btn-success">
+                    <a href="{{ route('pembayaran') }}" class="btn btn-success">
                         Checkout ({{ count($cart) }})
                     </a>
                 </div>

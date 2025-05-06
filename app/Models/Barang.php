@@ -11,6 +11,7 @@ class Barang extends Model
 
     // Kolom yang bisa diisi (mass assignable)
     protected $fillable = [
+        'order_id',
         'nama',
         'deskripsi',
         'stok',
