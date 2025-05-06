@@ -22,7 +22,7 @@
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item"><a class="nav-link" href="{{ url('dashboard') }}">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ route('produk') }}">Products</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('Riwayat Pesanan') }}">Riwayat Pesanan</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('keranjang') }}">Lihat Keranjang</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>
                 @auth
@@ -73,7 +73,7 @@
                         <input type="hidden" name="barang_id" value="{{ $barang->id }}">
                         <div class="d-flex gap-2 mt-4">
                             <button class="btn btn-custom" type="submit">+ Keranjang</button>
-                            <button class="btn btn-dark" type="button">Beli Sekarang</button>
+                            <button class="btn btn-dark" type="button" onclick="toggleCheckout()">Beli Sekarang</button>
                         </div>
                     </form>
                 </div>
@@ -113,6 +113,71 @@
             </div>
         </div>
     </section>
+    {{-- Pembayaran --}}
+    <div id="checkout-section" class="mt-5" style="display: none;">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="bi bi-bag-check-fill me-2"></i>Checkout</h5>
+            </div>
+            <div class="card-body">
+                {{-- Alamat Pengiriman --}}
+                <div class="mb-4">
+                    <h6 class="fw-bold"><i class="bi bi-geo-alt-fill me-2 text-danger"></i>Alamat Pengiriman</h6>
+                    <p class="mb-1">Putri Ayu Fadhilah</p>
+                    <p class="mb-1">0817-4976-9912</p>
+                    <p class="mb-0">Jalan Gardu Listrik Kepandean Indramayu</p>
+                    <span class="badge bg-secondary mt-1">Perempuan</span>
+                </div>
+    
+                {{-- Produk Dipesan --}}
+                <div class="d-flex align-items-center border p-3 rounded mb-4">
+                    <img src="{{ asset('storage/' . $barang->gambar) }}" width="100" class="rounded me-3">
+                    <div>
+                        <h6 class="mb-1">{{ $barang->nama }}</h6>
+                        <span class="text-muted">Rp {{ number_format($barang->harga, 0, ',', '.') }}</span>
+                    </div>
+                    </div>
+        
+                    {{-- Metode Pembayaran --}}
+                    <div class="mb-4">
+                        <h6 class="fw-bold"><i class="bi bi-wallet2 me-2 text-primary"></i>Metode Pembayaran</h6>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-dark w-50">COD (Cash On Delivery)</button>
+                            <button type="button" class="btn btn-outline-dark w-50">Transfer</button>
+                </div>
+            </div>
+
+            {{-- Rincian Pembayaran --}}
+            <div class="mb-4">
+                <h6 class="fw-bold"><i class="bi bi-receipt-cutoff me-2 text-warning"></i>Rincian Pembayaran</h6>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Subtotal Produk</span>
+                        <span>Rp {{ number_format($barang->harga, 0, ',', '.') }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Ongkos Kirim</span>
+                        <span>Rp 20.000</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Proteksi Kerusakan</span>
+                        <span>Rp 3.000</span>
+                        <input type="hidden" name="barang_id" value="{{ $barang->id }}">
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-cart-check-fill me-2"></i>Buat Pesanan
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script>
+            function toggleCheckout() {
+                const checkout = document.getElementById('checkout-section');
+                checkout.style.display = checkout.style.display === 'none' ? 'block' : 'none';
+        checkout.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
 
     {{-- Footer --}}
     <footer class="text-center mt-5 mb-3 text-muted">

@@ -20,7 +20,7 @@
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item"><a class="nav-link" href="{{ url('dashboard') }}">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ route('produk') }}">Products</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('Riwayat Pesanan') }}">Riwayat Pesanan</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('keranjang') }}">Lihat Keranjang</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Pesan</a></li>
                 @auth

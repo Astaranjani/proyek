@@ -96,7 +96,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/keranjang/tambah', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
     Route::post('/keranjang/hapus', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
     Route::get('/checkout', [KeranjangController::class, 'checkout'])->name('keranjang.checkout');
-
+    Route::get('Riwayat Pesanan', fn () => view('Riwayat Pesanan'))->name('Riwayat Pesanan') ;
+   
 });
 
 // ===========================
