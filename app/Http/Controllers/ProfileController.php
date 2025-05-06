@@ -8,41 +8,41 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
-    // Menampilkan halaman form update profil
-    public function edit()
+    public function update(Request $request)
     {
-        return view('profile.edit');
+        $user = Auth::user();
+
+        // Validasi input
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:20',
+            'gender' => 'nullable|string|in:Laki-laki,Perempuan',
+            'address' => 'nullable|string|max:255',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Handle upload foto jika ada
+        if ($request->hasFile('photo')) {
+            // Hapus foto lama jika ada
+            if ($user->photo && Storage::exists('public/photos/' . $user->photo)) {
+                Storage::delete('public/photos/' . $user->photo);
+            }
+
+            // Upload foto baru
+            $photo = $request->file('photo')->store('public/photos');
+            $validated['photo'] = basename($photo); // Simpan nama file saja
+        }
+
+        // Simpan ke DB
+        $user->update($validated);
+
+        return redirect()->route('profile')->with('success', 'Profil berhasil diperbarui.');
     }
-
-    // Menyimpan data hasil update profil
-    public function updateProfile(Request $request)
-{
-    $user = Auth::user();
-
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email',
-        'phone' => 'required|string|max:15',
-        'gender' => 'required|string|max:10',
-        'address' => 'required|string',
-        'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-    ]);
-
-    $user->name = $request->name;
-    $user->email = $request->email;
-    $user->phone = $request->phone;
-    $user->gender = $request->gender;
-    $user->address = $request->address;
-
-    if ($request->hasFile('profile_image')) {
-        // Menangani upload gambar profil
-        $imagePath = $request->file('profile_image')->store('profile_images', 'public');
-        $user->profile_image = $imagePath;
+    public function show()
+    {
+        $user = Auth::user();
+        return view('profile', compact('user'));
     }
-
-    $user->save();
-
-    return redirect()->route('profile')->with('success', 'Profil berhasil diperbarui');
-}
 
 }

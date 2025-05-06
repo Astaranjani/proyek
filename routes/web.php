@@ -11,8 +11,9 @@ use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\KeranjangController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\ProfileController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -95,10 +96,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/keranjang/tambah', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
     Route::post('/keranjang/hapus', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
     Route::get('/checkout', [KeranjangController::class, 'checkout'])->name('keranjang.checkout');
-    Route::post('/keranjang/checkout', [KeranjangController::class, 'checkout'])->name('keranjang.checkout');
-    Route::get('/profile', [UserController::class, 'edit'])->name('profile');
-    Route::put('/profile', [UserController::class, 'update']);
-    Route::get('/profile/edit', [UserController::class, 'edit'])->name('profile.edit');
+
 });
 
 // ===========================
@@ -107,3 +105,13 @@ Route::middleware('auth')->group(function () {
 Route::get('/checkout', [PembayaranController::class, 'index'])->name('keranjang.checkout');
 Route::post('/checkout', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
 Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang');
+
+// ===========================
+// PROFIL
+// ===========================
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+    Route::post('/profile', [ProfileController::class, 'update']);
+
+});
