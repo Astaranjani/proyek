@@ -12,6 +12,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PembayaranController;
 
 /*
 |--------------------------------------------------------------------------
@@ -99,3 +100,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [UserController::class, 'edit'])->name('profile.edit');
 });
 
+// ===========================
+// PEMBAYARAN
+// ===========================
+Route::get('/checkout', [PembayaranController::class, 'index'])->name('keranjang.checkout');
+Route::post('/checkout', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
