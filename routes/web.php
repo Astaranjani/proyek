@@ -109,6 +109,10 @@ Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name
 
 Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang');
 
+Route::get('/admin/transaksi', [TransaksiController::class, 'index'])->name('admin.transaksi.index');
+
+
+
 // ===========================
 // PROFIL
 // ===========================
