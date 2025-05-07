@@ -14,7 +14,6 @@ use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\ProfileController;
 
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -41,38 +40,20 @@ Route::get('/logout', function () {
 })->name('logout');
 
 // ===========================
-// ADMIN
+// ADMIN ROUTES
 // ===========================
-
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
-
+    
     // Dashboard Admin
     Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('dashboard');
 
     // Barang (CRUD)
     Route::resource('barang', BarangController::class);
-// });
 
-
-// Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
-    
-//     // Dashboard Admin
-//     Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('dashboard');
-
-//     // Barang (CRUD)
-//     Route::resource('/barang', BarangController::class, [
-//         'as' => 'admin' // otomatis bikin admin.barang.index, admin.barang.create, dst
-//     ]);
-//     Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
-//     Route::get('/barang/create', [BarangController::class, 'create'])->name('barang.create');
-//     Route::get('/barang/{barang}/edit', [BarangController::class, 'edit'])->name('barang.edit');
-//     Route::get('/barang/{barang}/destroy', [BarangController::class, 'destroy'])->name('barang.destroy');
-
-
-
-    // // Transaksi
+    // Transaksi
     Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
-   
+    Route::put('/transaksi/{id}/konfirmasi', [TransaksiController::class, 'konfirmasi'])->name('transaksi.konfirmasi');
+    Route::get('/transaksi/{id}/cetak', [TransaksiController::class, 'cetakPDF'])->name('transaksi.cetak');
 
     // Laporan Barang
     Route::get('/laporan/barang', [LaporanController::class, 'laporanBarang'])->name('laporan.barang');
@@ -80,14 +61,14 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 });
 
 // ===========================
-// OWNER
+// OWNER ROUTES
 // ===========================
 Route::middleware('auth')->prefix('owner')->name('owner.')->group(function () {
     Route::get('/dashboard', [OwnerController::class, 'index'])->name('dashboard');
 });
 
 // ===========================
-// PELANGGAN (USER)
+// PELANGGAN (USER) ROUTES
 // ===========================
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
@@ -96,33 +77,31 @@ Route::middleware('auth')->group(function () {
     Route::post('/keranjang/tambah', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
     Route::post('/keranjang/hapus', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
     Route::get('/checkout', [KeranjangController::class, 'checkout'])->name('keranjang.checkout');
-    Route::get('Riwayat Pesanan', fn () => view('Riwayat Pesanan'))->name('Riwayat Pesanan') ;
-   
+    Route::get('/riwayat-pesanan', fn () => view('riwayat_pesanan'))->name('riwayat.pesanan');
 });
 
 // ===========================
-// PEMBAYARAN
+// PEMBAYARAN ROUTES
 // ===========================
 Route::get('/keranjang/checkout', [KeranjangController::class, 'checkout'])->name('pembayaran');
-
 Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
 Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
-
 Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang');
 
-Route::get('/admin/transaksi', [TransaksiController::class, 'index'])->name('admin.transaksi.index');
-
-
-
 // ===========================
-// PROFIL
+// PROFIL ROUTES
 // ===========================
-
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::post('/profile', [ProfileController::class, 'update']);
-
 });
 
-
+// ===========================
+// MIDTRANS CALLBACK
+// ===========================
 Route::post('/payment/midtrans-callback', [App\Http\Controllers\PaymentController::class, 'midtransCallback']);
+
+
+// Route untuk Riwayat Pesanan
+Route::get('/riwayat-pesanan', [HomeController::class, 'riwayatPesanan'])->name('Riwayat Pesanan');
+
