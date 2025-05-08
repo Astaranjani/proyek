@@ -19,23 +19,11 @@ class ProfileController extends Controller
             'phone' => 'nullable|string|max:20',
             'gender' => 'nullable|string|in:Laki-laki,Perempuan',
             'address' => 'nullable|string|max:255',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Handle upload foto jika ada
-        if ($request->hasFile('photo')) {
-            // Hapus foto lama jika ada
-            if ($user->photo && Storage::exists('public/photos/' . $user->photo)) {
-                Storage::delete('public/photos/' . $user->photo);
-            }
-
-            // Upload foto baru
-            $photo = $request->file('photo')->store('public/photos');
-            $validated['photo'] = basename($photo); // Simpan nama file saja
-        }
-
         // Simpan ke DB
-        $user->update($validated);
+        dd($validated);
+
 
         return redirect()->route('profile')->with('success', 'Profil berhasil diperbarui.');
     }

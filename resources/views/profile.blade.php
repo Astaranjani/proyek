@@ -51,18 +51,14 @@
                 @if(Auth::user()->profile_image)
                     <img id="preview" src="{{ asset('images/icon profil.png' . Auth::user()->profile_image) }}" alt="Profil" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
                 @else
-                    <img id="preview" src="{{ asset('images/upload-icon.png') }}" alt="Upload" class="upload-icon rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                    <img id="preview" src="{{ asset('images/icon profil.png') }}" alt="Profil" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
                 @endif
             </div>
-
-            <form method="POST" action="{{ route('profile') }}">
+    
+            <form method="POST" action="{{ route('profile') }}" enctype="multipart/form-data">
                 @csrf
                 @method('POST')
-
-                <div class="mb-3 text-center">
-                    <input type="file" name="profile_image" accept="image/*" onchange="previewImage(event)">
-                </div>
-
+    
                 <input type="text" name="name" placeholder="Nama Lengkap" required value="{{ old('name', Auth::user()->name) }}">
                 <input type="email" name="email" placeholder="Email" required value="{{ old('email', Auth::user()->email) }}">
                 <input type="text" name="phone" placeholder="No. Handphone" required value="{{ old('phone', Auth::user()->phone) }}">
@@ -71,27 +67,7 @@
                 <button type="submit" class="save-btn btn btn-primary mt-2">Save</button>
             </form>
         </div>
-
-        <div class="header-bar">Riwayat Pesanan</div>
-        <div class="order-status">
-            <!-- Status Belum Bayar -->
-            <div class="status">
-                <img src="{{ asset('images/dompet.png') }}" alt="Belum Bayar" class="status-image">
-                <p>Belum Bayar</p>
-            </div>
-
-            <!-- Status Dikirim -->
-            <div class="status">
-                <img src="{{  asset('images/bus kurir.png') }}" alt="Dikirim" class="status-image">
-                <p>Dikirim</p>
-            </div>
-
-            <!-- Status Selesai -->
-            <div class="status">
-                <img src="{{ asset('images/selesai.png') }}" alt="Selesai" class="status-image">
-                <p>Selesai</p>
-            </div>
-        </div>
+    </div>
 
         <div class="header-bar mt-5">Kontak Bantuan</div>
         <div class="contact-info">
