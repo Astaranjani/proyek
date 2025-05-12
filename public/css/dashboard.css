@@ -21,7 +21,32 @@ body {
       color: #ff8800 !important;
     }
   }
-  
+  /* Fix untuk titik hitam dan styling ikon */
+.nav-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    display: block;
+    transition: all 0.3s ease;
+}
+
+.nav-item .nav-link {
+    padding: 8px 12px !important;
+    display: flex;
+    align-items: center;
+}
+
+/* Hapus efek default button */
+.btn-link.nav-link {
+    text-decoration: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Perbaikan alignment */
+.navbar-nav {
+    gap: 4px;
+}
   header {
     background-color: #e6e0d4;
     padding: 2rem 1rem;
