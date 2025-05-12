@@ -73,7 +73,7 @@ html {
 <a href="{{ url('/') }}" class="nav-link text-gray-800 hover:text-primary">Home</a>
 <a href="#about" class="nav-link text-gray-800 hover:text-primary transition-all">About</a> 
 
-<a href="{{ url('/contact') }}" class="nav-link text-gray-800 hover:text-primary">Contact</a>
+<a href="#contact" class="nav-link text-gray-800 hover:text-primary">Contact</a>
 </nav>
 <a href="{{ route('login') }}" class="hidden md:block bg-primary text-white py-2 px-6 !rounded-button whitespace-nowrap hover:bg-opacity-90 transition-all">Get Started</a>
 <button class="md:hidden w-10 h-10 flex items-center justify-center">
@@ -171,7 +171,7 @@ class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
   </div>
   
 </section>
-<section class="w-full px-6 md:px-12 py-16 bg-primary/5">
+<section id="contact" class="w-full px-6 md:px-12 py-16 bg-primary/5">
   <div class="max-w-4xl mx-auto">
     <div class="text-center mb-12">
       <h2 class="text-3xl md:text-4xl font-bold mb-4">Tinggalkan pesan untuk kami</h2>
@@ -287,14 +287,14 @@ class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
       <ul class="space-y-2">
         <li>
           <a
-            href="{{ url('/about') }}"
+            href="#about"
             class="text-gray-600 hover:text-primary transition-colors"
             >About</a
           >
         </li>
         <li>
           <a
-            href="{{ url('/contact') }}"
+            href="#contact"
             class="text-gray-600 hover:text-primary transition-colors"
             >Contact</a
           >

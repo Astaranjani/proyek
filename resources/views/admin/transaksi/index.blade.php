@@ -155,7 +155,7 @@
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold">Daftar Transaksi</h1>
     </div>
-    
+
     <div class="overflow-x-auto bg-white rounded-lg shadow">
         <table class="min-w-full">
             <thead class="bg-gray-800 text-white">
@@ -169,60 +169,34 @@
                     <th class="px-6 py-3 text-left">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200" id="transactionTable">
-                <tr class="hover:bg-gray-50" id="transaction-001">
-                    <td class="px-6 py-4">001</td>
-                    <td class="px-6 py-4 font-medium">Khoerul Paroid</td>
-                    <td class="px-6 py-4">Lemari</td>
-                    <td class="px-6 py-4">Rp1.500.000</td>
-                    <td class="px-6 py-4 font-medium">Lunas</td>
-                    <td class="px-6 py-4">07 Mei 2025</td>
-                    <td class="px-6 py-4">
-                        <div class="flex space-x-2">
-                            <button class="px-3 py-1.5 text-sm font-medium rounded-md border border-red-500 text-red-500 hover:bg-red-50 transition-colors delete-btn" 
-                                    data-id="001">
-                                Hapus
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50" id="transaction-002">
-                    <td class="px-6 py-4">002</td>
-                    <td class="px-6 py-4 font-medium">Putri Ayu Fadhilah</td>
-                    <td class="px-6 py-4">Sofa</td>
-                    <td class="px-6 py-4">Rp850.000</td>
-                    <td class="px-6 py-4 font-medium">Belum Lunas</td>
-                    <td class="px-6 py-4">06 Mei 2025</td>
-                    <td class="px-6 py-4">
-                        <div class="flex space-x-2">
-                            <button class="px-3 py-1.5 text-sm font-medium rounded-md border border-red-500 text-red-500 hover:bg-red-50 transition-colors delete-btn" 
-                                    data-id="002">
-                                Hapus
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tbody class="divide-y divide-gray-200" id="transactionTable">
-                    <tr class="hover:bg-gray-50" id="transaction-001">
-                        <td class="px-6 py-4">003</td>
-                        <td class="px-6 py-4 font-medium">Hamzah Pratama</td>
-                        <td class="px-6 py-4">Lemari</td>
-                        <td class="px-6 py-4">Rp1.500.000</td>
-                        <td class="px-6 py-4 font-medium">Lunas</td>
-                        <td class="px-6 py-4">07 Mei 2025</td>
+            <tbody class="divide-y divide-gray-200">
+                @foreach($transaksi as $t)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">{{ $t->id }}</td>
+                        <td class="px-6 py-4 font-medium">{{ $t->user->nama }}</td>
+                        <td class="px-6 py-4">{{ $t->barang->nama_barang }}</td>
+                        <td class="px-6 py-4">Rp{{ number_format($t->total_pembayaran, 0, ',', '.') }}</td>
+                        <td class="px-6 py-4 font-medium">
+                            <span class="{{ $t->status_pembayaran == 'Lunas' ? 'text-green-500' : 'text-red-500' }}">
+                                {{ $t->status_pembayaran }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">{{ date('d M Y', strtotime($t->tanggal_transaksi)) }}</td>
                         <td class="px-6 py-4">
                             <div class="flex space-x-2">
                                 <button class="px-3 py-1.5 text-sm font-medium rounded-md border border-red-500 text-red-500 hover:bg-red-50 transition-colors delete-btn" 
-                                        data-id="001">
+                                        data-id="{{ $t->id }}">
                                     Hapus
                                 </button>
                             </div>
                         </td>
                     </tr>
+                @endforeach
             </tbody>
         </table>
     </div>
 </div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

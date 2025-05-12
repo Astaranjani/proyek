@@ -103,10 +103,9 @@
                 </li>
 
                 <li>
-                    <a href="#" class="flex items-center px-4 py-2 text-gray-400 hover:bg-white/5 rounded-md">
-                        <div class="w-5 h-5 flex items-center justify-center mr-3">
-                            <i class="ri-order-play-line"></i>
-                        </div>
+                    <a href="{{ route('admin.transaksi.index') }}"
+                        class="flex items-center px-4 py-2 rounded-md {{ request()->routeIs('admin.transaksi.index') ? 'text-white bg-primary/10' : 'text-gray-400 hover:bg-white/5' }}">
+                        <i class="ri-order-play-line mr-3"></i>
                         <span>Transaksi</span>
                     </a>
                 </li>

@@ -10,16 +10,21 @@ class Transaksi extends Model
     use HasFactory;
 
     protected $fillable = [
-        'pelanggan_id',
+        'user_id', // kolom untuk relasi ke user
+        'barang_id', // kolom untuk relasi ke barang
         'total_pembayaran',
-        'status',
-        'created_at',
-        'updated_at'
+        'status_pembayaran'
     ];
 
-    // Relasi ke pelanggan
-    public function pelanggan()
+    // Relasi ke pengguna (user)
+    public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id'); // Relasi ke User
+    }
+
+    // Relasi ke barang
+    public function barang()
+    {
+        return $this->belongsTo(Barang::class, 'barang_id'); // Relasi ke Barang
     }
 }
