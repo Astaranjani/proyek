@@ -175,7 +175,7 @@
                         <td class="px-6 py-4">{{ $t->id }}</td>
                         <td class="px-6 py-4 font-medium">{{ $t->user->nama }}</td>
                         <td class="px-6 py-4">{{ $t->barang->nama_barang }}</td>
-                        <td class="px-6 py-4">Rp{{ number_format($t->total_pembayaran, 0, ',', '.') }}</td>
+                        <td class="px-6 py-4">Rp{{ number_format($t->total_harga, 0, ',', '.') }}</td>
                         <td class="px-6 py-4 font-medium">
                             <span class="{{ $t->status_pembayaran == 'Lunas' ? 'text-green-500' : 'text-red-500' }}">
                                 {{ $t->status_pembayaran }}

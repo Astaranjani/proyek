@@ -12,7 +12,7 @@ class Transaksi extends Model
     protected $fillable = [
         'user_id', // kolom untuk relasi ke user
         'barang_id', // kolom untuk relasi ke barang
-        'total_pembayaran',
+        'total_harga',
         'status_pembayaran'
     ];
 

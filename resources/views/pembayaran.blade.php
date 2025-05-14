@@ -129,7 +129,7 @@
                 onSuccess: function(result) {
                     /* You may add your own js here, this is just example */
                     // document.getElementById('result-json').innerHTML += JSON.stringify(result, null, 2);
-                    console.log(result)
+                    window.location.href = '{{ route('dashboard') }}';
                 },
                 // Optional
                 onPending: function(result) {
