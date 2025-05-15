@@ -78,15 +78,18 @@ Route::middleware('auth')->group(function () {
     Route::post('/keranjang/hapus', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
     Route::get('/checkout', [KeranjangController::class, 'checkout'])->name('keranjang.checkout');
     Route::get('/riwayat-pesanan', fn () => view('riwayat_pesanan'))->name('riwayat.pesanan');
+    Route::post('/keranjang/tambah-dan-bayar', [KeranjangController::class, 'tambahDanBayar'])->name('keranjang.tambah-dan-bayar');
 });
 
 // ===========================
 // PEMBAYARAN ROUTES
 // ===========================
-Route::get('/keranjang/checkout', [KeranjangController::class, 'checkout'])->name('pembayaran');
+// Route::get('/keranjang/checkout', [KeranjangController::class, 'index'])->name('pembayaran');
 Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
 Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
 Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang');
+Route::get('/pembayaran', [PembayaranController::class, 'index']);
+Route::any('/pembayaran', [PembayaranController::class, 'method']);
 
 // ===========================
 // PROFIL ROUTES
@@ -104,4 +107,3 @@ Route::post('/payment/midtrans-callback', [App\Http\Controllers\PaymentControlle
 
 // Route untuk Riwayat Pesanan
 Route::get('/riwayat-pesanan', [HomeController::class, 'riwayatPesanan'])->name('Riwayat Pesanan');
-

@@ -13,8 +13,9 @@ class PembayaranController extends Controller
 {
     public function index()
     {
-        $cart = session()->get('cart', []);
 
+        $cart = session()->get('cart', []);
+        // dd($cart);
         if (empty($cart)) {
             return redirect()->back()->with('error', 'Keranjang masih kosong!');
         }

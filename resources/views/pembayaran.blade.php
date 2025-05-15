@@ -59,6 +59,13 @@
                 <div class="card card-custom">
                     <h2 class="mb-4 text-center">Pembayaran</h2>
 
+                    <div class="mb-4">
+                        <h5 class="fw-bold"><i class="bi bi-geo-alt-fill me-2 text-danger"></i>Alamat Pengiriman</h5>
+                        <p class="mb-1">Putri Ayu Fadhilah</p>
+                        <p class="mb-1">0817-4976-9912</p>
+                        <p class="mb-0">Jalan Gardu Listrik Kepandean Indramayu</p>
+                        <span class="badge bg-secondary mt-1">Perempuan</span>
+                    </div>
                     @php
                         $cart = session('cart', []);
                         $total = 0;
@@ -96,12 +103,19 @@
                                 </tbody>
                             </table>
                         </div>
-
-                        <div class="text-center mt-4">
-                            <button class="btn btn-primary" id="pay-button">Bayar Sekarang</button>
+                        
+                         <div class="mb-4">
+                            <h5 class="fw-bold"><i class="bi bi-wallet2 me-2 text-primary"></i>Metode Pembayaran</h5>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-dark w-100 py-2" id="cod-button">COD</button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-dark w-100 py-2" id="pay-button">Bayar Sekarang</button>
+                                </div>
+                            </div>
                         </div>
-
-                        <form action="{{ route('pembayaran.proses') }}" method="POST" class="mt-4" id="payment-form" style="display: none;">
+                        <form action="{{ route('pembayaran') }}" method="POST" class="mt-4" id="payment-form" style="display: none;">
                             @csrf
                             <input type="hidden" name="snap_token" id="snap_token">
                             <button type="submit" class="btn btn-primary">Proses Pembayaran</button>
@@ -117,31 +131,31 @@
     </div>
 
     <!-- Midtrans Script -->
-    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}">
-    </script>
+        <!-- Midtrans Script -->
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+
     <script>
+        // Tombol COD langsung redirect ke dashboard
+        const codButton = document.querySelector('#cod-button');
+        codButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '{{ route('dashboard') }}';
+        });
+
+        // Tombol Bayar Sekarang menggunakan Midtrans Snap
         const payButton = document.querySelector('#pay-button');
         payButton.addEventListener('click', function(e) {
             e.preventDefault();
-    
+
             snap.pay('{{ $snapToken }}', {
-                // Optional
                 onSuccess: function(result) {
-                    /* You may add your own js here, this is just example */
-                    // document.getElementById('result-json').innerHTML += JSON.stringify(result, null, 2);
                     window.location.href = '{{ route('dashboard') }}';
                 },
-                // Optional
                 onPending: function(result) {
-                    /* You may add your own js here, this is just example */
-                    // document.getElementById('result-json').innerHTML += JSON.stringify(result, null, 2);
-                    console.log(result)
+                    console.log(result);
                 },
-                // Optional
                 onError: function(result) {
-                    /* You may add your own js here, this is just example */
-                    // document.getElementById('result-json').innerHTML += JSON.stringify(result, null, 2);
-                    console.log(result)
+                    console.log(result);
                 }
             });
         });

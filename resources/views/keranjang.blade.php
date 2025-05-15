@@ -42,7 +42,9 @@
         <section class="keranjang-wrapper bg-light py-4">
             <div class="container">
                 <h4 class="mb-3 fw-bold">Keranjang Saya</h4>
-                @php $cart = session('cart', []); @endphp
+                @php 
+                $cart = session('cart', []); 
+                @endphp
                 @foreach ($cart as $id => $item)
                 <div class="d-flex align-items-center border-bottom py-3 justify-content-between">
                     <div class="d-flex align-items-center">
