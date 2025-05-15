@@ -90,6 +90,7 @@ Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name
 Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang');
 Route::get('/pembayaran', [PembayaranController::class, 'index']);
 Route::any('/pembayaran', [PembayaranController::class, 'method']);
+Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
 
 // ===========================
 // PROFIL ROUTES
