@@ -60,15 +60,21 @@
                     <p><strong>Merek</strong> : {{ $barang->merek }}</p>
                     <p class="mt-3">{!! nl2br(e($barang->deskripsi)) !!}</p>
 
-                    <form action="{{ route('keranjang.tambah') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="barang_id" value="{{ $barang->id }}">
-                        <div class="d-flex gap-2 mt-4">
-                            <button class="btn btn-custom" type="submit">+ Keranjang</button>
-                            <button class="btn btn-dark" type="button" onclick="toggleCheckout()">Beli Sekarang</button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="d-flex gap-2 mt-4">
+    {{-- Tombol Tambah ke Keranjang --}}
+    <form action="{{ route('keranjang.tambah') }}" method="POST">
+        @csrf
+        <input type="hidden" name="barang_id" value="{{ $barang->id }}">
+        <button class="btn btn-custom" type="submit">+ Keranjang</button>
+    </form>
+
+    {{-- Tombol Beli Sekarang --}}
+   <form action="{{ route('beli.sekarang') }}" method="POST" id="form-beli-sekarang">
+    @csrf
+    <input type="hidden" name="product_id" value="{{ $barang->id }}">
+    <button type="submit" class="btn btn-primary">Beli Sekarang</button>
+</form>
+</div>
             </div>
         </div>
     </section>

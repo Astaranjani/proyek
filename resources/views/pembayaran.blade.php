@@ -7,29 +7,25 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <!-- Midtrans Snap -->
-    <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
 
     <style>
         body {
             background-color: #f1f3f5;
         }
-
         .card-custom {
             background: #fff;
             border-radius: 15px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
             padding: 30px;
         }
-
         h2 {
             font-weight: bold;
             color: #343a40;
         }
-
         .table th, .table td {
             vertical-align: middle;
         }
-
         .btn-primary {
             background-color: #0d6efd;
             border: none;
@@ -38,15 +34,12 @@
             border-radius: 10px;
             transition: background-color 0.3s ease;
         }
-
         .btn-primary:hover {
             background-color: #0b5ed7;
         }
-
         .alert {
             border-radius: 10px;
         }
-
         .text-end {
             text-align: right;
         }
@@ -66,12 +59,44 @@
                         <p class="mb-0">Jalan Gardu Listrik Kepandean Indramayu</p>
                         <span class="badge bg-secondary mt-1">Perempuan</span>
                     </div>
+
                     @php
-                        $cart = session('cart', []);
                         $total = 0;
                     @endphp
 
-                    @if(count($cart) > 0)
+                    @if(isset($barang))
+                        @php
+                            $total = $barang->harga;
+                        @endphp
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Produk</th>
+                                        <th>Harga</th>
+                                        <th>Jumlah</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{ $barang->nama }}</td>
+                                        <td>Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
+                                        <td>1</td>
+                                        <td>Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
+                                    </tr>
+                                    <tr class="table-secondary fw-bold">
+                                        <td colspan="3" class="text-end">Total</td>
+                                        <td>Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    @elseif(session()->has('cart') && count(session('cart')) > 0)
+                        @php
+                            $cart = session('cart');
+                        @endphp
                         <div class="table-responsive">
                             <table class="table table-bordered align-middle">
                                 <thead class="table-light">
@@ -103,8 +128,14 @@
                                 </tbody>
                             </table>
                         </div>
-                        
-                         <div class="mb-4">
+                    @else
+                        <div class="alert alert-warning text-center">
+                            Tidak ada produk untuk dibayar.
+                        </div>
+                    @endif
+
+                    @if(isset($snapToken))
+                        <div class="mb-4">
                             <h5 class="fw-bold"><i class="bi bi-wallet2 me-2 text-primary"></i>Metode Pembayaran</h5>
                             <div class="row g-2">
                                 <div class="col-6">
@@ -115,38 +146,26 @@
                                 </div>
                             </div>
                         </div>
-                        <form action="{{ route('pembayaran') }}" method="POST" class="mt-4" id="payment-form" style="display: none;">
-                            @csrf
-                            <input type="hidden" name="snap_token" id="snap_token">
-                            <button type="submit" class="btn btn-primary">Proses Pembayaran</button>
-                        </form>
-                    @else
-                        <div class="alert alert-warning text-center">
-                            Keranjang kosong. Silakan tambahkan produk terlebih dahulu.
-                        </div>
                     @endif
+
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Midtrans Script -->
-        <!-- Midtrans Script -->
-    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
-
+    <!-- Tombol Aksi -->
     <script>
-        // Tombol COD langsung redirect ke dashboard
-        const codButton = document.querySelector('#cod-button');
-        codButton.addEventListener('click', function(e) {
+        // COD langsung redirect
+        const codButton = document.getElementById('cod-button');
+        codButton?.addEventListener('click', function(e) {
             e.preventDefault();
             window.location.href = '{{ route('dashboard') }}';
         });
 
-        // Tombol Bayar Sekarang menggunakan Midtrans Snap
-        const payButton = document.querySelector('#pay-button');
-        payButton.addEventListener('click', function(e) {
+        // Bayar pakai Snap Midtrans
+        const payButton = document.getElementById('pay-button');
+        payButton?.addEventListener('click', function(e) {
             e.preventDefault();
-
             snap.pay('{{ $snapToken }}', {
                 onSuccess: function(result) {
                     window.location.href = '{{ route('dashboard') }}';

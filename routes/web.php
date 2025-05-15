@@ -79,6 +79,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/checkout', [KeranjangController::class, 'checkout'])->name('keranjang.checkout');
     Route::get('/riwayat-pesanan', fn () => view('riwayat_pesanan'))->name('riwayat.pesanan');
     Route::post('/keranjang/tambah-dan-bayar', [KeranjangController::class, 'tambahDanBayar'])->name('keranjang.tambah-dan-bayar');
+Route::post('/beli-sekarang', [KeranjangController::class, 'beliSekarang'])->name('beli.sekarang');
+Route::get('/pembayaran', [KeranjangController::class, 'checkout'])->name('pembayaran');
+Route::post('/beli-sekarang', [PembayaranController::class, 'beliSekarang'])->name('beli.sekarang');
+Route::post('/beli-sekarang', [PembayaranController::class, 'beliSekarang'])->name('beli.sekarang');
+
+
 });
 
 // ===========================

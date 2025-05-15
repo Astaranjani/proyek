@@ -7,20 +7,18 @@ use Midtrans\Snap;
 use Midtrans\Config;
 use Illuminate\Support\Facades\Log;
 use App\Models\Transaksi;
-use Illuminate\Support\Str;  // Tambahkan ini untuk UUID
+use Illuminate\Support\Str;
+use App\Models\Barang;
 
 class PembayaranController extends Controller
 {
     public function index()
     {
-
         $cart = session()->get('cart', []);
-        // dd($cart);
         if (empty($cart)) {
             return redirect()->back()->with('error', 'Keranjang masih kosong!');
         }
 
-        // Hitung total dan buat item_details
         $total = 0;
         $item_details = [];
 
@@ -36,17 +34,15 @@ class PembayaranController extends Controller
             ];
         }
 
-        // Konfigurasi Midtrans
         Config::$serverKey = config('services.midtrans.server_key');
         Config::$clientKey = config('services.midtrans.client_key');
-        Config::$isProduction = config('services.midtrans.is_production');
+        Config::$isProduction = config('services.midtrans.is_production', false);
         Config::$isSanitized = true;
         Config::$is3ds = true;
 
-        // Buat parameter transaksi
         $params = [
             'transaction_details' => [
-                'order_id' => Str::uuid(),  // Ganti uniqid() dengan UUID
+                'order_id' => (string) Str::uuid(),
                 'gross_amount' => $total,
             ],
             'item_details' => $item_details,
@@ -56,7 +52,6 @@ class PembayaranController extends Controller
             ],
         ];
 
-        // Buat Snap Token
         try {
             $snapToken = Snap::getSnapToken($params);
         } catch (\Exception $e) {
@@ -64,7 +59,6 @@ class PembayaranController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat membuat token Snap!');
         }
 
-        // Kirim ke view
         return view('pembayaran', compact('snapToken'));
     }
 
@@ -78,17 +72,15 @@ class PembayaranController extends Controller
         }
 
         foreach ($cart as $item) {
-            try {
-                // Validasi jika key 'barang_id' tidak ditemukan
-                if (!isset($item['barang_id'])) {
-                    return redirect()->route('dashboard')->with('error', 'Data barang tidak lengkap di keranjang.');
-                }
+            if (!isset($item['barang_id'])) {
+                return redirect()->route('dashboard')->with('error', 'Data barang tidak lengkap di keranjang.');
+            }
 
-                // Simpan transaksi ke database
+            try {
                 Transaksi::create([
-                    'user_id'           => $user_id,
-                    'barang_id'         => $item['barang_id'],
-                    'total_pembayaran'  => $item['harga'] * $item['jumlah'],
+                    'user_id' => $user_id,
+                    'barang_id' => $item['barang_id'],
+                    'total_pembayaran' => $item['harga'] * $item['jumlah'],
                     'status_pembayaran' => 'Belum Lunas',
                 ]);
             } catch (\Exception $e) {
@@ -96,9 +88,48 @@ class PembayaranController extends Controller
             }
         }
 
-        // Hapus session cart setelah transaksi sukses
         session()->forget('cart');
 
         return redirect()->route('dashboard')->with('success', 'Pembayaran berhasil disimpan ke database!');
     }
+
+    public function beliSekarang(Request $request)
+    {
+        $barang = Barang::findOrFail($request->product_id);
+
+        Config::$serverKey = config('services.midtrans.server_key');
+        Config::$clientKey = config('services.midtrans.client_key');
+        Config::$isProduction = config('services.midtrans.is_production', false);
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => uniqid(),
+                'gross_amount' => $barang->harga,
+            ],
+            'item_details' => [[
+                'id' => $barang->id,
+                'price' => $barang->harga,
+                'quantity' => 1,
+                'name' => $barang->nama,
+            ]],
+            'customer_details' => [
+                'first_name' => auth()->user()->name,
+                'email' => auth()->user()->email,
+            ],
+        ];
+
+        try {
+            $snapToken = Snap::getSnapToken($params);
+        } catch (\Exception $e) {
+            Log::error('Error creating Snap token: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat token Snap!');
+        }
+
+       return view('pembayaran', [
+        'snapToken' => $snapToken,
+        'barang' => $barang,
+    ]);
+}
 }

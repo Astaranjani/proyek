@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Barang;
 
+
 class KeranjangController extends Controller
 {
     public function index()
@@ -70,5 +71,24 @@ class KeranjangController extends Controller
         }
 
         return view('pembayaran', compact('cart', 'totalJumlah', 'totalHarga'));
+        return view('pembayaran', compact('snapToken', 'cart', 'total'));
     }
+   public function beliSekarang(Request $request)
+{
+    $barang = Barang::findOrFail($request->product_id);
+
+    $cart = [];
+    $cart[$barang->id] = [
+        'barang_id' => $barang->id,
+        'nama' => $barang->nama,
+        'harga' => $barang->harga,
+        'gambar' => $barang->gambar,
+        'jumlah' => 1,
+    ];
+
+    session(['cart' => $cart]);
+
+    // Tambahkan ini untuk debug
+    return redirect()->route('pembayaran');
+}
 }
