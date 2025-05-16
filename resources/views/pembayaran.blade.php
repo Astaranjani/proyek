@@ -27,7 +27,7 @@
             vertical-align: middle;
         }
         .btn-primary {
-            background-color: #0d6efd;
+            background-color: #0bc455;
             border: none;
             font-weight: 600;
             padding: 12px 24px;
@@ -35,7 +35,7 @@
             transition: background-color 0.3s ease;
         }
         .btn-primary:hover {
-            background-color: #0b5ed7;
+            background-color: #0bc455;
         }
         .alert {
             border-radius: 10px;
