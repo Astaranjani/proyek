@@ -168,15 +168,15 @@
             </div>
             <div class="flex items-center">
                 <div class="mr-3 text-right">
-                <div class="text-sm font-medium text-gray-900">Admin</div>
+                {{-- <div class="text-sm font-medium text-gray-900">Admin</div>
                 <div class="text-xs text-gray-500">Administrator</div>
-                </div>
-                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                <img
+                </div> --}}
+                {{-- <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"> --}}
+                {{-- <img
                     src="https://via.placeholder.com/100"
                     alt="Profile"
                     class="w-full h-full object-cover"
-                />
+                /> --}}
                 </div>
             </div>
             </div>

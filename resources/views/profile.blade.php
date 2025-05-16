@@ -130,11 +130,11 @@
         </a>
 
         <a 
-            href="https://mail.google.com/mail/?view=cm&fs=1&to=bantuan@example.com&su=Butuh%20Bantuan&body=Halo%20admin,%20saya%20memerlukan%20bantuan."
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=emebel.properti@gmail.com&su=Butuh%20Bantuan&body=Halo%20admin,%20saya%20memerlukan%20bantuan."
             target="_blank"
             class="contact-button"
         >
-            emebel.prope.com (Email)
+            emebel.propeti@gmail.com (Email)
         </a>
     </div>
 

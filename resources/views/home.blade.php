@@ -68,9 +68,9 @@ html {
 </head>
 <body class="bg-white">
 <header class="w-full bg-white py-4 px-6 md:px-12 flex items-center justify-between">
-<a href="{{ url('/') }}" class="text-3xl font-['Pacifico'] text-primary">E mebel</a>
+<a href="#" class="text-3xl font-['Pacifico'] text-primary">E mebel</a>
 <nav class="hidden md:flex items-center space-x-8">
-<a href="{{ url('/') }}" class="nav-link text-gray-800 hover:text-primary">Home</a>
+<a href="#" class="nav-link text-gray-800 hover:text-primary">Home</a>
 <a href="#about" class="nav-link text-gray-800 hover:text-primary transition-all">About</a> 
 
 <a href="#contact" class="nav-link text-gray-800 hover:text-primary">Contact</a>

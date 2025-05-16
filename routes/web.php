@@ -114,3 +114,4 @@ Route::post('/payment/midtrans-callback', [App\Http\Controllers\PaymentControlle
 
 // Route untuk Riwayat Pesanan
 Route::get('/riwayat-pesanan', [HomeController::class, 'riwayatPesanan'])->name('Riwayat Pesanan');
+// Route::get('/riwayat-pesanan', [HomeController::class, 'riwayatPesanan']);

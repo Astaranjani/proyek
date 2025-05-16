@@ -36,4 +36,10 @@ class HomeController extends Controller
         $barang = Barang::findOrFail($id);
         return view('detail', compact('barang'));
     }
+    public function riwayatPesanan()
+    {
+        // logika untuk menampilkan riwayat pesanan
+        return view('Riwayat Pesanan'); // ganti sesuai nama view kamu
+    }
+
 }
