@@ -55,7 +55,6 @@
                     <div class="mb-4">
                         <h5 class="fw-bold"><i class="bi bi-geo-alt-fill me-2 text-danger"></i>Alamat Pengiriman</h5>
                         <p class="mb-1">Putri Ayu Fadhilah</p>
-                        <p class="mb-1">0817-4976-9912</p>
                         <p class="mb-0">Jalan Gardu Listrik Kepandean Indramayu</p>
                         <span class="badge bg-secondary mt-1">Perempuan</span>
                     </div>
@@ -154,30 +153,29 @@
     </div>
 
     <!-- Tombol Aksi -->
-    <script>
-        // COD langsung redirect
-        const codButton = document.getElementById('cod-button');
-        codButton?.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.location.href = '{{ route('dashboard') }}';
-        });
+    <!-- Tombol Aksi -->
+<script>
+    // COD langsung redirect ke WhatsApp
+    const codButton = document.getElementById('cod-button');
+    codButton?.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = 'https://wa.me/6281311394644?text=' + encodeURIComponent('Halo, saya ingin melakukan pemesanan dengan metode COD.');
+    });
 
-        // Bayar pakai Snap Midtrans
-        const payButton = document.getElementById('pay-button');
-        payButton?.addEventListener('click', function(e) {
-            e.preventDefault();
-            snap.pay('{{ $snapToken }}', {
-                onSuccess: function(result) {
-                    window.location.href = '{{ route('dashboard') }}';
-                },
-                onPending: function(result) {
-                    console.log(result);
-                },
-                onError: function(result) {
-                    console.log(result);
-                }
-            });
+    // Bayar pakai Snap Midtrans
+    const payButton = document.getElementById('pay-button');
+    payButton?.addEventListener('click', function(e) {
+        e.preventDefault();
+        snap.pay('{{ $snapToken }}', {
+            onSuccess: function(result) {
+                window.location.href = '{{ route('dashboard') }}';
+            },
+            onPending: function(result) {
+                console.log(result);
+            },
+            onError: function(result) {
+                console.log(result);
+            }
         });
-    </script>
-</body>
-</html>
+    });
+</script>

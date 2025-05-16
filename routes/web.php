@@ -13,6 +13,7 @@ use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -115,3 +116,7 @@ Route::post('/payment/midtrans-callback', [App\Http\Controllers\PaymentControlle
 // Route untuk Riwayat Pesanan
 Route::get('/riwayat-pesanan', [HomeController::class, 'riwayatPesanan'])->name('Riwayat Pesanan');
 // Route::get('/riwayat-pesanan', [HomeController::class, 'riwayatPesanan']);
+
+// ===========================
+// RIWAYAT PESANAN ADMIN
+// ===========================
