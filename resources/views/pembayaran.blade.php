@@ -135,6 +135,10 @@
 
                     @if(isset($snapToken))
                         <div class="mb-4">
+                            <form id="formPembayaran" method="POST" action="{{ route('pembayaran.proses') }}">
+                                @csrf
+                                <input type="hidden" name="payment_result" id="payment_result">
+                            </form>
                             <h5 class="fw-bold"><i class="bi bi-wallet2 me-2 text-primary"></i>Metode Pembayaran</h5>
                             <div class="row g-2">
                                 <div class="col-6">
@@ -143,6 +147,9 @@
                                 <div class="col-6">
                                     <button type="button" class="btn btn-outline-dark w-100 py-2" id="pay-button">Bayar Sekarang</button>
                                 </div>
+                                <form id="formPembayaran" method="POST" action="{{ route('pembayaran.proses') }}" style="display: none;">
+                                @csrf
+                                </form>
                             </div>
                         </div>
                     @endif
@@ -157,25 +164,62 @@
 <script>
     // COD langsung redirect ke WhatsApp
     const codButton = document.getElementById('cod-button');
-    codButton?.addEventListener('click', function(e) {
-        e.preventDefault();
+codButton?.addEventListener('click', function(e) {
+    e.preventDefault();
+
+    fetch("{{ route('pembayaran.cod') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({ action: 'cod' })
+    })
+    .then(res => res.json())
+    .then(() => {
+        // Setelah keranjang dikosongkan, redirect ke WhatsApp
         window.location.href = 'https://wa.me/6281311394644?text=' + encodeURIComponent('Halo, saya ingin melakukan pemesanan dengan metode COD.');
+    })
+    .catch(err => {
+        alert("Gagal memproses COD. Silakan coba lagi.");
     });
+});
+
 
     // Bayar pakai Snap Midtrans
     const payButton = document.getElementById('pay-button');
-    payButton?.addEventListener('click', function(e) {
-        e.preventDefault();
-        snap.pay('{{ $snapToken }}', {
-            onSuccess: function(result) {
+
+payButton?.addEventListener('click', function(e) {
+    e.preventDefault();
+    snap.pay('{{ $snapToken }}', {
+        onSuccess: function(result) {
+            // Kirim hasil transaksi ke server
+            fetch("{{ route('pembayaran.proses') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    result: result // kirim detail pembayaran
+                })
+            })
+            .then(res => res.json())
+            .then(() => {
                 window.location.href = '{{ route('dashboard') }}';
-            },
-            onPending: function(result) {
-                console.log(result);
-            },
-            onError: function(result) {
-                console.log(result);
-            }
-        });
+            })
+            .catch(() => {
+                alert("Pembayaran berhasil, tapi ada error.");
+                window.location.href = '{{ route('dashboard') }}';
+            });
+        },
+        onPending: function(result) {
+            console.log('Pending:', result);
+        },
+        onError: function(result) {
+            console.log('Error:', result);
+        }
     });
+});
 </script>

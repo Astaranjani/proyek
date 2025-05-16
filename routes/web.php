@@ -99,6 +99,18 @@ Route::get('/pembayaran', [PembayaranController::class, 'index']);
 Route::any('/pembayaran', [PembayaranController::class, 'method']);
 Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
 
+Route::post('/pembayaran', [PembayaranController::class, 'bayar'])->name('pembayaran.bayar');
+Route::get('/pembayaran-sukses', function () {
+    return view('pembayaran-sukses');
+})->name('pembayaran.sukses');
+Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran'); // ✅ BENAR
+Route::post('/cod', [PembayaranController::class, 'cod'])->name('pembayaran.cod');
+Route::post('/cod', [PembayaranController::class, 'cod'])->name('pembayaran.cod');
+Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
+
+
+
+
 // ===========================
 // PROFIL ROUTES
 // ===========================

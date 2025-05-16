@@ -63,35 +63,35 @@ class PembayaranController extends Controller
     }
 
     public function proses(Request $request)
-    {
-        $cart = session()->get('cart', []);
-        $user_id = auth()->user()->id;
+{
+    Log::info('proses method dipanggil');
 
-        if (empty($cart)) {
-            return redirect()->route('dashboard')->with('error', 'Keranjang kosong, tidak ada transaksi yang disimpan.');
-        }
+    $cart = session()->get('cart', []);
+    $user_id = auth()->user()->id;
 
-        foreach ($cart as $item) {
-            if (!isset($item['barang_id'])) {
-                return redirect()->route('dashboard')->with('error', 'Data barang tidak lengkap di keranjang.');
-            }
-
-            try {
-                Transaksi::create([
-                    'user_id' => $user_id,
-                    'barang_id' => $item['barang_id'],
-                    'total_pembayaran' => $item['harga'] * $item['jumlah'],
-                    'status_pembayaran' => 'Belum Lunas',
-                ]);
-            } catch (\Exception $e) {
-                return redirect()->route('dashboard')->with('error', 'Gagal menyimpan transaksi: ' . $e->getMessage());
-            }
-        }
-
-        session()->forget('cart');
-
-        return redirect()->route('dashboard')->with('success', 'Pembayaran berhasil disimpan ke database!');
+    if (empty($cart)) {
+        Log::warning('Keranjang kosong saat proses pembayaran');
+        return redirect()->route('dashboard')->with('error', 'Keranjang kosong.');
     }
+
+    $paymentResult = json_decode($request->payment_result, true);
+    Log::info('Hasil pembayaran Midtrans:', $paymentResult);
+
+    foreach ($cart as $item) {
+        Transaksi::create([
+            'user_id' => $user_id,
+            'barang_id' => $item['barang_id'],
+            'total_pembayaran' => $item['harga'] * $item['jumlah'],
+            'status_pembayaran' => 'Lunas',
+            'kode_transaksi' => $paymentResult['transaction_id'] ?? 'manual',
+        ]);
+    }
+
+    session()->forget('cart');
+
+    return redirect()->route('dashboard')->with('success', 'Pembayaran berhasil!');
+}
+
 
     public function beliSekarang(Request $request)
     {
@@ -132,4 +132,17 @@ class PembayaranController extends Controller
         'barang' => $barang,
     ]);
 }
+public function bayar(Request $request)
+{
+    // Validasi dan proses pembayaran, misal menggunakan payment gateway atau manual
+
+    // Simulasi pembayaran sukses
+    // ... logika menyimpan transaksi ke database
+
+    // Hapus keranjang dari session
+    session()->forget('cart');
+
+    return redirect()->route('pembayaran.sukses')->with('success', 'Pembayaran berhasil!');
+}
+
 }
