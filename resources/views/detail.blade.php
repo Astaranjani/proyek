@@ -86,27 +86,21 @@
                 <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('Riwayat Pesanan') }}">Riwayat Pesanan</a></li>
             </ul>
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('keranjang') }}">
-                        <img src="{{ asset('images/keranjang.png') }}" alt="Keranjang" style="width: 37px; height: 23px;">
-                    </a>
-                </li>
+             <a class="nav-link" href="{{ route('keranjang') }}">
+                    <img src="{{ asset('images/keranjang.png') }}" alt="Keranjang" style="width: 37px; height: 23px;">
+                </a>
                 @auth
-                <li class="nav-item">
-                    <form method="GET" action="{{ route('logout') }}" style="display: inline;">
+                <class="nav-item">
+                    <form method="GET" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="btn btn-link nav-link p-0" style="border: none; background: none;">
-                            <img src="{{ asset('images/logout.png') }}" alt="Logout" style="width: 20px; height: 20px;">
-                        </button>
+                        <button type="submit" class="btn btn-link nav-link" style="padding: 0; border: none; background: none;">
+                        <img src="{{ asset('images/logout.png') }}" alt="Logout" style="width: 20px; height: 20px;">
+                    </button>
                     </form>
-                </li>
                 @endauth
-            </ul>
         </div>
-    </div>
-</nav>
-
+    </nav>
+    
 <!-- Product Detail -->
 <section class="product-wrapper py-5">
     <div class="container">

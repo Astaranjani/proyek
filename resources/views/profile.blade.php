@@ -93,25 +93,45 @@
 
     <div class="profile px-4 py-5">
         <div class="header-bar">Update Profil</div>
+
+        {{-- Alert sukses --}}
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        {{-- Alert error --}}
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <div class="profile-form">
             <div class="image-upload text-center mb-3">
                 @if(Auth::user()->profile_image)
-                    <img id="preview" src="{{ asset('images/icon profil.png' . Auth::user()->profile_image) }}" alt="Profil" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                    <img id="preview" src="{{ asset('storage/profile_images/' . Auth::user()->profile_image) }}" alt="Profil" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
                 @else
                     <img id="preview" src="{{ asset('images/icon profil.png') }}" alt="Profil" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
                 @endif
             </div>
 
-            <form method="POST" action="{{ route('profile') }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('profile.update') }}">
                 @csrf
-                @method('POST')
+                @method('PUT')
 
                 <input type="text" name="name" placeholder="Nama Lengkap" required value="{{ old('name', Auth::user()->name) }}">
                 <input type="email" name="email" placeholder="Email" required value="{{ old('email', Auth::user()->email) }}">
-                <input type="text" name="phone" placeholder="No. Handphone" required value="{{ old('phone', Auth::user()->phone) }}">
-                <input type="text" name="gender" placeholder="Jenis Kelamin" required value="{{ old('gender', Auth::user()->gender) }}">
-                <input type="text" name="address" placeholder="Alamat" required value="{{ old('address', Auth::user()->address) }}">
-                <button type="submit" class="save-btn btn mt-2">Save</button>
+                <input type="text" name="phone" placeholder="No. Handphone" value="{{ old('phone', Auth::user()->phone) }}">
+                <input type="text" name="gender" placeholder="Jenis Kelamin" value="{{ old('gender', Auth::user()->gender) }}">
+                <input type="text" name="address" placeholder="Alamat" value="{{ old('address', Auth::user()->address) }}">
+
+                <button type="submit" class="save-btn btn mt-2">Simpan</button>
             </form>
         </div>
     </div>
@@ -134,20 +154,10 @@
             target="_blank"
             class="contact-button"
         >
-            emebel.propeti@gmail.com (Email)
+            emebel.properti@gmail.com (Email)
         </a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function previewImage(event) {
-            const reader = new FileReader();
-            reader.onload = function(){
-                const output = document.getElementById('preview');
-                output.src = reader.result;
-            };
-            reader.readAsDataURL(event.target.files[0]);
-        }
-    </script>
 </body>
 </html>

@@ -40,6 +40,7 @@ class KeranjangController extends Controller
 
     public function hapus(Request $request)
     {
+       $barangId = $request->input('barang_id');
         $cart = session()->get('cart', []);
 
         if (isset($cart[$request->barang_id])) {
@@ -69,6 +70,8 @@ class KeranjangController extends Controller
             $totalJumlah += $jumlah;
             $totalHarga += $jumlah * $harga;
         }
+        // Hapus isi keranjang
+        session()->forget('cart');
 
         return view('pembayaran', compact('cart', 'totalJumlah', 'totalHarga'));
         return view('pembayaran', compact('snapToken', 'cart', 'total'));
@@ -91,4 +94,9 @@ class KeranjangController extends Controller
     // Tambahkan ini untuk debug
     return redirect()->route('pembayaran');
 }
+public function pembayaranSukses()
+{
+    // Hapus isi keranjang dari session
+}
+
 }

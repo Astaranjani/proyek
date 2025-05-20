@@ -170,77 +170,8 @@ class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
     </div>
   </div>
   
-</section>
-<section id="contact" class="w-full px-6 md:px-12 py-16 bg-primary/5">
-  <div class="max-w-4xl mx-auto">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl md:text-4xl font-bold mb-4">Tinggalkan pesan untuk kami</h2>
-      <p class="text-gray-600">
-        punya pesan ataupun kesan? suarakan melalui pesan ke kami, suara kalian inspirasi bagi kami <br>
-        atau punya keluhan tentang sistem, service, dan lain lain. Boleh bagikan ke kami jugaa <br>
-        kami tunggu suara anda.......
-      </p>
-    </div>
-    <div class="bg-white p-8 rounded-2xl shadow-lg">
-      <form
-        id="contactForm"
-        class="grid grid-cols-1 md:grid-cols-2 gap-6"
-      >
-        <div class="md:col-span-1">
-          <label
-            class="block text-sm font-medium text-gray-700 mb-2"
-            for="name"
-            >Full Name</label
-          >
-          <input
-            type="text"
-            id="name"
-            name="name"
-            class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary text-sm"
-            placeholder="Salman jeh"
-            required
-          />
-        </div>
-        <div class="md:col-span-1">
-          <label
-            class="block text-sm font-medium text-gray-700 mb-2"
-            for="email"
-            >Email Address</label
-          >
-          <input
-            type="email"
-            id="email"
-            name="email"
-            class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary text-sm"
-            placeholder="anu@gmail.com"
-            required
-          />
-        </div>
+
         <div class="md:col-span-2">
-          <label
-            class="block text-sm font-medium text-gray-700 mb-2"
-            for="message"
-            >Message</label
-          >
-          <textarea
-            id="message"
-            name="message"
-            rows="6"
-            class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary text-sm"
-            placeholder="Tell us about your project..."
-            required
-          ></textarea>
-        </div>
-        <div class="md:col-span-2">
-          <button
-            type="submit"
-            class="w-full bg-primary text-white py-3 px-8 !rounded-button whitespace-nowrap hover:bg-opacity-90 transition-all"
-          >
-            Send Message
-          </button>
-        </div>
-      </form>
-    </div>
     <div
       id="successMessage"
       class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -338,15 +269,11 @@ class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
       <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
       <ul class="space-y-2">
         <li class="flex items-center gap-2">
-          <i class="ri-map-pin-line"></i>
-          <span class="text-gray-600">departement mebel, electronic mebel</span>
-        </li>
-        <li class="flex items-center gap-2">
           <i class="ri-mail-line"></i>
           <a
             href="mailto:hello@example.com"
             class="text-gray-600 hover:text-primary transition-colors"
-            >Emebel@gmail.com</a
+            >emebel.properti@gmail.com</a
           >
         </li>
         <li class="flex items-center gap-2">
@@ -354,7 +281,7 @@ class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
           <a
             href="tel:+1234567890"
             class="text-gray-600 hover:text-primary transition-colors"
-            >+62 858-567-890</a
+            >+62 813-1139-4644</a
           >
         </li>
       </ul>

@@ -107,8 +107,14 @@ Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembaya
 Route::post('/cod', [PembayaranController::class, 'cod'])->name('pembayaran.cod');
 Route::post('/cod', [PembayaranController::class, 'cod'])->name('pembayaran.cod');
 Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
-
-
+Route::get('/pembayaran/sukses', [KeranjangController::class, 'pembayaranSukses'])->name('pembayaran.sukses');
+Route::get('/pembayaran', [PembayaranController::class, 'show'])->name('pembayaran');
+Route::post('/pembayaran', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
+Route::middleware('auth')->group(function () {
+    Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran.index');
+Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
+Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
+});
 
 
 // ===========================
@@ -117,7 +123,10 @@ Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::post('/profile', [ProfileController::class, 'update']);
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
+
 
 // ===========================
 // MIDTRANS CALLBACK

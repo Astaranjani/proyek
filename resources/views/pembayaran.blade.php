@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Halaman Pembayaran</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <!-- Midtrans Snap -->
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
 
@@ -18,6 +18,8 @@
             border-radius: 15px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
             padding: 30px;
+            margin-top: 40px;
+            margin-bottom: 40px;
         }
         h2 {
             font-weight: bold;
@@ -35,7 +37,7 @@
             transition: background-color 0.3s ease;
         }
         .btn-primary:hover {
-            background-color: #0bc455;
+            background-color: #0aa64b;
         }
         .alert {
             border-radius: 10px;
@@ -43,183 +45,152 @@
         .text-end {
             text-align: right;
         }
+        .form-control[readonly] {
+            background-color: #e9ecef;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
-    <div class="container my-5">
+
+    <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-10 col-lg-8">
                 <div class="card card-custom">
                     <h2 class="mb-4 text-center">Pembayaran</h2>
 
-                    <div class="mb-4">
-                        <h5 class="fw-bold"><i class="bi bi-geo-alt-fill me-2 text-danger"></i>Alamat Pengiriman</h5>
-                        <p class="mb-1">Putri Ayu Fadhilah</p>
-                        <p class="mb-0">Jalan Gardu Listrik Kepandean Indramayu</p>
-                        <span class="badge bg-secondary mt-1">Perempuan</span>
-                    </div>
+                    <form id="payment-form" method="POST" action="{{ route('pembayaran.proses') }}">
+                        @csrf
+                        <input type="hidden" name="payment_result" id="payment-result">
 
-                    @php
-                        $total = 0;
-                    @endphp
-
-                    @if(isset($barang))
-                        @php
-                            $total = $barang->harga;
-                        @endphp
-
-                        <div class="table-responsive">
-                            <table class="table table-bordered align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Produk</th>
-                                        <th>Harga</th>
-                                        <th>Jumlah</th>
-                                        <th>Subtotal</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>{{ $barang->nama }}</td>
-                                        <td>Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
-                                        <td>1</td>
-                                        <td>Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
-                                    </tr>
-                                    <tr class="table-secondary fw-bold">
-                                        <td colspan="3" class="text-end">Total</td>
-                                        <td>Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="mb-3">
+                            <input type="text" class="form-control mb-2" value="{{ auth()->user()->name }}" readonly />
+                            <input type="email" class="form-control mb-2" value="{{ auth()->user()->email }}" readonly />
+                            <input type="text" class="form-control mb-2" value="{{ auth()->user()->phone }}" readonly />
+                            <input type="text" class="form-control" value="{{ auth()->user()->address }}" readonly />
                         </div>
-                    @elseif(session()->has('cart') && count(session('cart')) > 0)
+
                         @php
-                            $cart = session('cart');
+                            $total = 0;
                         @endphp
-                        <div class="table-responsive">
-                            <table class="table table-bordered align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Produk</th>
-                                        <th>Harga</th>
-                                        <th>Jumlah</th>
-                                        <th>Subtotal</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($cart as $item)
+
+                        @if(isset($barang))
+                            @php
+                                $total = $barang->harga;
+                            @endphp
+
+                            <div class="table-responsive mb-4">
+                                <table class="table table-bordered align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Produk</th>
+                                            <th>Harga</th>
+                                            <th>Jumlah</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{{ $barang->nama }}</td>
+                                            <td>Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
+                                            <td>1</td>
+                                            <td>Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
+                                        </tr>
+                                        <tr class="table-secondary fw-bold">
+                                            <td colspan="3" class="text-end">Total</td>
+                                            <td>Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        @elseif(session()->has('cart') && count(session('cart')) > 0)
+                            @php
+                                $cart = session('cart');
+                            @endphp
+                            <div class="table-responsive mb-4">
+                                <table class="table table-bordered align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Produk</th>
+                                            <th>Harga</th>
+                                            <th>Jumlah</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php
+                                            $total = 0; // reset total
+                                        @endphp
+                                        @foreach($selectedCartItems as $item)
                                         @php
                                             $jumlah = $item['jumlah'] ?? 1;
                                             $subtotal = $item['harga'] * $jumlah;
-                                            $total += $subtotal;
-                                        @endphp
-                                        <tr>
-                                            <td>{{ $item['nama'] }}</td>
-                                            <td>Rp {{ number_format($item['harga'], 0, ',', '.') }}</td>
-                                            <td>{{ $jumlah }}</td>
-                                            <td>Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
+                                             $total += $subtotal; 
+                                       @endphp
+                                            <tr>
+                                                <td>{{ $item['nama'] }}</td>
+                                                <td>Rp {{ number_format($item['harga'], 0, ',', '.') }}</td>
+                                                <td>{{ $jumlah }}</td>
+                                                <td>Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
+                                            </tr>
+                                        @endforeach
+                                        <tr class="table-secondary fw-bold">
+                                            <td colspan="3" class="text-end">Total</td>
+                                            <td>Rp {{ number_format($total, 0, ',', '.') }}</td>
                                         </tr>
-                                    @endforeach
-                                    <tr class="table-secondary fw-bold">
-                                        <td colspan="3" class="text-end">Total</td>
-                                        <td>Rp {{ number_format($total, 0, ',', '.') }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="alert alert-warning text-center">
-                            Tidak ada produk untuk dibayar.
-                        </div>
-                    @endif
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="alert alert-warning text-center">
+                                Tidak ada produk untuk dibayar.
+                            </div>
+                        @endif
 
-                    @if(isset($snapToken))
-                        <div class="mb-4">
-                            <form id="formPembayaran" method="POST" action="{{ route('pembayaran.proses') }}">
-                                @csrf
-                                <input type="hidden" name="payment_result" id="payment_result">
-                            </form>
-                            <h5 class="fw-bold"><i class="bi bi-wallet2 me-2 text-primary"></i>Metode Pembayaran</h5>
-                            <div class="row g-2">
+                        @if(isset($snapToken))
+                            <h5 class="fw-bold mb-3"><i class="bi bi-wallet2 me-2 text-primary"></i>Metode Pembayaran</h5>
+                            <div class="row g-2 mb-3">
                                 <div class="col-6">
                                     <button type="button" class="btn btn-outline-dark w-100 py-2" id="cod-button">COD</button>
                                 </div>
                                 <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark w-100 py-2" id="pay-button">Bayar Sekarang</button>
+                                    <button type="button" class="btn btn-primary w-100 py-2" id="pay-button">Bayar Sekarang</button>
                                 </div>
-                                <form id="formPembayaran" method="POST" action="{{ route('pembayaran.proses') }}" style="display: none;">
-                                @csrf
-                                </form>
                             </div>
-                        </div>
-                    @endif
-
+                        @endif
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Tombol Aksi -->
-    <!-- Tombol Aksi -->
-<script>
-    // COD langsung redirect ke WhatsApp
-    const codButton = document.getElementById('cod-button');
-codButton?.addEventListener('click', function(e) {
-    e.preventDefault();
-
-    fetch("{{ route('pembayaran.cod') }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        },
-        body: JSON.stringify({ action: 'cod' })
-    })
-    .then(res => res.json())
-    .then(() => {
-        // Setelah keranjang dikosongkan, redirect ke WhatsApp
-        window.location.href = 'https://wa.me/6281311394644?text=' + encodeURIComponent('Halo, saya ingin melakukan pemesanan dengan metode COD.');
-    })
-    .catch(err => {
-        alert("Gagal memproses COD. Silakan coba lagi.");
-    });
-});
-
-
-    // Bayar pakai Snap Midtrans
-    const payButton = document.getElementById('pay-button');
-
-payButton?.addEventListener('click', function(e) {
-    e.preventDefault();
-    snap.pay('{{ $snapToken }}', {
-        onSuccess: function(result) {
-            // Kirim hasil transaksi ke server
-            fetch("{{ route('pembayaran.proses') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+    <script>
+        const payButton = document.getElementById('pay-button');
+        payButton?.addEventListener('click', function(e) {
+            e.preventDefault();
+            snap.pay('{{ $snapToken }}', {
+                onSuccess: function(result) {
+                    document.getElementById('payment-result').value = JSON.stringify(result);
+                    document.getElementById('payment-form').submit();
                 },
-                credentials: 'same-origin',
-                body: JSON.stringify({
-                    result: result // kirim detail pembayaran
-                })
-            })
-            .then(res => res.json())
-            .then(() => {
-                window.location.href = '{{ route('dashboard') }}';
-            })
-            .catch(() => {
-                alert("Pembayaran berhasil, tapi ada error.");
-                window.location.href = '{{ route('dashboard') }}';
+                onPending: function(result) {
+                    document.getElementById('payment-result').value = JSON.stringify(result);
+                    document.getElementById('payment-form').submit();
+                },
+                onError: function(result) {
+                    alert("Pembayaran gagal!");
+                    console.error(result);
+                }
             });
-        },
-        onPending: function(result) {
-            console.log('Pending:', result);
-        },
-        onError: function(result) {
-            console.log('Error:', result);
-        }
-    });
-});
-</script>
+        });
+
+        const codButton = document.getElementById('cod-button');
+        codButton?.addEventListener('click', function () {
+            const nomor = "6281311394644"; // Nomor admin (format internasional tanpa +)
+            const pesan = encodeURIComponent("Halo admin, saya ingin pesan dengan metode COD.");
+            const url = `https://wa.me/${nomor}?text=${pesan}`;
+            window.open(url, '_blank');
+        });
+    </script>
+</body>
+</html>
