@@ -109,7 +109,7 @@ class PembayaranController extends Controller
             Transaksi::create([
                 'user_id' => $user_id,
                 'barang_id' => $item['barang_id'],
-                'total_pembayaran' => $item['harga'] * ($item['jumlah'] ?? 1),
+                'total_harga' => $item['harga'] * ($item['jumlah'] ?? 1),
                 'status_pembayaran' => 'Lunas',
                 'kode_transaksi' => $paymentResult['transaction_id'] ?? 'manual',
             ]);
@@ -183,7 +183,7 @@ class PembayaranController extends Controller
             Transaksi::create([
                 'user_id' => $user_id,
                 'barang_id' => $item['barang_id'],
-                'total_pembayaran' => $item['harga'] * ($item['jumlah'] ?? 1),
+                'total_harga' => $item['harga'] * ($item['jumlah'] ?? 1),
                 'status_pembayaran' => 'Lunas',
                 'kode_transaksi' => 'manual-' . Str::random(10),
             ]);

@@ -124,10 +124,11 @@
            @endforeach
 
                     <div class="text-end mt-3">
-                        <button type="button" id="checkout-button" class="btn btn-success checkout-btn" disabled onclick="submitCheckout()">
+                        <a id="checkout-button" class="btn btn-success checkout-btn disabled" href="{{ route('pembayaran') }}">
                             Checkout (<span id="selected-count">0</span> Item)
-                        </button>
+                        </a>
                     </div>
+
                 </form>
             @endif
         </div>
