@@ -82,11 +82,12 @@
         </div>
     </nav>
 
-    <section class="keranjang-wrapper bg-light py-4">
+        <section class="keranjang-wrapper bg-light py-4">
         <div class="container">
             <h4 class="mb-3 fw-bold">Keranjang Saya</h4>
+
             @php 
-            $cart = session('cart', []); 
+                $cart = session('cart', []); 
             @endphp
 
             @if (count($cart) === 0)
@@ -94,45 +95,51 @@
             @else
                 <form action="{{ route('pembayaran') }}" method="GET" id="checkout-form">
                     @csrf
+
                     <div id="selected-items-container">
                         <!-- Items yang dipilih akan disimpan di sini -->
                     </div>
 
                     @foreach ($cart as $id => $item)
-                    <div class="d-flex align-items-center border-bottom py-3 justify-content-between item-container" data-item-id="{{ $id }}">
-                        <div class="d-flex align-items-center">
-                            <div class="select-btn" onclick="toggleSelectItem(this, '{{ $id }}')">
-                                <i class="bi bi-check-lg"></i>
+                        <div class="d-flex align-items-center border-bottom py-3 justify-content-between item-container" data-item-id="{{ $id }}">
+                            <div class="d-flex align-items-center">
+                                <div class="select-btn" onclick="toggleSelectItem(this, '{{ $id }}')">
+                                    <i class="bi bi-check-lg"></i>
+                                </div>
+                                <img src="{{ asset('storage/' . $item['gambar']) }}" alt="{{ $item['nama'] }}" class="item-image me-3">
+                                <div>
+                                    <div class="item-name">{{ $item['nama'] }}</div>
+                                    <div class="item-price">Rp. {{ number_format($item['harga'], 0, ',', '.') }}</div>
+                                </div>
                             </div>
-                            <img src="{{ asset('storage/' . $item['gambar']) }}" alt="{{ $item['nama'] }}" class="item-image me-3">
+
+                            <!-- Tombol hapus -->
                             <div>
-                                <div class="item-name">{{ $item['nama'] }}</div>
-                                <div class="item-price">Rp. {{ number_format($item['harga'], 0, ',', '.') }}</div>
+                                <form action="{{ route('keranjang.hapus') }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus barang ini dari keranjang?');">
+                                    @csrf
+                                    <input type="hidden" name="barang_id" value="{{ $id }}">
+                                    <button class="btn btn-danger btn-sm">Hapus</button>
+                                </form>
                             </div>
                         </div>
-
-                        {{-- Tombol hapus ditaruh di luar form utama --}}
-                        <div>
-                           <form action="{{ route('keranjang.hapus') }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus barang ini dari keranjang?');">
-                        @csrf
-                        <input type="hidden" name="barang_id" value="{{ $id }}">
-                        <button class="btn btn-danger btn-sm">Hapus</button>
-                    </form>
-                </div>
-                    </div>
-               
-           @endforeach
+                    @endforeach
 
                     <div class="text-end mt-3">
-                        <a id="checkout-button" class="btn btn-success checkout-btn disabled" href="{{ route('pembayaran') }}">
+                        <button 
+                            type="button" 
+                            id="checkout-button" 
+                            class="btn btn-success checkout-btn" 
+                            disabled 
+                            onclick="submitCheckout()" 
+                            href="{{ route('pembayaran') }}">
                             Checkout (<span id="selected-count">0</span> Item)
-                        </a>
+                        </button>
                     </div>
-
                 </form>
             @endif
         </div>
     </section>
+
 
     <script>
         let selectedItems = [];
