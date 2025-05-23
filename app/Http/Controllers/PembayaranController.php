@@ -24,7 +24,7 @@ class PembayaranController extends Controller
 
         // Filter hanya item yang dipilih berdasarkan key (barang_id)
         $selectedCartItems = array_intersect_key($cart, array_flip($selectedItems));
-
+        Log::info('Selected Cart Items at index:', ['items' => $selectedCartItems]);
         if (empty($selectedCartItems)) {
             return redirect()->back()->with('error', 'Tidak ada item yang dipilih untuk checkout!');
         }
@@ -96,7 +96,7 @@ class PembayaranController extends Controller
         $user_id = auth()->user()->id;
 
         $selectedCartItems = array_intersect_key($cart, array_flip($selectedItems));
-
+        Log::info('Selected Cart Items at proses:', ['items' => $selectedCartItems]);
         if (empty($selectedCartItems)) {
             Log::warning('Tidak ada item yang dipilih saat proses pembayaran');
             return redirect()->route('dashboard')->with('error', 'Tidak ada item yang dipilih.');
@@ -104,10 +104,14 @@ class PembayaranController extends Controller
 
         $paymentResult = json_decode($request->payment_result, true);
         Log::info('Hasil pembayaran Midtrans:', $paymentResult);
+        Log::info('Nama barang dari cart: ' . ($item['nama'] ?? 'null'));
 
         foreach ($selectedCartItems as $item) {
+            $barang = session('barang');
             Transaksi::create([
+                
                 'user_id' => $user_id,
+                'nama_barang' => $item['nama'],
                 'barang_id' => $item['barang_id'],
                 'total_harga' => $item['harga'] * ($item['jumlah'] ?? 1),
                 'status_pembayaran' => 'Lunas',
@@ -172,7 +176,7 @@ class PembayaranController extends Controller
         $selectedItems = array_map('strval', $selectedItems);
 
         $selectedCartItems = array_intersect_key($cart, array_flip($selectedItems));
-
+        Log::info('Selected Cart Items at bayar:', ['items' => $selectedCartItems]);
         if (empty($selectedCartItems)) {
             return redirect()->back()->with('error', 'Tidak ada item yang dipilih untuk checkout!');
         }
@@ -182,6 +186,7 @@ class PembayaranController extends Controller
         foreach ($selectedCartItems as $item) {
             Transaksi::create([
                 'user_id' => $user_id,
+                'nama_barang' => $item['nama'],
                 'barang_id' => $item['barang_id'],
                 'total_harga' => $item['harga'] * ($item['jumlah'] ?? 1),
                 'status_pembayaran' => 'Lunas',

@@ -20,7 +20,7 @@
         <ul class="navbar-nav mx-auto"> <!-- Pindahkan ke tengah dengan mx-auto -->
             <li class="nav-item"><a class="nav-link" href="{{ url('dashboard') }}">Home</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('Riwayat Pesanan') }}">Riwayat Pesanan</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ route('riwayat.pesanan') }}">Riwayat Pesanan</a></li>
         </ul>
                 <a class="nav-link" href="{{ route('keranjang') }}">
                     <img src="{{ asset('images/keranjang.png') }}" alt="Keranjang" style="width: 37px; height: 23px;">

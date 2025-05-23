@@ -10,7 +10,10 @@ return new class extends Migration {
         Schema::create('transaksis', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // relasi ke pelanggan
-            $table->decimal('total_harga', 15, 2);
+            $table->string('nama_barang')->nullable(false); 
+            $table->string('status_pembayaran')->nullable();
+            $table->string('kode_transaksi')->nullable();
+            $table->string('status')->default('pending'); // diperlukan untuk metode riwayat Anda di mana 'status' di-query
             $table->timestamps();
         });
     }

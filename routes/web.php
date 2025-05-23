@@ -13,7 +13,9 @@ use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\RiwayatController;
+use App\Models\Order;
 
 /*
 |--------------------------------------------------------------------------
@@ -114,6 +116,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran.index');
 Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
 Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
+Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
+
 });
 
 
@@ -139,5 +143,6 @@ Route::get('/riwayat-pesanan', [HomeController::class, 'riwayatPesanan'])->name(
 // Route::get('/riwayat-pesanan', [HomeController::class, 'riwayatPesanan']);
 
 // ===========================
-// RIWAYAT PESANAN ADMIN
+// RIWAYAT PESANAN USER
 // ===========================
+Route::get('/riwayat-pesanan', [RiwayatController::class, 'index'])->name('riwayat.pesanan');
