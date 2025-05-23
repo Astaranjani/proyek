@@ -1,55 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Transaksi - Admin</title>
-
-<script src="https://cdn.tailwindcss.com/3.4.16"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: { primary: "#4318FF", secondary: "#4FD1C5" },
-            borderRadius: {
-              none: "0px",
-              sm: "4px",
-              DEFAULT: "8px",
-              md: "12px",
-              lg: "16px",
-              xl: "20px",
-              "2xl": "24px",
-              "3xl": "32px",
-              full: "9999px",
-              button: "8px",
-            },
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manajemen Transaksi - Admin</title>
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { primary: "#4318FF", secondary: "#4FD1C5" },
+          borderRadius: {
+            button: "8px",
           },
         },
-      };
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
-      rel="stylesheet"
-    />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
-    <style>
-      :where([class^="ri-"])::before { content: "\f3c2"; }
-      input[type="number"]::-webkit-inner-spin-button,
-      input[type="number"]::-webkit-outer-spin-button {
-          -webkit-appearance: none;
-          margin: 0;
-      }
-      body {
-          font-family: 'Inter', sans-serif;
-      }
-    </style>
-
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+  <style>
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="flex h-screen bg-gray-50">
+  <!-- Sidebar -->
 <div class="flex h-screen bg-gray-50">
     <!-- Sidebar -->
     <aside class="w-64 bg-[#111827] text-white flex flex-col">
@@ -148,92 +133,56 @@
                 </form>
             </div>
         </div>
-    </aside>
-</head>
+    </aside>  
 
-<div class="p-6">
+  <!-- Konten -->
+  <div class="flex-1 p-6 overflow-y-auto">
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Daftar Transaksi</h1>
+      <h1 class="text-2xl font-bold">Daftar Transaksi</h1>
     </div>
 
     <div class="overflow-x-auto bg-white rounded-lg shadow">
-        <table class="min-w-full">
-            <thead class="bg-gray-800 text-white">
-                <tr>
-                    <th class="px-6 py-3 text-left">ID Transaksi</th>
-                    <th class="px-6 py-3 text-left">Nama Pelanggan</th>
-                    <th class="px-6 py-3 text-left">Nama Barang</th>
-                    <th class="px-6 py-3 text-left">Total Pembayaran</th>
-                    <th class="px-6 py-3 text-left">Status Pembayaran</th>
-                    <th class="px-6 py-3 text-left">Tanggal Transaksi</th>
-                    <th class="px-6 py-3 text-left">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-                @foreach($transaksi as $t)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4">{{ $t->id }}</td>
-                        <td class="px-6 py-4 font-medium">{{ $t->user->nama }}</td>
-                        <td class="px-6 py-4">{{ $t->barang->nama_barang }}</td>
-                        <td class="px-6 py-4">Rp{{ number_format($t->total_harga, 0, ',', '.') }}</td>
-                        <td class="px-6 py-4 font-medium">
-                            <span class="{{ $t->status_pembayaran == 'Lunas' ? 'text-green-500' : 'text-red-500' }}">
-                                {{ $t->status_pembayaran }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4">{{ date('d M Y', strtotime($t->tanggal_transaksi)) }}</td>
-                        <td class="px-6 py-4">
-                            <div class="flex space-x-2">
-                                <button class="px-3 py-1.5 text-sm font-medium rounded-md border border-red-500 text-red-500 hover:bg-red-50 transition-colors delete-btn" 
-                                        data-id="{{ $t->id }}">
-                                    Hapus
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+      <table class="min-w-full">
+        <thead class="bg-gray-800 text-white">
+          <tr>
+            <th class="px-6 py-3 text-left">ID Transaksi</th>
+            <th class="px-6 py-3 text-left">Nama Pelanggan</th>
+            <th class="px-6 py-3 text-left">Nama Barang</th>
+            <th class="px-6 py-3 text-left">Total Pembayaran</th>
+            <th class="px-6 py-3 text-left">Status Pembayaran</th>
+            <th class="px-6 py-3 text-left">Tanggal Transaksi</th>
+            <th class="px-6 py-3 text-left">Aksi</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          @foreach($transaksi as $t)
+            <tr id="transaction-{{ $t->id }}" class="hover:bg-gray-50">
+              <td class="px-6 py-4">{{ $t->id }}</td>
+              <td class="px-6 py-4 font-medium">{{ $t->user->nama }}</td>
+              <td class="px-6 py-4">{{ $t->barang->nama_barang }}</td>
+              <td class="px-6 py-4">Rp{{ number_format($t->total_harga, 0, ',', '.') }}</td>
+              <td class="px-6 py-4 font-medium">
+                <span class="{{ $t->status_pembayaran == 'Lunas' ? 'text-green-500' : 'text-red-500' }}">
+                  {{ $t->status_pembayaran }}
+                </span>
+              </td>
+              <td class="px-6 py-4">{{ date('d M Y', strtotime($t->created_at)) }}</td>
+              <td class="px-6 py-4">
+                <form method="POST" action="{{ route('admin.transaksi.destroy', $t->id) }}">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" 
+                          onclick="return confirm('Yakin ingin menghapus transaksi ini?')"
+                          class="px-3 py-1.5 text-sm font-medium rounded-md border border-red-500 text-red-500 hover:bg-red-50 transition-colors">
+                    Hapus
+                  </button>
+                </form>
+              </td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
     </div>
-</div>
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Add event listeners to all delete buttons
-    document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const transactionId = this.getAttribute('data-id');
-            if (confirm('Yakin ingin menghapus transaksi ini?')) {
-                // Call function to delete transaction
-                deleteTransaction(transactionId);
-            }
-        });
-    });
-
-    // Function to handle transaction deletion
-    function deleteTransaction(id) {
-        // In a real application, you would make an AJAX call to your server here
-        // For demonstration, we'll just remove the row from the table
-        
-        const row = document.getElementById(`transaction-${id}`);
-        if (row) {
-            row.remove();
-            // Show success message
-            alert(`Transaksi ${id} berhasil dihapus`);
-            
-            // In a real app, you might want to:
-            // 1. Make an API call to your backend
-            // fetch(`/api/transactions/${id}`, { method: 'DELETE' })
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         if (data.success) {
-            //             row.remove();
-            //             alert('Transaksi berhasil dihapus');
-            //         }
-            //     })
-            //     .catch(error => console.error('Error:', error));
-        }
-    }
-});
-</script>
+  </div>
+</body>
+</html>

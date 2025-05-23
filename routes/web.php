@@ -140,6 +140,10 @@ Route::post('/payment/midtrans-callback', [App\Http\Controllers\PaymentControlle
 
 // Route untuk Riwayat Pesanan
 Route::get('/riwayat-pesanan', [HomeController::class, 'riwayatPesanan'])->name('Riwayat Pesanan');
+
+
+Route::delete('/admin/transaksi/{id}', [TransaksiController::class, 'destroy'])->name('admin.transaksi.destroy');
+
 // Route::get('/riwayat-pesanan', [HomeController::class, 'riwayatPesanan']);
 
 // ===========================

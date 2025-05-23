@@ -13,8 +13,7 @@ class Transaksi extends Model
         'user_id', // kolom untuk relasi ke user
         'barang_id', // kolom untuk relasi ke barang
         'total_harga',
-        'status_pembayaran',
-        'nama_barang'
+        'status_pembayaran'
     ];
 
     // Relasi ke pengguna (user)
