@@ -11,12 +11,14 @@ use App\Models\Transaksi;
 use Illuminate\Support\Str;
 use App\Models\Barang;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PembayaranController extends Controller
 {
     public function index(Request $request)
     {
         $selectedItems = $request->input('produk', []);
+        
         $cart = session()->get('cart', []);
 
         // Pastikan selectedItems berisi string (karena key di cart kemungkinan string)
@@ -71,6 +73,8 @@ class PembayaranController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat membuat token Snap!');
         }
 
+        
+
         return view('pembayaran', [
         'snapToken' => $snapToken,
         'selectedCartItems' => $selectedCartItems,
@@ -111,6 +115,7 @@ class PembayaranController extends Controller
             Transaksi::create([
                 
                 'user_id' => $user_id,
+                'nama_user' => auth()->user()->name,
                 'nama_barang' => $item['nama'],
                 'barang_id' => $item['barang_id'],
                 'total_harga' => $item['harga'] * ($item['jumlah'] ?? 1),
@@ -186,6 +191,7 @@ class PembayaranController extends Controller
         foreach ($selectedCartItems as $item) {
             Transaksi::create([
                 'user_id' => $user_id,
+                'nama_user' => auth()->user()->name,
                 'nama_barang' => $item['nama'],
                 'barang_id' => $item['barang_id'],
                 'total_harga' => $item['harga'] * ($item['jumlah'] ?? 1),
@@ -214,4 +220,13 @@ class PembayaranController extends Controller
 
         return view('riwayat', compact('pesananselesai'));
     }
+
+    public function adminIndex()
+{
+    $transaksi = \App\Models\Transaksi::with(['user', 'barang'])->get();
+     $totalSemuaPembayaran = $transaksi->sum('total_harga');
+    
+     return view('admin.transaksi.index', compact('transaksi', 'totalSemuaPembayaran'));
+}
+
 }

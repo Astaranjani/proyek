@@ -61,6 +61,11 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     // Laporan Barang
     Route::get('/laporan/barang', [LaporanController::class, 'laporanBarang'])->name('laporan.barang');
     Route::get('/laporan/barang-pdf', [LaporanController::class, 'laporanBarangPDF'])->name('laporan.barang_pdf');
+    Route::get('/admin/transaksi/download', [TransaksiController::class, 'download'])->name('admin.transaksi.download');
+    Route::get('/transaksi/download', [TransaksiController::class, 'download'])->name('transaksi.download'); // ✅ Tambahkan ini
+    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('transaksi/download', [TransaksiController::class, 'download'])->name('transaksi.download');
+});
 });
 
 // ===========================
@@ -143,10 +148,29 @@ Route::get('/riwayat-pesanan', [HomeController::class, 'riwayatPesanan'])->name(
 
 
 Route::delete('/admin/transaksi/{id}', [TransaksiController::class, 'destroy'])->name('admin.transaksi.destroy');
-
+Route::get('/admin/transaksi/{id}', [TransaksiController::class, 'destroy'])->name('admin.transaksi.destroy');
 // Route::get('/riwayat-pesanan', [HomeController::class, 'riwayatPesanan']);
 
 // ===========================
 // RIWAYAT PESANAN USER
 // ===========================
 Route::get('/riwayat-pesanan', [RiwayatController::class, 'index'])->name('riwayat.pesanan');
+
+// ===========================
+// TRANSAKSI ADMIN
+// ===========================
+Route::get('/admin/pembayaran', [PembayaranController::class, 'adminIndex'])->name('admin.transaksi.index');
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
+    Route::delete('transaksi/{id}', [TransaksiController::class, 'destroy'])->name('transaksi.destroy');
+
+    // **Tambahkan route ini untuk download PDF**
+    Route::get('transaksi/download', [TransaksiController::class, 'download'])->name('transaksi.download');
+    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
+    Route::delete('transaksi/{id}', [TransaksiController::class, 'destroy'])->name('transaksi.destroy');
+Route::prefix('admin')->group(function () {
+    Route::get('/transaksi/download', [TransaksiController::class, 'download'])->name('transaksi.download');
+});
+});
+});

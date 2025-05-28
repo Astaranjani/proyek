@@ -63,7 +63,7 @@
                             <tr>
                                 <td>{{ $order->id }}</td>
                                 <td>{{ $order->user->name ?? 'N/A' }}</td>
-                                <td>{{ $order->barang->nama_barang ?? '-' }}</td> <!-- Tampilkan nama barang -->
+                                <td>{{ $order->barang->nama ?? '-' }}</td> <!-- Tampilkan nama barang -->
                                 <td>Rp {{ number_format($order->total_harga, 0, ',', '.') }}</td>
                                  <td>
                                     <span class="badge bg-success">

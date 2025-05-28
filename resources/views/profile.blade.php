@@ -128,7 +128,11 @@
                 <input type="text" name="name" placeholder="Nama Lengkap" required value="{{ old('name', Auth::user()->name) }}">
                 <input type="email" name="email" placeholder="Email" required value="{{ old('email', Auth::user()->email) }}">
                 <input type="text" name="phone" placeholder="No. Handphone" value="{{ old('phone', Auth::user()->phone) }}">
-                <input type="text" name="gender" placeholder="Jenis Kelamin" value="{{ old('gender', Auth::user()->gender) }}">
+                <select name="gender" class="form-select" required>
+                    <option value="Laki-laki" {{ old('gender', Auth::user()->gender) == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                    <option value="Perempuan" {{ old('gender', Auth::user()->gender) == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                </select>
+
                 <input type="text" name="address" placeholder="Alamat" value="{{ old('address', Auth::user()->address) }}">
 
                 <button type="submit" class="save-btn btn mt-2">Simpan</button>

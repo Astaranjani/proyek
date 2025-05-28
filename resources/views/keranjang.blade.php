@@ -93,49 +93,45 @@
             @if (count($cart) === 0)
                 <div class="alert alert-info">Keranjang Anda kosong.</div>
             @else
-                <form action="{{ route('pembayaran') }}" method="GET" id="checkout-form">
-                    @csrf
+               {{-- Form Checkout hanya membungkus tombol dan selected items --}}
+{{-- Daftar item keranjang, tidak berada dalam form checkout --}}
+@foreach ($cart as $id => $item)
+    <div class="d-flex align-items-center border-bottom py-3 justify-content-between item-container" data-item-id="{{ $id }}">
+        <div class="d-flex align-items-center">
+            <div class="select-btn" onclick="toggleSelectItem(this, '{{ $id }}')">
+                <i class="bi bi-check-lg"></i>
+            </div>
+            <img src="{{ asset('storage/' . $item['gambar']) }}" alt="{{ $item['nama'] }}" class="item-image me-3">
+            <div>
+                <div class="item-name">{{ $item['nama'] }}</div>
+                <div class="item-price">Rp. {{ number_format($item['harga'], 0, ',', '.') }}</div>
+            </div>
+        </div>
 
-                    <div id="selected-items-container">
-                        <!-- Items yang dipilih akan disimpan di sini -->
-                    </div>
+        {{-- Form hapus sendiri, tidak di dalam form lain --}}
+        <form action="{{ route('keranjang.hapus') }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus barang ini dari keranjang?');">
+            @csrf
+            <input type="hidden" name="barang_id" value="{{ $id }}">
+            <button class="btn btn-danger btn-sm">Hapus</button>
+        </form>
+    </div>
+@endforeach
 
-                    @foreach ($cart as $id => $item)
-                        <div class="d-flex align-items-center border-bottom py-3 justify-content-between item-container" data-item-id="{{ $id }}">
-                            <div class="d-flex align-items-center">
-                                <div class="select-btn" onclick="toggleSelectItem(this, '{{ $id }}')">
-                                    <i class="bi bi-check-lg"></i>
-                                </div>
-                                <img src="{{ asset('storage/' . $item['gambar']) }}" alt="{{ $item['nama'] }}" class="item-image me-3">
-                                <div>
-                                    <div class="item-name">{{ $item['nama'] }}</div>
-                                    <div class="item-price">Rp. {{ number_format($item['harga'], 0, ',', '.') }}</div>
-                                </div>
-                            </div>
 
-                            <!-- Tombol hapus -->
-                            <div>
-                                <form action="{{ route('keranjang.hapus') }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus barang ini dari keranjang?');">
-                                    @csrf
-                                    <input type="hidden" name="barang_id" value="{{ $id }}">
-                                    <button class="btn btn-danger btn-sm">Hapus</button>
-                                </form>
-                            </div>
-                        </div>
-                    @endforeach
-
-                    <div class="text-end mt-3">
-                        <button 
-                            type="button" 
-                            id="checkout-button" 
-                            class="btn btn-success checkout-btn" 
-                            disabled 
-                            onclick="submitCheckout()" 
-                            href="{{ route('pembayaran') }}">
-                            Checkout (<span id="selected-count">0</span> Item)
-                        </button>
-                    </div>
-                </form>
+                    <form action="{{ route('pembayaran') }}" method="GET" id="checkout-form">
+    @csrf
+    <div id="selected-items-container"></div>
+    <div class="text-end mt-3">
+        <button 
+            type="button" 
+            id="checkout-button" 
+            class="btn btn-success checkout-btn" 
+            disabled 
+            onclick="submitCheckout()">
+            Checkout (<span id="selected-count">0</span> Item)
+        </button>
+    </div>
+</form>
             @endif
         </div>
     </section>

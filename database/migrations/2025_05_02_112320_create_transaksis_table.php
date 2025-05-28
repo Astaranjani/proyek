@@ -9,7 +9,8 @@ return new class extends Migration {
     {
         Schema::create('transaksis', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // relasi ke pelanggan
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); 
+            $table->string('nama_user')->nullable();
             $table->string('nama_barang')->nullable(false); 
             $table->string('status_pembayaran')->nullable();
             $table->string('kode_transaksi')->nullable();

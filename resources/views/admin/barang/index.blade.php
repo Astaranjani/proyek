@@ -156,18 +156,6 @@
         <header class="bg-white border-b border-gray-200 py-4 px-6 flex items-center justify-between">
             <div class="text-xl font-semibold">Data Barang</div>
             <div class="flex items-center space-x-4">
-                <div class="w-10 h-10 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-full cursor-pointer">
-                    <i class="ri-notification-3-line"></i>
-                </div>
-                <div class="flex items-center">
-                    <div class="mr-3 text-right">
-                        <div class="text-sm font-medium text-gray-900">Admin</div>
-                        <div class="text-xs text-gray-500">Administrator</div>
-                    </div>
-                    <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                        <img src="https://via.placeholder.com/100" class="w-full h-full object-cover" />
-                    </div>
-                </div>
             </div>
         </header>
 

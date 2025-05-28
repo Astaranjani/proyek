@@ -158,8 +158,8 @@
           @foreach($transaksi as $t)
             <tr id="transaction-{{ $t->id }}" class="hover:bg-gray-50">
               <td class="px-6 py-4">{{ $t->id }}</td>
-              <td class="px-6 py-4 font-medium">{{ $t->user->nama }}</td>
-              <td class="px-6 py-4">{{ $t->barang->nama_barang }}</td>
+              <td class="px-6 py-4 font-medium">{{ $t->user->nama ?? $t->nama_user  }}</td>
+               <td class="px-6 py-4">{{ $t->barang->nama ?? $t->nama_barang }}</td>
               <td class="px-6 py-4">Rp{{ number_format($t->total_harga, 0, ',', '.') }}</td>
               <td class="px-6 py-4 font-medium">
                 <span class="{{ $t->status_pembayaran == 'Lunas' ? 'text-green-500' : 'text-red-500' }}">
@@ -182,6 +182,10 @@
           @endforeach
         </tbody>
       </table>
+      <div class="p-4 bg-gray-100 text-right font-bold">
+  Total Pemasukan: Rp{{ number_format($totalSemuaPembayaran, 0, ',', '.') }}
+</div>
+      <a href="/admin/transaksi/download/" style="display:inline-block;padding:8px 16px;background-color:#4F46E5;color:white;text-decoration:none;border-radius:6px;font-weight:bold;">Unduh PDF</a>
     </div>
   </div>
 </body>
