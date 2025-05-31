@@ -73,4 +73,35 @@ class AuthController extends Controller
         Auth::logout();
         return redirect()->route('login')->with('success', 'Anda telah logout.');
     }
+    // Tambahan untuk login dari aplikasi mobile/ionic
+    public function apiLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        $credentials = $request->only('email', 'password');
+
+        if (!auth()->attempt($credentials)) {
+            return response()->json(['message' => 'Login gagal'], 401);
+        }
+
+        $user = auth()->user();
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user
+        ]);
+    }
+    public function apiLogout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'Logout berhasil']);
+    }
+
+
 }
