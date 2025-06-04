@@ -104,32 +104,24 @@ class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
     <p class="text-gray-600 max-w-2xl mx-auto">proyek ini untuk sebagai memenuhi tugas project yang telah kampus berikan kepada kami</p>
   </div>
   
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-    <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
-      <div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl mb-6">
-        <i class="ri-palette-line text-2xl text-primary"></i>
-      </div>
-      <h3 class="text-xl font-semibold mb-3">Designer enginer</h3>
-      <p class="text-gray-600">Putri Ayu Fadhillah 2305022</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+  <!-- Card 1 -->
+  <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
+    <div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl mb-6">
+      <i class="ri-palette-line text-2xl text-primary"></i>
     </div>
-    
-    <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
-      <div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl mb-6">
-        <i class="ri-code-box-line text-2xl text-primary"></i>
-      </div>
-      <h3 class="text-xl font-semibold mb-3">management Developer</h3>
-      <p class="text-gray-600">Khoerul Paroid 2305013
-      </p>
-    </div>
-    
-    <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
-      <div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl mb-6">
-        <i class="ri-customer-service-line text-2xl text-primary"></i>
-      </div>
-      <h3 class="text-xl font-semibold mb-3">dokumenter developer</h3>
-      <p class="text-gray-600">Hamzah Fauji Pratama 2305011</p>
-    </div>
+    <h3 class="text-xl font-semibold mb-3">Designer Engineer</h3>
+    <p class="text-gray-600">Putri Ayu Fadhillah 2305022</p>
   </div>
+    
+     <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
+    <div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl mb-6">
+      <i class="ri-code-box-line text-2xl text-primary"></i>
+    </div>
+    <h3 class="text-xl font-semibold mb-3">Management Developer</h3>
+    <p class="text-gray-600">Khoerul Paroid 2305013</p>
+  </div>
+</div>
 </section>
 <section class="w-full px-6 md:px-12 py-16">
   <div class="text-center mb-16">
@@ -137,38 +129,28 @@ class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
     <p class="text-gray-600 max-w-2xl mx-auto">nih yang mau kenal sama kitaa</p>
   </div>
   
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-    <div class="group relative overflow-hidden rounded-2xl">
-      <img src="{{ asset('images/KhoerulParoid.jpg') }}" alt="Khoerul Paroid" class="w-full h-64 object-cover">
-      <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-        <div class="text-center text-white p-6">
-          <h3 class="text-xl font-semibold mb-2">Khoerul Paroid</h3>
-          <p class="text-sm">Developer</p>
-        </div>
-      </div>
-    </div>
-  
-    <div class="group relative overflow-hidden rounded-2xl">
-      <img src="{{ asset('images/PutriAyuFadhilah.jpg') }}" alt="Putri Ayu Fadhillah" class="w-full h-64 object-cover">
-      <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-        <div class="text-center text-white p-6">
-          <h3 class="text-xl font-semibold mb-2">Putri Ayu Fadhillah</h3>
-          <p class="text-sm">Spesialis Designer</p>
-        </div>
-      </div>
-    </div>
-  
-    <div class="group relative overflow-hidden rounded-2xl">
-      <img src="{{ asset('images/HamzahFaujiPratama.jpg') }}" alt="Hamzah Fauji Pratama" class="w-full h-64 object-cover">
-      <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-        <div class="text-center text-white p-6">
-          <h3 class="text-xl font-semibold mb-2">Hamzah Fauji Pratama</h3>
-          <p class="text-sm">Dokumenter Developer</p>
-          <p class="text-sm">AFK</p>
-        </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
+  <!-- Khoerul Paroid -->
+  <div class="group relative overflow-hidden rounded-2xl shadow-md">
+    <img src="{{ asset('images/KhoerulParoid.jpg') }}" alt="Khoerul Paroid" class="w-full h-64 object-cover">
+    <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+      <div class="text-center text-white p-6">
+        <h3 class="text-xl font-semibold mb-2">Khoerul Paroid</h3>
+        <p class="text-sm">Developer</p>
       </div>
     </div>
   </div>
+  
+   <div class="group relative overflow-hidden rounded-2xl shadow-md">
+    <img src="{{ asset('images/PutriAyuFadhilah.jpg') }}" alt="Putri Ayu Fadhillah" class="w-full h-64 object-cover">
+    <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+      <div class="text-center text-white p-6">
+        <h3 class="text-xl font-semibold mb-2">Putri Ayu Fadhillah</h3>
+        <p class="text-sm">Spesialis Designer</p>
+      </div>
+    </div>
+  </div>
+</div>
   
 
         <div class="md:col-span-2">

@@ -112,9 +112,8 @@
             <div class="col-md-6 product-info">
                 <h2 style="font-size: 2.1rem;">{{ $barang->nama }}</h2>
                 <div class="price mb-2 text-success fw-bold">Rp {{ number_format($barang->harga, 0, ',', '.') }}</div>
-                <p><strong>Kategori:</strong> {{ $barang->kategori }}</p>
                 <p><strong>Stok:</strong> {{ $barang->stok }}</p>
-                <p><strong>Merek:</strong> {{ $barang->merek }}</p>
+                <p><strong>Deskripsi</strong> {{ $barang->merek }}</p>
                 <p class="mt-3">{!! nl2br(e($barang->deskripsi)) !!}</p>
 
                 <div class="d-flex gap-2 mt-4">

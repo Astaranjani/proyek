@@ -2,16 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+   <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
     <title>Keranjang Saya</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Untuk responsif -->
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
     <style>
         .selected-item {
             background-color: #f0f8ff;
             border-left: 4px solid #4285f4;
         }
+
         .select-btn {
             width: 40px;
             height: 40px;
@@ -24,26 +32,39 @@
             margin-right: 15px;
             transition: all 0.3s;
         }
+
         .select-btn.selected {
             background-color: #4285f4;
             color: white;
             border-color: #4285f4;
         }
+
         .checkout-btn {
             padding: 10px 30px;
             font-size: 1.1em;
             font-weight: bold;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 8px;
         }
+
+        .checkout-btn:hover {
+            background-color: #3367d6;
+        }
+
         .item-image {
             width: 100px;
             height: 100px;
             object-fit: cover;
             border-radius: 5px;
         }
+
         .item-name {
-            font-size: 1.2rem;
-            font-weight: bold;
+            font-size: 1.1rem;
+            font-weight: 600;
         }
+
         .item-price {
             color: #28a745;
             font-weight: bold;

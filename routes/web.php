@@ -16,7 +16,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RiwayatController;
 use App\Models\Order;
-
+use App\Http\Controllers\ManualTransaksiController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -92,6 +92,7 @@ Route::get('/pembayaran', [KeranjangController::class, 'checkout'])->name('pemba
 Route::post('/beli-sekarang', [PembayaranController::class, 'beliSekarang'])->name('beli.sekarang');
 Route::post('/beli-sekarang', [PembayaranController::class, 'beliSekarang'])->name('beli.sekarang');
 
+Route::post('/proses-beli-sekarang', [YourController::class, 'prosesBeliSekarang'])->name('prosesBeliSekarang');
 
 });
 
@@ -173,4 +174,13 @@ Route::prefix('admin')->group(function () {
     Route::get('/transaksi/download', [TransaksiController::class, 'download'])->name('transaksi.download');
 });
 });
+});
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/manual', function () {
+        return view('admin.manual');
+    })->name('manual');
+    Route::post('/manual', [ManualTransaksiController::class, 'store'])->name('manual.store');
+
+    Route::post('/admin/manual-transaksi/store', [ManualTransaksiController::class, 'store'])->name('admin.manual.store');
+
 });

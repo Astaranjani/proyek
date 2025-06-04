@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Profil Saya</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- buat responsive -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
@@ -56,10 +57,28 @@
             background-color: #C4B8A8;
             color: #fff;
             border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
         }
 
         .save-btn:hover {
             background-color: #b3a38e;
+        }
+
+        /* Responsive tweaks */
+        @media (max-width: 576px) {
+            .header-bar {
+                font-size: 20px;
+                padding: 10px;
+            }
+
+            .contact-box {
+                padding: 16px;
+                max-width: 100%;
+                margin: 0 10px;
+            }
         }
     </style>
 </head>

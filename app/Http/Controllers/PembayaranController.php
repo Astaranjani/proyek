@@ -6,25 +6,20 @@ use Illuminate\Http\Request;
 use Midtrans\Snap;
 use Midtrans\Config;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 use App\Models\Transaksi;
-use Illuminate\Support\Str;
 use App\Models\Barang;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class PembayaranController extends Controller
 {
     public function index(Request $request)
     {
         $selectedItems = $request->input('produk', []);
-        
         $cart = session()->get('cart', []);
 
-        // Pastikan selectedItems berisi string (karena key di cart kemungkinan string)
         $selectedItems = array_map('strval', $selectedItems);
-
-        // Filter hanya item yang dipilih berdasarkan key (barang_id)
         $selectedCartItems = array_intersect_key($cart, array_flip($selectedItems));
         Log::info('Selected Cart Items at index:', ['items' => $selectedCartItems]);
         if (empty($selectedCartItems)) {
@@ -73,14 +68,11 @@ class PembayaranController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat membuat token Snap!');
         }
 
-        
-
         return view('pembayaran', [
-        'snapToken' => $snapToken,
-        'selectedCartItems' => $selectedCartItems,
-        'total' => $total,
-]);
-
+            'snapToken' => $snapToken,
+            'selectedCartItems' => $selectedCartItems,
+            'total' => $total,
+        ]);
     }
 
     public function show()
@@ -96,8 +88,7 @@ class PembayaranController extends Controller
         $cart = session()->get('cart', []);
         $selectedItems = session()->get('selected_items', []);
         $selectedItems = array_map('strval', $selectedItems);
-
-        $user_id = auth()->user()->id;
+        $user_id = Auth::id();
 
         $selectedCartItems = array_intersect_key($cart, array_flip($selectedItems));
         Log::info('Selected Cart Items at proses:', ['items' => $selectedCartItems]);
@@ -108,23 +99,27 @@ class PembayaranController extends Controller
 
         $paymentResult = json_decode($request->payment_result, true);
         Log::info('Hasil pembayaran Midtrans:', $paymentResult);
-        Log::info('Nama barang dari cart: ' . ($item['nama'] ?? 'null'));
 
         foreach ($selectedCartItems as $item) {
-            $barang = session('barang');
             Transaksi::create([
-                
                 'user_id' => $user_id,
-                'nama_user' => auth()->user()->name,
+                'nama_user' => Auth::user()->name,
                 'nama_barang' => $item['nama'],
                 'barang_id' => $item['barang_id'],
                 'total_harga' => $item['harga'] * ($item['jumlah'] ?? 1),
                 'status_pembayaran' => 'Lunas',
                 'kode_transaksi' => $paymentResult['transaction_id'] ?? 'manual',
             ]);
+            // Kurangi stok barang
+            $barang = Barang::find($item['barang_id']);
+            if ($barang) {
+                $barang->stok -= $item['jumlah'] ?? 1;
+                $barang->save();
+            }
+
         }
 
-        // Hapus hanya item yang sudah dibayar
+        // Hapus item yang sudah dibayar dari cart
         foreach ($selectedItems as $itemId) {
             unset($cart[$itemId]);
         }
@@ -134,9 +129,10 @@ class PembayaranController extends Controller
         return redirect()->route('dashboard')->with('success', 'Pembayaran berhasil!');
     }
 
-    public function beliSekarang(Request $request)
+     public function beliSekarang(Request $request)
     {
         $barang = Barang::findOrFail($request->product_id);
+        $user = Auth::user();
 
         Config::$serverKey = config('services.midtrans.server_key');
         Config::$clientKey = config('services.midtrans.client_key');
@@ -156,10 +152,23 @@ class PembayaranController extends Controller
                 'name' => $barang->nama,
             ]],
             'customer_details' => [
-                'first_name' => auth()->user()->name,
-                'email' => auth()->user()->email,
+                'first_name' => $user->name,
+                'email' => $user->email,
             ],
         ];
+
+        $transaksi = Transaksi::create([
+            'user_id' => $user->id,
+              'nama_user' => $user->name,
+            'barang_id' => $barang->id,
+            'nama_barang' => $barang->nama,
+            'total_harga' => $barang->harga,
+            'status_pembayaran' => 'Lunas',
+        ]);
+
+        // Kurangi stok barang
+            $barang->stok -= 1;
+            $barang->save();
 
         try {
             $snapToken = Snap::getSnapToken($params);
@@ -171,8 +180,10 @@ class PembayaranController extends Controller
         return view('pembayaran', [
             'snapToken' => $snapToken,
             'barang' => $barang,
+            'transaksi' => $transaksi,
         ]);
     }
+
 
     public function bayar(Request $request)
     {
@@ -186,18 +197,25 @@ class PembayaranController extends Controller
             return redirect()->back()->with('error', 'Tidak ada item yang dipilih untuk checkout!');
         }
 
-        $user_id = auth()->user()->id;
+        $user_id = Auth::id();
 
         foreach ($selectedCartItems as $item) {
             Transaksi::create([
                 'user_id' => $user_id,
-                'nama_user' => auth()->user()->name,
+                'nama_user' => Auth::user()->name,
                 'nama_barang' => $item['nama'],
                 'barang_id' => $item['barang_id'],
                 'total_harga' => $item['harga'] * ($item['jumlah'] ?? 1),
                 'status_pembayaran' => 'Lunas',
                 'kode_transaksi' => 'manual-' . Str::random(10),
             ]);
+        }
+
+        // Kurangi stok barang
+        $barang = Barang::find($item['barang_id']);
+        if ($barang) {
+            $barang->stok -= $item['jumlah'] ?? 1;
+            $barang->save();
         }
 
         // Hapus hanya item yang sudah dibayar
@@ -211,22 +229,46 @@ class PembayaranController extends Controller
 
     public function riwayat()
     {
-        $userId = auth()->id();
+        $userId = Auth::id();
 
         $pesananselesai = Transaksi::where('user_id', $userId)
-                        ->where('status', 'selesai')
-                        ->orderBy('created_at', 'desc')
-                        ->get();
+            ->where('status', 'selesai')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('riwayat', compact('pesananselesai'));
     }
 
     public function adminIndex()
+    {
+        $transaksi = Transaksi::with(['user', 'barang'])->get();
+        $totalSemuaPembayaran = $transaksi->sum('total_harga');
+
+        return view('admin.transaksi.index', compact('transaksi', 'totalSemuaPembayaran'));
+    }
+
+public function store(Request $request)
 {
-    $transaksi = \App\Models\Transaksi::with(['user', 'barang'])->get();
-     $totalSemuaPembayaran = $transaksi->sum('total_harga');
-    
-     return view('admin.transaksi.index', compact('transaksi', 'totalSemuaPembayaran'));
+    $request->validate([
+        'nama_pelanggan' => 'required|string|max:255',
+        'nama_barang' => 'required|string|max:255',
+        'total_pembayaran' => 'required|numeric|min:0',
+        'status_pembayaran' => 'required|in:lunas,belum',
+        'tanggal_transaksi' => 'required|date',
+    ]);
+
+    Transaksi::create([
+        'user_id' => auth()->id() ?? 1, // atau bisa null/default
+        'nama_user' => $request->nama_pelanggan,
+        'barang_id' => 1, // sementara, jika tidak dipilih
+        'nama_barang' => $request->nama_barang,
+        'total_harga' => $request->total_pembayaran,
+        'status_pembayaran' => $request->status_pembayaran,
+        'created_at' => $request->tanggal_transaksi,
+        'updated_at' => now(),
+    ]);
+
+    return redirect()->back()->with('success', 'Transaksi berhasil disimpan!');
 }
 
 }

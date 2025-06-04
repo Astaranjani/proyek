@@ -64,7 +64,7 @@
                     <input type="hidden" name="payment_result" id="payment-result">
 
                     <!-- Data User -->
-                    <div class="mb-3">
+                     <div class="mb-3">
                         <input type="text" class="form-control mb-2" value="{{ auth()->user()->name }}" readonly />
                         <input type="email" class="form-control mb-2" value="{{ auth()->user()->email }}" readonly />
                         <input type="text" class="form-control mb-2" value="{{ auth()->user()->phone }}" readonly />
@@ -105,7 +105,7 @@
                     @elseif(session()->has('cart') && count(session('cart')) > 0)
                         @php
                             $cart = session('cart');
-                            $selectedCartItems = $selectedCartItems ?? $cart; // Pastikan $selectedCartItems terdefinisi
+                            $selectedCartItems = $selectedCartItems ?? $cart;
                             $total = 0;
                         @endphp
                         <div class="table-responsive mb-4">
@@ -149,10 +149,10 @@
                     @if(isset($snapToken))
                         <h5 class="fw-bold mb-3"><i class="bi bi-wallet2 me-2 text-primary"></i>Metode Pembayaran</h5>
                         <div class="row g-2 mb-3">
-                            <div class="col-6">
+                            <div class="col-12 col-md-6">
                                 <button type="button" class="btn btn-outline-dark w-100 py-2" id="cod-button">COD</button>
                             </div>
-                            <div class="col-6">
+                            <div class="col-12 col-md-6">
                                 <button type="button" class="btn btn-primary w-100 py-2" id="pay-button">Bayar Sekarang</button>
                             </div>
                         </div>
@@ -163,6 +163,7 @@
     </div>
 </div>
 
+<!-- script ini saja yang kamu butuhkan -->
 <script>
     const payButton = document.getElementById('pay-button');
     payButton?.addEventListener('click', function(e) {
@@ -183,14 +184,16 @@
         });
     });
 
+
     const codButton = document.getElementById('cod-button');
     codButton?.addEventListener('click', function () {
-        const nomor = "6281311394644"; // Nomor admin (format internasional tanpa +)
+        const nomor = "6281311394644"; // Nomor admin
         const pesan = encodeURIComponent("Halo admin, saya ingin pesan dengan metode COD.");
         const url = `https://wa.me/${nomor}?text=${pesan}`;
         window.open(url, '_blank');
     });
 </script>
+
 
 </body>
 </html>
