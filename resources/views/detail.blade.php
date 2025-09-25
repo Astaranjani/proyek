@@ -128,6 +128,10 @@
                         <input type="hidden" name="product_id" value="{{ $barang->id }}">
                         <button type="submit" class="btn btn-primary animate__animated animate__bounceIn">Beli Sekarang</button>
                     </form>
+
+                 <a href="{{ route('chat') }}" class="btn btn-warning btn-sm d-flex align-items-center gap-1">
+        <i class="bi bi-chat-dots"></i> Chat
+    </a>
                 </div>
             </div>
         </div>

@@ -117,6 +117,15 @@
                           <span>Manual Transaksi</span>
                       </a>
                   </li>
+                  <li>
+    <a href="{{ route('admin.chat') }}" 
+   class="flex items-center px-4 py-2 rounded-md {{ request()->routeIs('admin.chat') ? 'text-white bg-primary/10' : 'text-gray-400 hover:bg-white/5' }}">
+    <div class="w-5 h-5 flex items-center justify-center mr-3">
+        <i class="ri-chat-1-line"></i>
+    </div>
+    <span>Chat</span>
+</a>
+</li>
               </ul>
           </div>
 

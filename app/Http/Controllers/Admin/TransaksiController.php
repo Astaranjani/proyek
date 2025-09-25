@@ -9,13 +9,16 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class TransaksiController extends Controller
 {
     public function index()
-    {
-        // Ambil semua data transaksi beserta relasinya (user dan barang)
-        $transaksi = Transaksi::with(['user', 'barang'])->get();
-        $totalSemuaPembayaran = $transaksi->sum('total_harga');
-        // Kirim data ke view
-        return view('admin.transaksi.index', compact('transaksi'));
-    }
+{
+    // ambil data transaksi (pakai paginate agar tabel tetap jalan)
+    $transaksi = \App\Models\Transaksi::with(['user','barang'])->latest()->paginate(10);
+
+    // total semua pemasukan (semua baris, bukan hanya halaman ini)
+    $totalSemuaPembayaran = \App\Models\Transaksi::sum('total_harga');
+
+    return view('admin.transaksi.index', compact('transaksi', 'totalSemuaPembayaran'));
+}
+
     public function destroy($id)
     {
         $transaksi = Transaksi::findOrFail($id);

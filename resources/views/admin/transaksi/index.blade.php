@@ -92,6 +92,15 @@
               <span>Manual Transaksi</span>
             </a>
           </li>
+          <li>
+    <a href="{{ route('admin.chat') }}" 
+   class="flex items-center px-4 py-2 rounded-md {{ request()->routeIs('admin.chat') ? 'text-white bg-primary/10' : 'text-gray-400 hover:bg-white/5' }}">
+    <div class="w-5 h-5 flex items-center justify-center mr-3">
+        <i class="ri-chat-1-line"></i>
+    </div>
+    <span>Chat</span>
+</a>
+</li>
         </ul>
       </div>
 
@@ -158,8 +167,9 @@
         </div>
 
         <div class="p-4 bg-gray-100 text-right font-bold">
-          Total Pemasukan: Rp{{ number_format($totalSemuaPembayaran, 0, ',', '.') }}
-        </div>
+  Total Pemasukan: Rp{{ number_format($totalSemuaPembayaran ?? 0, 0, ',', '.') }}
+</div>
+
 
         <div class="flex justify-end flex-wrap gap-2 p-4 bg-gray-100">
           <a href="/admin/transaksi/download/" class="px-4 py-2 bg-primary text-white rounded-md font-bold hover:bg-primary/90 w-full sm:w-auto text-center">
