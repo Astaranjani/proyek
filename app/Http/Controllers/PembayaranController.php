@@ -31,6 +31,13 @@ class PembayaranController extends Controller
 
         foreach ($selectedCartItems as $id => $item) {
             $jumlah = $item['jumlah'] ?? 1;
+
+            // Periksa stok barang
+            $barang = Barang::find($item['barang_id']);
+            if ($barang && $barang->stok < $jumlah) {
+                return redirect()->back()->with('error', 'Stok untuk ' . $item['nama'] . ' tidak mencukupi!');
+            }
+
             $total += $item['harga'] * $jumlah;
 
             $item_details[] = [
@@ -92,15 +99,51 @@ class PembayaranController extends Controller
 
         $selectedCartItems = array_intersect_key($cart, array_flip($selectedItems));
         Log::info('Selected Cart Items at proses:', ['items' => $selectedCartItems]);
+
+        $paymentResult = json_decode($request->payment_result, true);
+        Log::info('Hasil pembayaran Midtrans:', $paymentResult);
+
+        // Handle beli sekarang item if exists in session
+        if (session()->has('beli_sekarang_item')) {
+            $item = session('beli_sekarang_item');
+
+            // Check stock before transaction
+            $barang = Barang::find($item['barang_id']);
+            if ($barang && $barang->stok < 1) {
+                return redirect()->back()->with('error', 'Stok untuk ' . $item['nama_barang'] . ' tidak mencukupi!');
+            }
+
+            Transaksi::create([
+                'user_id' => $item['user_id'],
+                'nama_user' => $item['nama_user'],
+                'nama_barang' => $item['nama_barang'],
+                'barang_id' => $item['barang_id'],
+                'total_harga' => $item['total_harga'],
+                'status_pembayaran' => 'Lunas',
+                'kode_transaksi' => $paymentResult['transaction_id'] ?? 'manual',
+            ]);
+
+            // Kurangi stok barang setelah transaksi sukses
+            if ($barang) {
+                $barang->stok -= 1;
+                $barang->save();
+            }
+
+            session()->forget('beli_sekarang_item'); // Clear session after processing
+        }
+
         if (empty($selectedCartItems)) {
             Log::warning('Tidak ada item yang dipilih saat proses pembayaran');
             return redirect()->route('dashboard')->with('error', 'Tidak ada item yang dipilih.');
         }
 
-        $paymentResult = json_decode($request->payment_result, true);
-        Log::info('Hasil pembayaran Midtrans:', $paymentResult);
-
         foreach ($selectedCartItems as $item) {
+            // Periksa stok barang sebelum membuat transaksi
+            $barang = Barang::find($item['barang_id']);
+            if ($barang && $barang->stok < ($item['jumlah'] ?? 1)) {
+                return redirect()->back()->with('error', 'Stok untuk ' . $item['nama'] . ' tidak mencukupi!');
+            }
+
             Transaksi::create([
                 'user_id' => $user_id,
                 'nama_user' => Auth::user()->name,
@@ -110,13 +153,12 @@ class PembayaranController extends Controller
                 'status_pembayaran' => 'Lunas',
                 'kode_transaksi' => $paymentResult['transaction_id'] ?? 'manual',
             ]);
+
             // Kurangi stok barang
-            $barang = Barang::find($item['barang_id']);
             if ($barang) {
                 $barang->stok -= $item['jumlah'] ?? 1;
                 $barang->save();
             }
-
         }
 
         // Hapus item yang sudah dibayar dari cart
@@ -129,9 +171,15 @@ class PembayaranController extends Controller
         return redirect()->route('dashboard')->with('success', 'Pembayaran berhasil!');
     }
 
-     public function beliSekarang(Request $request)
+    public function beliSekarang(Request $request)
     {
         $barang = Barang::findOrFail($request->product_id);
+
+        // Cek stok barang
+        if ($barang->stok <= 0) {
+            return redirect()->back()->with('error', 'Stok barang tidak mencukupi untuk pembelian ini!');
+        }
+
         $user = Auth::user();
 
         Config::$serverKey = config('services.midtrans.server_key');
@@ -157,19 +205,6 @@ class PembayaranController extends Controller
             ],
         ];
 
-        $transaksi = Transaksi::create([
-            'user_id' => $user->id,
-              'nama_user' => $user->name,
-            'barang_id' => $barang->id,
-            'nama_barang' => $barang->nama,
-            'total_harga' => $barang->harga,
-            'status_pembayaran' => 'Lunas',
-        ]);
-
-        // Kurangi stok barang
-            $barang->stok -= 1;
-            $barang->save();
-
         try {
             $snapToken = Snap::getSnapToken($params);
         } catch (\Exception $e) {
@@ -177,10 +212,18 @@ class PembayaranController extends Controller
             return redirect()->back()->with('error', 'Gagal membuat token Snap!');
         }
 
+        // Simpan detail pembelian di session agar diproses setelah pembayaran sukses
+        session(['beli_sekarang_item' => [
+            'user_id' => $user->id,
+            'nama_user' => $user->name,
+            'barang_id' => $barang->id,
+            'nama_barang' => $barang->nama,
+            'total_harga' => $barang->harga,
+        ]]);
+
         return view('pembayaran', [
             'snapToken' => $snapToken,
             'barang' => $barang,
-            'transaksi' => $transaksi,
         ]);
     }
 
@@ -272,3 +315,4 @@ public function store(Request $request)
 }
 
 }
+

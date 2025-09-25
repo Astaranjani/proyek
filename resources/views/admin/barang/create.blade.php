@@ -167,6 +167,38 @@
             <textarea id="deskripsi" name="deskripsi" class="form-textarea w-full border rounded px-3 py-2 @error('deskripsi') border-red-500 @enderror" rows="4">{{ old('deskripsi') }}</textarea>
             @error('deskripsi')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
           </div>
+          
+        <div class="mb-4">
+  <label for="kategori" class="block font-semibold mb-1">Kategori</label>
+  <select id="kategori" name="kategori"
+          class="form-select w-full border rounded px-3 py-2 @error('kategori') border-red-500 @enderror"
+          required>
+    <option value="">-- Pilih Kategori --</option>
+
+    @foreach($kategori as $k)
+  <option value="{{ $k['nama_kategori'] }}">
+    {{ $k['nama_kategori'] }}
+  </option>
+@endforeach
+
+
+
+    {{-- fallback kalau data kategori kosong --}}
+    @if($kategori->isEmpty())
+      <option value="Kursi">Kursi</option>
+      <option value="Meja">Meja</option>
+      <option value="Lemari">Lemari</option>
+      <option value="Sofa">Sofa</option>
+      <option value="Kasur">Kasur</option>
+    @endif
+  </select>
+  @error('kategori')
+    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+  @enderror
+</div>
+
+
+
 
           <div class="mb-4">
             <label for="gambar" class="block font-semibold mb-1">Gambar (Opsional)</label>
@@ -174,10 +206,12 @@
             @error('gambar')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
           </div>
 
+
           <div class="flex justify-end">
             <a href="{{ route('admin.barang.index') }}" class="px-4 py-2 bg-gray-200 rounded mr-2">Batal</a>
             <button type="submit" class="px-4 py-2 bg-primary text-white rounded">Simpan</button>
           </div>
+          
         </form>
       </div>
     </main>

@@ -92,9 +92,12 @@ Route::get('/pembayaran', [KeranjangController::class, 'checkout'])->name('pemba
 Route::post('/beli-sekarang', [PembayaranController::class, 'beliSekarang'])->name('beli.sekarang');
 Route::post('/beli-sekarang', [PembayaranController::class, 'beliSekarang'])->name('beli.sekarang');
 
-Route::post('/proses-beli-sekarang', [YourController::class, 'prosesBeliSekarang'])->name('prosesBeliSekarang');
-
+Route::post('/pembayaran/beli-sekarang/proses', [PembayaranController::class, 'beliSekarangProses'])->name('pembayaran.beliSekarang.proses');
+Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
+Route::get('/search-produk', [HomeController::class, 'searchProduk'])->name('search.produk');
+Route::post('/keranjang/update', [KeranjangController::class, 'update'])->name('keranjang.update');
 });
+
 
 // ===========================
 // PEMBAYARAN ROUTES

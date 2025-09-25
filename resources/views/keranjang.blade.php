@@ -114,32 +114,49 @@
             @if (count($cart) === 0)
                 <div class="alert alert-info">Keranjang Anda kosong.</div>
             @else
-               {{-- Form Checkout hanya membungkus tombol dan selected items --}}
-{{-- Daftar item keranjang, tidak berada dalam form checkout --}}
 @foreach ($cart as $id => $item)
-    <div class="d-flex align-items-center border-bottom py-3 justify-content-between item-container" data-item-id="{{ $id }}">
-        <div class="d-flex align-items-center">
-            <div class="select-btn" onclick="toggleSelectItem(this, '{{ $id }}')">
-                <i class="bi bi-check-lg"></i>
-            </div>
-            <img src="{{ asset('storage/' . $item['gambar']) }}" alt="{{ $item['nama'] }}" class="item-image me-3">
-            <div>
-                <div class="item-name">{{ $item['nama'] }}</div>
-                <div class="item-price">Rp. {{ number_format($item['harga'], 0, ',', '.') }}</div>
-            </div>
+@php
+    $subtotal = ($item['harga'] ?? 0) * ($item['jumlah'] ?? 1);
+@endphp
+<div class="d-flex align-items-center border-bottom py-3 justify-content-between item-container" 
+     data-item-id="{{ $id }}" 
+     data-subtotal="{{ $subtotal }}">
+    <div class="d-flex align-items-center">
+        <div class="select-btn" onclick="toggleSelectItem(this, '{{ $id }}')">
+            <i class="bi bi-check-lg"></i>
         </div>
-
-        {{-- Form hapus sendiri, tidak di dalam form lain --}}
-        <form action="{{ route('keranjang.hapus') }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus barang ini dari keranjang?');">
-            @csrf
-            <input type="hidden" name="barang_id" value="{{ $id }}">
-            <button class="btn btn-danger btn-sm">Hapus</button>
-        </form>
+        <img src="{{ asset('storage/' . $item['gambar']) }}" alt="{{ $item['nama'] }}" class="item-image me-3">
+        <div>
+            <div class="item-name">{{ $item['nama'] }}</div>
+            <div class="item-price">Rp. {{ number_format($item['harga'], 0, ',', '.') }}</div>
+            <div class="text-muted">Subtotal: Rp. {{ number_format($subtotal, 0, ',', '.') }}</div>
+            
+            {{-- 🔹 Form Update Jumlah --}}
+            <form action="{{ route('keranjang.update') }}" method="POST" class="d-flex align-items-center mt-2">
+                @csrf
+                <input type="hidden" name="barang_id" value="{{ $id }}">
+                
+                <button type="submit" name="action" value="decrease" class="btn btn-outline-secondary btn-sm me-2">-</button>
+                <span class="mx-2">{{ $item['jumlah'] ?? 1 }}</span>
+                <button type="submit" name="action" value="increase" class="btn btn-outline-secondary btn-sm">+</button>
+            </form>
+        </div>
     </div>
+
+    <form action="{{ route('keranjang.hapus') }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus barang ini dari keranjang?');">
+        @csrf
+        <input type="hidden" name="barang_id" value="{{ $id }}">
+        <button class="btn btn-danger btn-sm">Hapus</button>
+    </form>
+</div>
 @endforeach
 
+{{-- 🔹 Total Belanja (dinamis ikut item terpilih) --}}
+<div class="text-end mt-4">
+    <h5>Total Belanja: <span id="grand-total" class="fw-bold text-success">Rp. 0</span></h5>
+</div>
 
-                    <form action="{{ route('pembayaran') }}" method="GET" id="checkout-form">
+<form action="{{ route('pembayaran') }}" method="GET" id="checkout-form">
     @csrf
     <div id="selected-items-container"></div>
     <div class="text-end mt-3">
@@ -176,6 +193,7 @@
             }
             
             updateCheckoutButton();
+            updateGrandTotal();
         }
 
         function updateCheckoutButton() {
@@ -195,6 +213,20 @@
                 input.value = itemId;
                 container.appendChild(input);
             });
+        }
+
+        function updateGrandTotal() {
+            let total = 0;
+            selectedItems.forEach(itemId => {
+                const itemContainer = document.querySelector(`[data-item-id="${itemId}"]`);
+                if (itemContainer) {
+                    const subtotal = parseInt(itemContainer.getAttribute('data-subtotal')) || 0;
+                    total += subtotal;
+                }
+            });
+
+            document.getElementById('grand-total').textContent = 
+                "Rp. " + total.toLocaleString('id-ID');
         }
 
         function submitCheckout() {

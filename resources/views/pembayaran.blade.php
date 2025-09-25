@@ -163,7 +163,6 @@
     </div>
 </div>
 
-<!-- script ini saja yang kamu butuhkan -->
 <script>
     const payButton = document.getElementById('pay-button');
     payButton?.addEventListener('click', function(e) {
@@ -183,7 +182,6 @@
             }
         });
     });
-
 
     const codButton = document.getElementById('cod-button');
     codButton?.addEventListener('click', function () {

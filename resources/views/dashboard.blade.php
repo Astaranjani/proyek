@@ -10,30 +10,29 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
-    <a class="navbar-brand" href="{{ url('/') }}">
-        <img src="{{ asset('images/logo.jpg') }}" alt="E-Mebel Logo" height="40">
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mx-auto"> <!-- Pindahkan ke tengah dengan mx-auto -->
-            <li class="nav-item"><a class="nav-link" href="{{ url('dashboard') }}">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('riwayat.pesanan') }}">Riwayat Pesanan</a></li>
-        </ul>
-                <a class="nav-link" href="{{ route('keranjang') }}">
-                    <img src="{{ asset('images/keranjang.png') }}" alt="Keranjang" style="width: 37px; height: 23px;">
-                </a>
-                @auth
-                <class="nav-item">
-                    <form method="GET" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="btn btn-link nav-link" style="padding: 0; border: none; background: none;">
-                        <img src="{{ asset('images/logout.png') }}" alt="Logout" style="width: 20px; height: 20px;">
-                    </button>
-                    </form>
-                @endauth
+        <a class="navbar-brand" href="{{ url('/') }}">
+            <img src="{{ asset('images/logo.jpg') }}" alt="E-Mebel Logo" height="40">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto"> <!-- Pindahkan ke tengah dengan mx-auto -->
+                <li class="nav-item"><a class="nav-link" href="{{ url('dashboard') }}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('riwayat.pesanan') }}">Riwayat Pesanan</a></li>
+            </ul>
+            <a class="nav-link" href="{{ route('keranjang') }}">
+                <img src="{{ asset('images/keranjang.png') }}" alt="Keranjang" style="width: 37px; height: 23px;">
+            </a>
+            @auth
+            <form method="GET" action="{{ route('logout') }}" class="ms-2">
+                @csrf
+                <button type="submit" class="btn btn-link nav-link p-0" style="border: none; background: none;">
+                    <img src="{{ asset('images/logout.png') }}" alt="Logout" style="width: 20px; height: 20px;">
+                </button>
+            </form>
+            @endauth
         </div>
     </nav>
     
@@ -42,33 +41,74 @@
         {{-- Isi header jika ada --}}
     </header>
 
-    {{-- Promo --}}
-    <h1 class="text-center my-3">Produk Terbaru</h1>
+    {{-- Search Form --}}
     <section class="container mt-4">
-        <div class="row justify-content-start flex-nowrap overflow-auto">
-    
-            @foreach ($produkTerbaru as $barang)
-            <div class="col-md-3 mb-4">
-                <div class="card h-100">
-                    <img src="{{ asset('storage/' . $barang->gambar) }}" class="card-img-top" alt="{{ $barang->nama }}">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $barang->nama }}</h5>
-                        <p class="card-text text-primary">Rp {{ number_format($barang->harga, 0, ',', '.') }}</p>
-                        <p class="card-text text-muted mb-2" style="font-size: 0.85rem;">{{ Str::limit($barang->deskripsi, 50) }}</p>
-                        <a href="{{ route('produk.detail', $barang->id) }}" class="btn btn-sm btn-outline-primary w-100">Lihat Detail</a>
-                    </div>
-                </div>
+        <form action="{{ url('dashboard') }}" method="GET" class="d-flex justify-content-center mb-3">
+            <input type="text" name="search" class="form-control w-50" placeholder="Cari produk..." value="{{ request('search') }}">
+            <button type="submit" class="btn btn-primary ms-2">Cari</button>
+        </form>
+
+        {{-- Filter Harga dengan Button --}}
+   @php
+    $query = request()->query();
+@endphp
+
+<div class="d-flex justify-content-center mb-3">
+    <div class="btn-group" role="group">
+
+        {{-- Murah ke Mahal --}}
+        <a href="{{ route('dashboard', array_merge($query, ['sort' => 'price_asc'])) }}"
+           class="btn btn-outline-primary {{ request('sort') == 'price_asc' ? 'active' : '' }}">
+           Murah ke Mahal
+        </a>
+
+        {{-- Mahal ke Murah --}}
+        <a href="{{ route('dashboard', array_merge($query, ['sort' => 'price_desc'])) }}"
+           class="btn btn-outline-primary {{ request('sort') == 'price_desc' ? 'active' : '' }}">
+           Mahal ke Murah
+        </a>
+
+    </div>
+</div>
+
+{{-- Icon Furniture --}}
+    <section class="container mt-4">
+        <div class="row text-center mb-4">
+            <div class="col-3">
+                <a href="#" class="text-decoration-none text-dark">
+                    <img src="{{ asset('images/armchair.png') }}" alt="Sofa" class="img-fluid" style="width: 80px;">
+                    <p class="mt-2">Sofa</p>
+                </a>
             </div>
-        @endforeach
+            <div class="col-3">
+                <a href="#" class="text-decoration-none text-dark">
+                    <img src="{{ asset('images/bed.png') }}" alt="Bed" class="img-fluid" style="width: 80px;">
+                    <p class="mt-2">Tempat Tidur</p>
+                </a>
+            </div>
+            <div class="col-3">
+                <a href="#" class="text-decoration-none text-dark">
+                    <img src="{{ asset('images/cabinet-drawer.png') }}" alt="Cabinet" class="img-fluid" style="width: 80px;">
+                    <p class="mt-2">Lemari</p>
+                </a>
+            </div>
+            
+            <div class="col-3">
+                <a href="#" class="text-decoration-none text-dark">
+                    <img src="{{ asset('images/coffee-table.png') }}" alt="Table" class="img-fluid" style="width: 80px;">
+                    <p class="mt-2">Meja</p>
+                </a>
+            </div>
         </div>
+        
     </section>
-    
+
     {{-- Produk Dinamis dari DB --}}
     <h1 class="text-center mb-4 mt-5">Produk Kami</h1>
     <section class="container mt-4">
         <div class="row justify-content-center">
             <!-- Produk dinamis -->
-            @foreach ($semuaProduk as $barang)
+            @forelse ($semuaProduk as $barang)
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                 <div class="card h-100 shadow-sm border-0">
                     @if($barang->gambar)
@@ -85,16 +125,24 @@
                     </div>
                 </div>
             </div>
-            @endforeach
+            @empty
+            <div class="col-12 text-center">
+                <p class="text-muted">Tidak ada produk yang ditemukan. Coba ubah pencarian atau filter.</p>
+            </div>
+            @endforelse
+
+            {{-- Pagination (preserve search dan sort) --}}
+            <div class="d-flex justify-content-center mt-4">
+                {{ $semuaProduk->appends(request()->query())->links() }}
+            </div>
         </div>
     </section>
     
+    {{-- Footer --}}
+    <footer class="bg-dark text-white text-center py-3 mt-4">
+        &copy; {{ date('Y') }} E-Mebel. All Rights Reserved.
+    </footer>
 
-        {{-- Footer --}}
-        <footer class="bg-dark text-white text-center py-3 mt-4">
-            &copy; {{ date('Y') }} E-Mebel. All Rights Reserved.
-        </footer>
-    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

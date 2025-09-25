@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Barang;
+use App\Models\Kategori;
 use Illuminate\Support\Facades\Storage;
 
 class BarangController extends Controller
@@ -19,22 +20,24 @@ class BarangController extends Controller
     // Menampilkan form tambah barang
     public function create()
     {
-        return view('admin.barang.create');
+        $kategori = Kategori::all();
+        return view('admin.barang.create', compact('kategori'));
     }
 
     // Menyimpan data barang baru
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'harga' => 'required|numeric',
-            'stok'  => 'required|integer|min:0',
-            'deskripsi' => 'nullable|string',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'nama'        => 'required|string|max:255',
+            'harga'       => 'required|numeric',
+            'stok'        => 'required|integer|min:0',
+            'kategori'    => 'required|string|max:255',
+            'deskripsi'   => 'nullable|string',
+            'gambar'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         try {
-            $data = $request->only(['nama', 'harga', 'stok', 'deskripsi']);
+            $data = $request->only(['nama', 'harga', 'stok', 'deskripsi', 'kategori']);
 
             if ($request->hasFile('gambar')) {
                 $data['gambar'] = $request->file('gambar')->store('gambar-barang', 'public');
@@ -51,23 +54,25 @@ class BarangController extends Controller
     // Menampilkan form edit barang
     public function edit($id)
     {
-        $barang = Barang::findOrFail($id);
-        return view('admin.barang.edit', compact('barang'));
+        $barang   = Barang::findOrFail($id);
+        $kategori = Kategori::all();
+        return view('admin.barang.edit', compact('barang', 'kategori'));
     }
 
     // Update data barang
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'harga' => 'required|numeric',
-            'stok'  => 'required|integer|min:0',
-            'deskripsi' => 'nullable|string',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'nama'        => 'required|string|max:255',
+            'harga'       => 'required|numeric',
+            'stok'        => 'required|integer|min:0',
+           'kategori'     => 'required|string|max:255',
+            'deskripsi'   => 'nullable|string',
+            'gambar'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $barang = Barang::findOrFail($id);
-        $data = $request->only(['nama', 'harga', 'stok', 'deskripsi']);
+        $data   = $request->only(['nama', 'harga', 'stok', 'deskripsi', 'kategori']);
 
         if ($request->hasFile('gambar')) {
             if ($barang->gambar) {
