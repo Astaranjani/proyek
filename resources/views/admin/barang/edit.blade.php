@@ -202,6 +202,35 @@
                     </div>
 
                     <div class="mb-4">
+  <label for="kategori" class="block font-semibold mb-1">Kategori</label>
+  <select id="kategori" name="kategori"
+          class="form-select w-full border rounded px-3 py-2 @error('kategori') border-red-500 @enderror"
+          required>
+    <option value="">-- Pilih Kategori --</option>
+
+    @foreach($kategori as $k)
+  <option value="{{ $k['nama_kategori'] }}">
+    {{ $k['nama_kategori'] }}
+  </option>
+@endforeach
+
+
+
+    {{-- fallback kalau data kategori kosong --}}
+    @if($kategori->isEmpty())
+      <option value="Kursi">Kursi</option>
+      <option value="Meja">Meja</option>
+      <option value="Lemari">Lemari</option>
+      <option value="Sofa">Sofa</option>
+      <option value="Kasur">Kasur</option>
+    @endif
+  </select>
+  @error('kategori')
+    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+  @enderror
+</div>
+
+                    <div class="mb-4">
                         <label for="gambar" class="block font-semibold mb-1">Gambar (Opsional)</label>
                         @if ($barang->gambar)
                             <img src="{{ asset('storage/' . $barang->gambar) }}" class="mb-2 h-24 w-24 object-cover rounded">
