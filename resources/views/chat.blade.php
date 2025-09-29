@@ -82,18 +82,31 @@
     }
 
     // Event kirim pesan
-    sendButton.addEventListener('click', () => {
-        const text = messageInput.value.trim();
-        if (text === '') return;
+sendButton.addEventListener('click', () => {
+    const text = messageInput.value.trim();
+    if (text === '') return;
 
-        addMessage(text, 'customer');
-        messageInput.value = '';
+    addMessage(text, 'customer');
+    messageInput.value = '';
 
-        // Simulasi balasan dari CS
-        setTimeout(() => {
-            addMessage("Pesan Anda sudah diterima, CS segera merespon 😊", 'cs');
-        }, 1200);
+    // Kirim ke server Laravel
+    fetch("{{ route('chat.store') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({ message: text })
+    })
+    .then(res => res.json())
+    .then(data => {
+        addMessage(data.reply, 'cs'); // balasan dari OpenAI
+    })
+    .catch(() => {
+        addMessage("⚠️ Terjadi kesalahan. Coba lagi.", 'cs');
     });
+});
+
 
     // Tekan Enter untuk kirim
     messageInput.addEventListener('keypress', (e) => {

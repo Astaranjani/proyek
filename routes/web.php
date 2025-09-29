@@ -98,6 +98,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat', [ChatController::class, 'store'])->name('chat.store');
     Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
     Route::get('/chat', [AdminChatController::class, 'index'])->name('chat');
+
+    Route::get('/chat', [ChatController::class, 'index']);
+Route::post('/chat/send', [ChatController::class, 'store']);
 });
 });
 
