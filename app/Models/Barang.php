@@ -19,4 +19,12 @@ class Barang extends Model
         'gambar',
         'kategori',
     ];
+
+    
+    public function vouchers()
+{
+    return $this->belongsToMany(Voucher::class, 'voucher_barang', 'barang_id', 'voucher_id')
+                ->where('aktif', true);
+}
+
 }

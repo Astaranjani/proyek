@@ -9,20 +9,21 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up(): void
+    public function up(): void
 {
     Schema::table('transaksis', function (Blueprint $table) {
-        if (!Schema::hasColumn('transaksis', 'nama_barang')) {
-            $table->string('nama_barang')->nullable();
+        if (!Schema::hasColumn('transaksis', 'total_harga')) {
+            $table->decimal('total_harga', 15, 2)->nullable();
         }
     });
 }
 
-
-public function down()
+public function down(): void
 {
     Schema::table('transaksis', function (Blueprint $table) {
-        $table->dropColumn('nama_barang');
+        if (Schema::hasColumn('transaksis', 'total_harga')) {
+            $table->dropColumn('total_harga');
+        }
     });
 }
 

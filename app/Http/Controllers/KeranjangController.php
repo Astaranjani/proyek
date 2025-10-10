@@ -15,14 +15,24 @@ class KeranjangController extends Controller
 
     public function tambah(Request $request)
     {
-        $barang = Barang::findOrFail($request->barang_id);
+        $barang = Barang::with('vouchers')->findOrFail($request->barang_id);
 
-        // 🔹 Cek stok barang
+        // Cek stok barang
         if ($barang->stok <= 0) {
             return redirect()->back()->with('error', 'Stok barang habis, tidak bisa ditambahkan ke keranjang.');
         }
 
         $cart = session()->get('cart', []);
+
+        // Hitung diskon (snapshot untuk konsistensi)
+        $harga_asli = $barang->harga;
+        $harga_diskon = $harga_asli;
+        $diskon_persen = 0;
+        if ($barang->vouchers->count() > 0) {
+            $voucher = $barang->vouchers->first();
+            $harga_diskon = $harga_asli * (1 - $voucher->diskon / 100);
+            $diskon_persen = $voucher->diskon;
+        }
 
         if (isset($cart[$barang->id])) {
             // Cek apakah jumlah di keranjang melebihi stok
@@ -34,10 +44,12 @@ class KeranjangController extends Controller
             $cart[$barang->id] = [
                 'barang_id' => $barang->id,
                 'nama'      => $barang->nama,
-                'harga'     => $barang->harga,
+                'harga'     => $harga_asli,  // Harga asli untuk line-through
+                'harga_diskon' => $harga_diskon,  // Harga setelah diskon
+                'diskon_persen' => $diskon_persen,  // Persen diskon (0 jika tidak ada)
                 'gambar'    => $barang->gambar,
                 'jumlah'    => 1,
-                'stok'      => $barang->stok, // simpan stok juga
+                'stok'      => $barang->stok,
             ];
         }
 
@@ -63,50 +75,71 @@ class KeranjangController extends Controller
     {
         $cart = session()->get('cart', []);
 
-        if (empty($cart)) {
-            return redirect()->back()->with('error', 'Keranjang masih kosong!');
+        if (empty($request->produk) || empty($cart)) {
+            return redirect()->back()->with('error', 'Tidak ada item terpilih untuk checkout!');
         }
 
-        // 🔹 Validasi stok sebelum checkout
+        // Validasi stok untuk item terpilih
         foreach ($request->produk as $id) {
+            if (!isset($cart[$id])) continue;
             $barang = Barang::find($id);
-            if (!$barang || $barang->stok <= 0) {
-                return redirect()->back()->with('error', 'Ada barang yang stoknya habis, checkout dibatalkan.');
+            $item = $cart[$id];
+            if (!$barang || $barang->stok < $item['jumlah']) {
+                return redirect()->back()->with('error', "Stok barang '{$item['nama']}' tidak mencukupi (stok: {$barang->stok}, dibutuhkan: {$item['jumlah']}).");
             }
         }
 
-        // Hitung total jumlah item secara aman
+        // Hitung total hanya untuk item terpilih (dengan diskon)
         $totalJumlah = 0;
-        $totalHarga  = 0;
+        $totalHarga = 0;
+        $selectedCart = [];  // Hanya item terpilih untuk view pembayaran
 
-        foreach ($cart as $item) {
-            $jumlah = $item['jumlah'] ?? 0;
-            $harga  = $item['harga'] ?? 0;
-
-            $totalJumlah += $jumlah;
-            $totalHarga  += $jumlah * $harga;
+        foreach ($request->produk as $id) {
+            if (isset($cart[$id])) {
+                $item = $cart[$id];
+                $selectedCart[$id] = $item;
+                $totalJumlah += $item['jumlah'];
+                $totalHarga += $item['jumlah'] * $item['harga_diskon'];  // Pakai harga diskon!
+            }
         }
 
-        // Hapus isi keranjang
-        session()->forget('cart');
+        // Hapus hanya item terpilih dari cart (sisanya tetap)
+        foreach ($request->produk as $id) {
+            if (isset($cart[$id])) {
+                unset($cart[$id]);
+            }
+        }
+        session()->put('cart', $cart);
 
-        return view('pembayaran', compact('cart', 'totalJumlah', 'totalHarga'));
+        return view('pembayaran', compact('selectedCart', 'totalJumlah', 'totalHarga'));
     }
 
     public function beliSekarang(Request $request)
     {
-        $barang = Barang::findOrFail($request->product_id);
+        $barang = Barang::with('vouchers')->findOrFail($request->product_id);
 
-        // 🔹 Cek stok dulu
+        // Cek stok dulu
         if ($barang->stok <= 0) {
             return redirect()->back()->with('error', 'Stok barang habis, tidak bisa dibeli.');
+        }
+
+        // Hitung diskon
+        $harga_asli = $barang->harga;
+        $harga_diskon = $harga_asli;
+        $diskon_persen = 0;
+        if ($barang->vouchers->count() > 0) {
+            $voucher = $barang->vouchers->first();
+            $harga_diskon = $harga_asli * (1 - $voucher->diskon / 100);
+            $diskon_persen = $voucher->diskon;
         }
 
         $cart = [];
         $cart[$barang->id] = [
             'barang_id' => $barang->id,
             'nama'      => $barang->nama,
-            'harga'     => $barang->harga,
+            'harga'     => $harga_asli,
+            'harga_diskon' => $harga_diskon,
+            'diskon_persen' => $diskon_persen,
             'gambar'    => $barang->gambar,
             'jumlah'    => 1,
             'stok'      => $barang->stok,
@@ -119,20 +152,30 @@ class KeranjangController extends Controller
 
     public function pembayaranSukses()
     {
-        // Hapus isi keranjang dari session
+        // Hapus isi keranjang dari session (jika diperlukan, sesuaikan)
         session()->forget('cart');
     }
 
     public function tambahKeranjang(Request $request, $id)
     {
-        $produk = Barang::findOrFail($id);
+        $produk = Barang::with('vouchers')->findOrFail($id);
 
-        // 🔹 Cek stok
+        // Cek stok
         if ($produk->stok <= 0) {
             return redirect()->back()->with('error', 'Stok produk habis.');
         }
 
         $cart = session()->get('cart', []);
+
+        // Hitung diskon
+        $harga_asli = $produk->harga;
+        $harga_diskon = $harga_asli;
+        $diskon_persen = 0;
+        if ($produk->vouchers->count() > 0) {
+            $voucher = $produk->vouchers->first();
+            $harga_diskon = $harga_asli * (1 - $voucher->diskon / 100);
+            $diskon_persen = $voucher->diskon;
+        }
 
         if (isset($cart[$id])) {
             if ($cart[$id]['jumlah'] + 1 > $produk->stok) {
@@ -142,7 +185,9 @@ class KeranjangController extends Controller
         } else {
             $cart[$id] = [
                 'nama'   => $produk->nama,
-                'harga'  => $produk->harga,
+                'harga'  => $harga_asli,
+                'harga_diskon' => $harga_diskon,
+                'diskon_persen' => $diskon_persen,
                 'gambar' => $produk->gambar,
                 'jumlah' => 1,
                 'stok'   => $produk->stok,
@@ -159,20 +204,47 @@ class KeranjangController extends Controller
         $cart = session()->get('cart', []);
         $id   = $request->barang_id;
 
-        if (isset($cart[$id])) {
-            $barang = Barang::find($id);
+       if (isset($cart[$id])) {
+    $barang = Barang::with('vouchers')->find($id);
 
-            if ($request->action === 'increase') {
-                // 🔹 Cek stok
-                if ($barang && $cart[$id]['jumlah'] + 1 > $barang->stok) {
-                    return back()->with('error', 'Jumlah barang tidak boleh melebihi stok.');
-                }
-                $cart[$id]['jumlah'] = ($cart[$id]['jumlah'] ?? 1) + 1;
-            } elseif ($request->action === 'decrease') {
-                $cart[$id]['jumlah'] = max(1, ($cart[$id]['jumlah'] ?? 1) - 1);
+    if ($barang) {
+        // Hitung ulang diskon jika voucher masih berlaku
+        $harga_asli = $barang->harga;
+        $harga_diskon = $harga_asli;
+        $diskon_persen = 0;
+
+        if ($barang->vouchers->count() > 0) {
+            $voucher = $barang->vouchers
+                ->filter(fn($v) =>
+                    $v->aktif &&
+                    (!$v->masa_berlaku || \Carbon\Carbon::now()->lte(\Carbon\Carbon::parse($v->masa_berlaku))) &&
+                    (!$v->batas_penggunaan || $v->jumlah_digunakan < $v->batas_penggunaan)
+                )
+                ->first();
+
+            if ($voucher) {
+                $harga_diskon = $harga_asli * (1 - $voucher->diskon / 100);
+                $diskon_persen = $voucher->diskon;
             }
-            session()->put('cart', $cart);
         }
+
+        // Update jumlah
+        if ($request->action === 'increase') {
+            if ($cart[$id]['jumlah'] + 1 > $barang->stok) {
+                return back()->with('error', 'Jumlah barang tidak boleh melebihi stok.');
+            }
+            $cart[$id]['jumlah']++;
+        } elseif ($request->action === 'decrease') {
+            $cart[$id]['jumlah'] = max(1, $cart[$id]['jumlah'] - 1);
+        }
+
+        // Update harga_diskon & diskon_persen
+        $cart[$id]['harga_diskon'] = $harga_diskon;
+        $cart[$id]['diskon_persen'] = $diskon_persen;
+        session()->put('cart', $cart);
+    }
+}
+
 
         return back();
     }

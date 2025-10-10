@@ -9,7 +9,7 @@
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 <body>
-<div class="d-flex flex-column min-vh-100"> <!-- Wrapper untuk sticky footer -->
+<div class="d-flex flex-column min-vh-100">
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
         <a class="navbar-brand" href="{{ url('/') }}">
@@ -22,7 +22,7 @@
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item"><a class="nav-link" href="{{ url('dashboard') }}">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('profile') }}">Profil</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ route('riwayat.pesanan') }}">Riwayat Pesanan</a></li>
+                <li class="nav-item"><a class="nav-link active fw-bold" href="{{ route('riwayat.pesanan') }}">Riwayat Pesanan</a></li>
             </ul>
             <a class="nav-link" href="{{ route('keranjang') }}">
                 <img src="{{ asset('images/keranjang.png') }}" alt="Keranjang" style="width: 37px; height: 23px;">
@@ -40,7 +40,6 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <main class="container mt-5">
         <h1 class="text-center mb-4">Riwayat Transaksi</h1>
 
@@ -50,44 +49,46 @@
             </div>
         @else
             <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID Transaksi</th>
-                            <th>Nama Pelanggan</th>
-                            <th>Nama Barang</th>
-                            <th>Total Harga</th>
-                            <th>Status</th>
-                            <th>Tanggal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($orders as $order)
-                            <tr>
-                                <td>{{ $order->id }}</td>
-                                <td>{{ $order->user->name ?? 'N/A' }}</td>
-                                <td>{{ $order->barang->nama ?? '-' }}</td>
-                                <td>Rp {{ number_format($order->total_harga, 0, ',', '.') }}</td>
-                                <td>
-                                    <span class="badge bg-success">
-                                        Selesai
-                                    </span>
-                                </td>
-                                <td>{{ $order->created_at->format('d-m-Y H:i') }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
+                <table class="table table-bordered align-middle text-center">
+                  <thead class="table-dark">
+    <tr>
+        <th>ID Transaksi</th>
+        <th>Nama Barang</th>
+        <th>Harga Barang</th>
+        <th>Total Bayar</th>
+        <th>Status</th>
+        <th>Tanggal</th>
+    </tr>
+</thead>
+<tbody>
+    @foreach($orders as $order)
+        <tr>
+            <td>{{ $order->id }}</td>
+            <td>{{ $order->nama_barang }}</td>
+            <td>Rp {{ number_format($order->harga_asli, 0, ',', '.') }}</td>
+
+            <td class="fw-bold text-success">
+                Rp {{ number_format($order->total_bayar, 0, ',', '.') }}
+            </td>
+            <td>
+                <span class="badge bg-success">Selesai</span>
+            </td>
+            <td>{{ $order->created_at->format('d-m-Y H:i') }}</td>
+        </tr>
+    @endforeach
+</tbody>
+
+
                 </table>
             </div>
         @endif
     </main>
 
-    <!-- Footer -->
     <footer class="bg-dark text-white text-center py-3 mt-auto">
         &copy; {{ date('Y') }} E-Mebel. All Rights Reserved.
     </footer>
 
-</div> <!-- Tutup wrapper -->
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

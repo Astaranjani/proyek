@@ -99,8 +99,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
     Route::get('/chat', [AdminChatController::class, 'index'])->name('chat');
 
-    Route::get('/chat', [ChatController::class, 'index']);
-Route::post('/chat/send', [ChatController::class, 'store']);
+  
 });
 });
 
@@ -111,7 +110,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
     Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
     Route::post('/cod', [PembayaranController::class, 'cod'])->name('pembayaran.cod');
-    Route::get('/pembayaran-sukses', fn() => view('pembayaran-sukses'))->name('pembayaran.sukses');
+   
 });
 
 // ===========================
@@ -119,3 +118,35 @@ Route::middleware('auth')->group(function () {
 // ===========================
 Route::post('/payment/midtrans-callback', [App\Http\Controllers\PaymentController::class, 'midtransCallback']);
 
+Route::post('/admin/voucher/store', [DashboardAdminController::class, 'storeVoucher'])->name('admin.voucher.store');
+// Voucher
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::get('/voucher/create', [DashboardAdminController::class, 'createVoucher'])->name('admin.voucher.create');
+    Route::post('/voucher/store', [DashboardAdminController::class, 'storeVoucher'])->name('admin.voucher.store');
+    Route::get('/voucher/{voucher}/edit', [DashboardAdminController::class, 'editVoucher'])->name('admin.voucher.edit');
+    Route::put('/voucher/{voucher}', [DashboardAdminController::class, 'updateVoucher'])->name('admin.voucher.update');
+    Route::delete('/voucher/{voucher}', [DashboardAdminController::class, 'destroyVoucher'])->name('admin.voucher.destroy');
+    Route::delete('/admin/voucher/{id}', [DashboardAdminController::class, 'destroy'])
+    ->name('admin.voucher.destroy');
+
+Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran.index');
+Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
+Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
+
+// Proses pembayaran (POST)
+Route::post('/pembayaran', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
+Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
+Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
+
+Route::prefix('admin')->group(function () {
+    Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('admin.pembayaran.index');
+    Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('admin.pembayaran.proses');
+Route::post('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
+
+// Proses pembayaran Midtrans Snap
+Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
+
+// Callback (jika digunakan)
+Route::post('/pembayaran/callback', [PembayaranController::class, 'callback'])->name('pembayaran.callback');
+});
+});

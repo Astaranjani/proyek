@@ -211,6 +211,141 @@
             </div>
           </div>
         </div>
+
+
+      <!-- Tambah Voucher Diskon -->
+<!-- Tambah Voucher Diskon -->
+<div class="bg-white rounded-lg p-4 md:p-6 shadow-sm mt-6">
+    <h2 class="text-lg font-semibold mb-4">Tambah Voucher Diskon</h2>
+
+    @if(session('success'))
+        <div class="p-2 mb-3 bg-green-100 text-green-700 rounded">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <form action="{{ route('admin.voucher.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        @csrf
+
+        <!-- Kode Voucher -->
+        <div>
+            <label class="block text-sm font-medium mb-1">Kode Voucher</label>
+            <input type="text" name="kode" class="w-full border rounded px-3 py-2" required>
+        </div>
+
+        <!-- Diskon -->
+        <div>
+            <label class="block text-sm font-medium mb-1">Diskon (%)</label>
+            <input type="number" name="diskon" class="w-full border rounded px-3 py-2" min="1" max="100" required>
+        </div>
+
+        <!-- Tanggal Mulai -->
+        <div>
+            <label class="block text-sm font-medium mb-1">Tanggal Mulai</label>
+            <input type="date" name="tanggal_mulai" class="w-full border rounded px-3 py-2">
+        </div>
+
+        <!-- Tanggal Berakhir -->
+        <div>
+            <label class="block text-sm font-medium mb-1">Tanggal Berakhir</label>
+            <input type="date" name="tanggal_berakhir" class="w-full border rounded px-3 py-2">
+        </div>
+
+        <!-- Batas Penggunaan -->
+        <div>
+            <label class="block text-sm font-medium mb-1">Batas Penggunaan</label>
+            <input type="number" name="batas_penggunaan" class="w-full border rounded px-3 py-2" min="1" placeholder="Contoh: 100">
+        </div>
+
+        <!-- Pilih Produk -->
+        <div class="md:col-span-2">
+            <label class="block text-sm font-medium mb-1">Pilih Produk (Voucher Berlaku)</label>
+            <select name="barang_ids[]" multiple class="w-full border rounded px-3 py-2 h-40">
+                @foreach($barangs as $barang)
+                    <option value="{{ $barang->id }}">{{ $barang->nama }}</option>
+                @endforeach
+            </select>
+            <p class="text-xs text-gray-500 mt-1">Tekan Ctrl (Windows) / Cmd (Mac) untuk memilih lebih dari satu produk.</p>
+        </div>
+
+        <!-- Tombol Simpan -->
+        <div class="md:col-span-2 flex justify-end">
+            <button type="submit" class="px-4 py-2 bg-primary text-white rounded">Simpan</button>
+        </div>
+    </form>
+</div>
+
+<!-- Daftar Voucher -->
+<!-- Daftar Voucher -->
+<div class="bg-white rounded-lg p-4 md:p-6 shadow-sm mt-6">
+    <h2 class="text-lg font-semibold mb-4">Daftar Voucher</h2>
+
+    <table class="w-full border-collapse">
+        <thead>
+            <tr class="bg-gray-100 text-left">
+                <th class="p-2 border">Kode</th>
+                <th class="p-2 border">Diskon</th>
+                <th class="p-2 border">Masa Berlaku</th>
+                <th class="p-2 border">Batas Penggunaan</th>
+                <th class="p-2 border">Status</th>
+                <th class="p-2 border">Produk Berlaku</th>
+                <th class="p-2 border">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($vouchers as $voucher)
+            <tr>
+                <td class="p-2 border font-semibold">{{ $voucher->kode }}</td>
+                <td class="p-2 border">{{ $voucher->diskon }}%</td>
+                <td class="p-2 border">
+                    @if($voucher->tanggal_mulai && $voucher->tanggal_berakhir)
+                        {{ $voucher->tanggal_mulai }} s.d {{ $voucher->tanggal_berakhir }}
+                    @else
+                        <span class="text-gray-400 text-sm">Tidak ditentukan</span>
+                    @endif
+                </td>
+                <td class="p-2 border">
+                    @if($voucher->batas_penggunaan)
+                        {{ $voucher->jumlah_digunakan ?? 0 }} / {{ $voucher->batas_penggunaan }}
+                    @else
+                        <span class="text-gray-400 text-sm">Tanpa batas</span>
+                    @endif
+                </td>
+
+                <!-- Status -->
+                <td class="p-2 border">
+                    @if($voucher->status === 'Habis')
+                        <span class="px-2 py-1 bg-red-100 text-red-600 rounded text-xs">Habis</span>
+                    @elseif($voucher->status === 'Kadaluarsa')
+                        <span class="px-2 py-1 bg-yellow-100 text-yellow-600 rounded text-xs">Kadaluarsa</span>
+                    @else
+                        <span class="px-2 py-1 bg-green-100 text-green-600 rounded text-xs">Aktif</span>
+                    @endif
+                </td>
+
+                <td class="p-2 border">
+                    @foreach($voucher->barangs as $barang)
+                        <span class="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs">{{ $barang->nama }}</span>
+                    @endforeach
+                </td>
+
+                <td class="p-2 border">
+                    <form action="{{ route('admin.voucher.destroy', $voucher->id) }}" 
+                          method="POST" class="inline-block"
+                          onsubmit="return confirm('Yakin ingin menghapus voucher ini?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="px-3 py-1 bg-red-600 text-white rounded">Hapus</button>
+                    </form>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+
+
+
         <!-- Charts Section -->
         <div class="bg-white rounded-lg p-4 md:p-6 shadow-sm w-full">
           <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js?v=1"></script>

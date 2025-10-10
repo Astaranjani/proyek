@@ -2,10 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-   <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
     <title>Keranjang Saya</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Untuk responsif -->
 
@@ -66,7 +62,12 @@
         }
 
         .item-price {
-            color: #28a745;
+            color: #28a745; /* Hijau untuk harga normal */
+            font-weight: bold;
+        }
+
+        .item-price-discount {
+            color: #dc3545; /* Merah untuk harga diskon */
             font-weight: bold;
         }
     </style>
@@ -92,7 +93,7 @@
             </a>
             @auth
             <div class="nav-item">
-                <form method="GET" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}"> {{-- Ubah ke POST untuk keamanan --}}
                     @csrf
                     <button type="submit" class="btn btn-link nav-link" style="padding: 0; border: none; background: none;">
                         <img src="{{ asset('images/logout.png') }}" alt="Logout" style="width: 20px; height: 20px;">
@@ -103,77 +104,113 @@
         </div>
     </nav>
 
-        <section class="keranjang-wrapper bg-light py-4">
+    <section class="keranjang-wrapper bg-light py-4">
         <div class="container">
             <h4 class="mb-3 fw-bold">Keranjang Saya</h4>
 
-            @php 
-                $cart = session('cart', []); 
+            @php
+                $cart = session('cart', []);
             @endphp
 
             @if (count($cart) === 0)
                 <div class="alert alert-info">Keranjang Anda kosong.</div>
             @else
-@foreach ($cart as $id => $item)
-@php
-    $subtotal = ($item['harga'] ?? 0) * ($item['jumlah'] ?? 1);
-@endphp
-<div class="d-flex align-items-center border-bottom py-3 justify-content-between item-container" 
-     data-item-id="{{ $id }}" 
-     data-subtotal="{{ $subtotal }}">
-    <div class="d-flex align-items-center">
-        <div class="select-btn" onclick="toggleSelectItem(this, '{{ $id }}')">
-            <i class="bi bi-check-lg"></i>
-        </div>
-        <img src="{{ asset('storage/' . $item['gambar']) }}" alt="{{ $item['nama'] }}" class="item-image me-3">
-        <div>
-            <div class="item-name">{{ $item['nama'] }}</div>
-            <div class="item-price">Rp. {{ number_format($item['harga'], 0, ',', '.') }}</div>
-            <div class="text-muted">Subtotal: Rp. {{ number_format($subtotal, 0, ',', '.') }}</div>
-            
-            {{-- 🔹 Form Update Jumlah --}}
-            <form action="{{ route('keranjang.update') }}" method="POST" class="d-flex align-items-center mt-2">
-                @csrf
-                <input type="hidden" name="barang_id" value="{{ $id }}">
-                
-                <button type="submit" name="action" value="decrease" class="btn btn-outline-secondary btn-sm me-2">-</button>
-                <span class="mx-2">{{ $item['jumlah'] ?? 1 }}</span>
-                <button type="submit" name="action" value="increase" class="btn btn-outline-secondary btn-sm">+</button>
-            </form>
-        </div>
-    </div>
+               @foreach ($cart as $id => $item)
+    @php
+        $barang = \App\Models\Barang::with('vouchers')->find($id);
 
-    <form action="{{ route('keranjang.hapus') }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus barang ini dari keranjang?');">
-        @csrf
-        <input type="hidden" name="barang_id" value="{{ $id }}">
-        <button class="btn btn-danger btn-sm">Hapus</button>
-    </form>
-</div>
+        if (!$barang) continue;
+
+        $harga = $barang->harga; // Ambil harga dari database
+        $hargaDiskon = $harga;
+        $voucherText = '';
+
+        // Ambil voucher aktif dengan diskon terbesar
+        $voucherAktif = $barang->vouchers
+            ->filter(fn($v) => 
+                $v->aktif &&
+                (!$v->masa_berlaku || \Carbon\Carbon::now()->lte(\Carbon\Carbon::parse($v->masa_berlaku))) &&
+                (!$v->batas_penggunaan || $v->jumlah_digunakan < $v->batas_penggunaan)
+            )
+            ->sortByDesc('diskon')
+            ->first();
+
+        if ($voucherAktif) {
+            $hargaDiskon = $harga * (1 - $voucherAktif->diskon / 100);
+            $voucherText = "(-{$voucherAktif->diskon}%)";
+        }
+
+        $jumlah = $item['jumlah'] ?? 1;
+        $subtotal = $hargaDiskon * $jumlah;
+    @endphp
+
+    <div class="d-flex align-items-center border-bottom py-3 justify-content-between item-container" 
+         data-item-id="{{ $id }}" 
+         data-subtotal="{{ $subtotal }}">
+        <div class="d-flex align-items-center">
+            <div class="select-btn" onclick="toggleSelectItem(this, '{{ $id }}')">
+                <i class="bi bi-check-lg"></i>
+            </div>
+            <img src="{{ asset('storage/' . $item['gambar']) }}" alt="{{ $item['nama'] }}" class="item-image me-3">
+            <div>
+                <div class="item-name">{{ $item['nama'] }}</div>
+
+                @if($voucherAktif)
+                    <div class="text-muted" style="text-decoration: line-through;">
+                        Rp. {{ number_format($harga, 0, ',', '.') }}
+                    </div>
+                    <div class="item-price-discount">
+                        Rp. {{ number_format($hargaDiskon, 0, ',', '.') }} {{ $voucherText }}
+                    </div>
+                @else
+                    <div class="item-price">Rp. {{ number_format($harga, 0, ',', '.') }}</div>
+                @endif
+
+                <div class="text-muted">Subtotal: Rp. {{ number_format($subtotal, 0, ',', '.') }}</div>
+
+                <form action="{{ route('keranjang.update') }}" method="POST" class="d-flex align-items-center mt-2">
+                    @csrf
+                    <input type="hidden" name="barang_id" value="{{ $id }}">
+                    <button type="submit" name="action" value="decrease" class="btn btn-outline-secondary btn-sm me-2">-</button>
+                    <span class="mx-2">{{ $jumlah }}</span>
+                    <button type="submit" name="action" value="increase" class="btn btn-outline-secondary btn-sm">+</button>
+                </form>
+            </div>
+        </div>
+
+        <form action="{{ route('keranjang.hapus') }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus barang ini dari keranjang?');" class="ms-auto">
+            @csrf
+            <input type="hidden" name="barang_id" value="{{ $id }}">
+            <button class="btn btn-danger btn-sm">Hapus</button>
+        </form>
+    </div>
 @endforeach
 
-{{-- 🔹 Total Belanja (dinamis ikut item terpilih) --}}
-<div class="text-end mt-4">
-    <h5>Total Belanja: <span id="grand-total" class="fw-bold text-success">Rp. 0</span></h5>
-</div>
 
-<form action="{{ route('pembayaran') }}" method="GET" id="checkout-form">
-    @csrf
-    <div id="selected-items-container"></div>
-    <div class="text-end mt-3">
-        <button 
-            type="button" 
-            id="checkout-button" 
-            class="btn btn-success checkout-btn" 
-            disabled 
-            onclick="submitCheckout()">
-            Checkout (<span id="selected-count">0</span> Item)
-        </button>
-    </div>
-</form>
+
+                {{-- Total Belanja (dinamis ikut item terpilih, menggunakan subtotal dengan diskon) --}}
+                <div class="text-end mt-4">
+                    <h5>Total Belanja: <span id="grand-total" class="fw-bold text-success">Rp. 0</span></h5>
+                </div>
+
+                {{-- Form Checkout --}}
+                <form action="{{ route('pembayaran') }}" method="POST" id="checkout-form"> {{-- Ubah ke POST --}}
+                    @csrf
+                    <div id="selected-items-container"></div>
+                    <div class="text-end mt-3">
+                        <button 
+                            type="button" 
+                            id="checkout-button" 
+                            class="btn btn-success checkout-btn" 
+                            disabled 
+                            onclick="submitCheckout()">
+                            Checkout (<span id="selected-count">0</span> Item)
+                        </button>
+                    </div>
+                </form>
             @endif
         </div>
     </section>
-
 
     <script>
         let selectedItems = [];

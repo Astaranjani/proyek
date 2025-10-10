@@ -2,42 +2,57 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transaksi;
 use Illuminate\Http\Request;
-use App\Services\MidtransService;
+use App\Models\Barang;
+use App\Models\Payment;
+use Midtrans\Snap;
 
 class PaymentController extends Controller
 {
-    public function midtransCallback(Request $request, MidtransService $midtransService)
+    public function checkout(Request $request)
     {
-        // Pastikan signature key dari Midtrans valid
-        if ($midtransService->isSignatureKeyVerified()) {
-            $order = $midtransService->getOrder();
+        $items = [];
+        $totalHarga = 0;
 
-            if ($midtransService->getStatus() == 'success') {
-                // Simpan transaksi ke database
-                Transaksi::create([
-                    'user_id'           => $order->user_id, // pastikan ini ID user yang benar
-                    'barang_id'         => $order->barang_id, // pastikan ini ID barang yang benar
-                    'total_harga'       => $order->gross_amount,
-                    'status_pembayaran' => 'Lunas',
-                ]);
+        foreach ($request->barang_id as $id => $jumlah) {
+            $barang = Barang::with('vouchers')->findOrFail($id);
 
-                // Update status pembayaran di order
-                $order->update([
-                    'status' => 'processing',
-                    'payment_status' => 'paid',
-                ]);
+            // cek ada voucher atau tidak
+            if ($barang->vouchers->count() > 0) {
+                $voucher = $barang->vouchers->first();
+                $hargaAkhir = $barang->harga * (1 - $voucher->diskon / 100);
+            } else {
+                $hargaAkhir = $barang->harga;
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Notifikasi berhasil diproses',
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'Unauthorized',
-            ], 401);
+            $subtotal = $hargaAkhir * $jumlah;
+
+            // data item untuk Midtrans
+            $items[] = [
+                'id'       => $barang->id,
+                'price'    => $hargaAkhir,
+                'quantity' => $jumlah,
+                'name'     => $barang->nama,
+            ];
+
+            $totalHarga += $subtotal;
         }
+
+        // data transaksi ke Midtrans
+        $params = [
+            'transaction_details' => [
+                'order_id' => uniqid(),
+                'gross_amount' => $totalHarga, // harga total setelah diskon
+            ],
+            'item_details' => $items,
+            'customer_details' => [
+                'first_name' => auth()->user()->name,
+                'email'      => auth()->user()->email,
+            ],
+        ];
+
+        $snapToken = Snap::getSnapToken($params);
+
+        return view('pembayaran', compact('snapToken', 'items', 'totalHarga'));
     }
 }
