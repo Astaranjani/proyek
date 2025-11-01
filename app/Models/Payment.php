@@ -6,16 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    public $fillable = [
+    protected $fillable = [
+        'payment_code',
         'order_id',
-        'snap_token',
+        'user_id',
+        'payment_method',
+        'amount',
         'status',
-        'expired_at',
-        'paid_at',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 }
