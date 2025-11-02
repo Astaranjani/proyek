@@ -148,5 +148,7 @@ Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name
 
 // Callback (jika digunakan)
 Route::post('/pembayaran/callback', [PembayaranController::class, 'callback'])->name('pembayaran.callback');
+Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
 });
 });

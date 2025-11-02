@@ -161,43 +161,49 @@
           @endif
 
        <div class="overflow-x-auto bg-white rounded-lg shadow">
-    <table class="min-w-full text-sm text-gray-700">
+    <table class="min-w-full border-collapse text-sm text-gray-700">
         <thead class="bg-gray-100 text-xs font-semibold uppercase text-gray-600">
             <tr>
-                <th class="px-6 py-3 text-left">No</th>
-                <th class="px-6 py-3 text-left">Nama</th>
-                <th class="px-6 py-3 text-left">Kategori</th>
-                <th class="px-6 py-3 text-left">Harga</th>
-                <th class="px-6 py-3 text-left">Stok</th>
-                <th class="px-6 py-3 text-left">Deskripsi</th>
-                <th class="px-6 py-3 text-left">Gambar</th>
-                <th class="px-6 py-3 text-left">Aksi</th>
+                <th class="px-4 py-3 text-left w-[5%]">No</th>
+                <th class="px-4 py-3 text-left w-[15%]">Nama</th>
+                <th class="px-4 py-3 text-left w-[12%]">Kategori</th>
+                <th class="px-4 py-3 text-left w-[10%]">Harga</th>
+                <th class="px-4 py-3 text-left w-[8%]">Stok</th>
+                <th class="px-4 py-3 text-left w-[25%]">Deskripsi</th>
+                <th class="px-4 py-3 text-left w-[15%]">Gambar</th>
+                <th class="px-4 py-3 text-left w-[10%]">Aksi</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($barangs as $index => $barang)
-                <tr class="border-b">
-                    <td class="px-6 py-3">{{ $barangs->firstItem() + $index }}</td>
-                    <td class="px-6 py-3">{{ $barang->nama }}</td>
-                    <td class="px-6 py-3">{{ $barang->kategori }}</td>
-                    <td class="px-6 py-3">Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
-                    <td class="px-6 py-3">{{ $barang->stok }}</td>
-                    <td class="px-6 py-3">{{ Str::limit($barang->deskripsi, 50) }}</td>
+                <tr class="border-b hover:bg-gray-50 transition">
+                    <td class="px-4 py-3 text-gray-600">{{ $barangs->firstItem() + $index }}</td>
+                    <td class="px-4 py-3 font-medium text-gray-800">{{ $barang->nama }}</td>
+                    <td class="px-4 py-3">{{ $barang->kategori }}</td>
+                    <td class="px-4 py-3">Rp {{ number_format($barang->harga, 0, ',', '.') }}</td>
+                    <td class="px-4 py-3">{{ $barang->stok }}</td>
+                    <td class="px-4 py-3 text-gray-600">{{ Str::limit($barang->deskripsi, 70) }}</td>
                     <td class="px-6 py-3">
-                        <img src="{{ $barang->gambar ? asset('storage/' . $barang->gambar) : asset('images/default.png') }}" 
-                             class="h-16 w-16 object-cover rounded" />
+                        <div class="w-20 h-20 overflow-hidden rounded-lg border border-gray-200 shadow-sm">
+                            <img src="{{ $barang->gambar ? asset('storage/' . $barang->gambar) : asset('images/default.png') }}" 
+                                alt="Foto {{ $barang->nama }}"
+                                class="w-full h-full object-cover" />
+                        </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <div class="flex space-x-3 items-center">
+
+                    <td class="px-4 py-3 whitespace-nowrap">
+                        <div class="flex flex-col md:flex-row gap-2">
                             <a href="{{ route('admin.barang.edit', $barang->id) }}" 
-                               class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Edit</a>
+                               class="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-center text-xs">
+                                Edit
+                            </a>
                             <form action="{{ route('admin.barang.destroy', $barang->id) }}" 
                                   method="POST" 
                                   onsubmit="return confirm('Yakin ingin menghapus barang ini?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" 
-                                        class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                                        class="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 text-xs w-full text-center">
                                     Hapus
                                 </button>
                             </form>
@@ -206,7 +212,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" class="px-6 py-3 text-center text-gray-500">Belum ada data barang.</td>
+                    <td colspan="8" class="px-6 py-4 text-center text-gray-500">Belum ada data barang.</td>
                 </tr>
             @endforelse
         </tbody>

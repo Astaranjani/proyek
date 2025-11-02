@@ -202,32 +202,31 @@
                     </div>
 
                     <div class="mb-4">
-  <label for="kategori" class="block font-semibold mb-1">Kategori</label>
-  <select id="kategori" name="kategori"
-          class="form-select w-full border rounded px-3 py-2 @error('kategori') border-red-500 @enderror"
-          required>
-    <option value="">-- Pilih Kategori --</option>
+    <label for="kategori" class="block font-semibold mb-1">Kategori</label>
+    <select id="kategori" name="kategori"
+        class="form-select w-full border rounded px-3 py-2 @error('kategori') border-red-500 @enderror"
+        required>
+        <option value="">-- Pilih Kategori --</option>
 
-    @foreach($kategori as $k)
-  <option value="{{ $k['nama_kategori'] }}">
-    {{ $k['nama_kategori'] }}
-  </option>
-@endforeach
+        @foreach($kategori as $k)
+            <option value="{{ $k['nama_kategori'] }}"
+                {{ old('kategori', $barang->kategori) == $k['nama_kategori'] ? 'selected' : '' }}>
+                {{ $k['nama_kategori'] }}
+            </option>
+        @endforeach
 
-
-
-    {{-- fallback kalau data kategori kosong --}}
-    @if($kategori->isEmpty())
-      <option value="Kursi">Kursi</option>
-      <option value="Meja">Meja</option>
-      <option value="Lemari">Lemari</option>
-      <option value="Sofa">Sofa</option>
-      <option value="Kasur">Kasur</option>
-    @endif
-  </select>
-  @error('kategori')
-    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-  @enderror
+        {{-- fallback kalau data kategori kosong --}}
+        @if($kategori->isEmpty())
+            <option value="Kursi" {{ old('kategori', $barang->kategori) == 'Kursi' ? 'selected' : '' }}>Kursi</option>
+            <option value="Meja" {{ old('kategori', $barang->kategori) == 'Meja' ? 'selected' : '' }}>Meja</option>
+            <option value="Lemari" {{ old('kategori', $barang->kategori) == 'Lemari' ? 'selected' : '' }}>Lemari</option>
+            <option value="Sofa" {{ old('kategori', $barang->kategori) == 'Sofa' ? 'selected' : '' }}>Sofa</option>
+            <option value="Kasur" {{ old('kategori', $barang->kategori) == 'Kasur' ? 'selected' : '' }}>Kasur</option>
+        @endif
+    </select>
+    @error('kategori')
+        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+    @enderror
 </div>
 
                     <div class="mb-4">
