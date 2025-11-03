@@ -10,11 +10,14 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::table('transaksis', function (Blueprint $table) {
-            $table->string('nama_user')->nullable()->after('user_id'); // Tambahkan kolom nama_user setelah user_id
-        });
-    }
+{
+    Schema::table('transaksis', function (Blueprint $table) {
+        if (!Schema::hasColumn('transaksis', 'nama_user')) {
+            $table->string('nama_user')->nullable()->after('user_id');
+        }
+    });
+}
+
 
     /**
      * Reverse the migrations.
