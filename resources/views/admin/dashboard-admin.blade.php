@@ -224,6 +224,13 @@
         </div>
     @endif
 
+    @if(!empty($notifikasiStokHabis))
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <strong class="font-bold">⚠️ Stok Habis!</strong>
+        <span class="block sm:inline">{{ $notifikasiStokHabis }}</span>
+    </div>
+@endif
+
     <form action="{{ route('admin.voucher.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         @csrf
 
@@ -261,8 +268,16 @@
         <div class="md:col-span-2">
             <label class="block text-sm font-medium mb-1">Pilih Produk (Voucher Berlaku)</label>
             <select name="barang_ids[]" multiple class="w-full border rounded px-3 py-2 h-40">
+               <div id="notifStokHabis" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-2">
+                <strong class="font-bold">⚠️ Stok Habis!</strong>
+                <span id="listBarangHabis" class="block sm:inline"></span>
+            </div>
+
                 @foreach($barangs as $barang)
-                    <option value="{{ $barang->id }}">{{ $barang->nama }}</option>
+                   <option value="{{ $barang->id }}" data-stok="{{ $barang->stok }}">
+                    {{ $barang->nama }} (Stok: {{ $barang->stok }})
+                </option>
+
                 @endforeach
             </select>
             <p class="text-xs text-gray-500 mt-1">Tekan Ctrl (Windows) / Cmd (Mac) untuk memilih lebih dari satu produk.</p>

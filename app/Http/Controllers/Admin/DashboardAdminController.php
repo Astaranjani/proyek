@@ -22,7 +22,7 @@ class DashboardAdminController extends Controller
     if (auth()->user()->role !== 'admin') {
         abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk mengakses halaman ini.');
     }
-
+    $notifikasiStokHabis = null;
     // Jumlah data
     $jumlahPengguna = User::count();
     $jumlahBarang = Barang::count();
@@ -96,7 +96,8 @@ class DashboardAdminController extends Controller
         'pemasukanHari',
         'customData',
         'barangs', 
-        'vouchers'// sekarang sudah terdefinisi
+        'vouchers',
+        'notifikasiStokHabis'// sekarang sudah terdefinisi
     ));
 }
 
@@ -104,6 +105,16 @@ class DashboardAdminController extends Controller
     public function laporanBarang()
     {
         $barangs = Barang::all();
+        
+        // 🔹 Cek barang yang stoknya habis
+$barangStokHabis = Barang::where('stok', '<=', 0)->pluck('nama')->toArray();
+
+// 🔹 Buat notifikasi jika ada stok habis
+$notifikasiStokHabis = '';
+if (!empty($barangStokHabis)) {
+    $notifikasiStokHabis = 'Perhatian! Barang berikut stoknya habis: ' . implode(', ', $barangStokHabis);
+}
+
         return view('admin.laporan.barang', compact('barangs'));
     }
 
@@ -117,6 +128,18 @@ class DashboardAdminController extends Controller
         'tanggal_berakhir' => 'nullable|date|after_or_equal:tanggal_mulai',
         'batas_penggunaan' => 'nullable|integer|min:1',
     ]);
+
+    // 🔹 Tambahkan setelah $request->validate([...]);
+$barangTidakTersedia = Barang::whereIn('id', $request->barang_ids)
+    ->where('stok', '<=', 0)
+    ->pluck('nama')
+    ->toArray();
+
+if (!empty($barangTidakTersedia)) {
+    return redirect()->back()->withErrors([
+        'barang_ids' => 'Tidak dapat membuat voucher untuk barang yang stoknya habis: ' . implode(', ', $barangTidakTersedia)
+    ])->withInput();
+}
 
     $voucher = Voucher::create([
         'kode' => $request->kode,
@@ -157,6 +180,18 @@ public function updateVoucher(Request $request, Voucher $voucher)
         'tanggal_berakhir' => 'nullable|date|after_or_equal:tanggal_mulai',
         'batas_penggunaan' => 'nullable|integer|min:1',
     ]);
+
+// 🔹 Tambahkan setelah $request->validate([...]);
+$barangTidakTersedia = Barang::whereIn('id', $request->barang_ids)
+    ->where('stok', '<=', 0)
+    ->pluck('nama')
+    ->toArray();
+
+if (!empty($barangTidakTersedia)) {
+    return redirect()->back()->withErrors([
+        'barang_ids' => 'Tidak dapat memperbarui voucher untuk barang yang stoknya habis: ' . implode(', ', $barangTidakTersedia)
+    ])->withInput();
+}
 
     $voucher->update([
         'kode' => $request->kode,

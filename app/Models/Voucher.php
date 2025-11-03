@@ -19,9 +19,8 @@ class Voucher extends Model
         'aktif',
     ];
 
-    public function barangs()
-    {
-        return $this->belongsToMany(Barang::class, 'voucher_barang', 'voucher_id', 'barang_id');
+    public function barangs() {
+    return $this->belongsToMany(Barang::class, 'voucher_barang');
     }
 
     // Hitung sisa pemakaian otomatis
