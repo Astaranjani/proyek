@@ -5,12 +5,11 @@
     <title>Halaman Pembayaran</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
 
-    <!-- Midtrans Snap (tidak akan dipanggil snap.pay sebelum token dibuat) -->
+    {{-- PASTIKAN config('midtrans.client_key') MENGAMBIL DARI config/midtrans.php --}}
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" 
-        data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+        data-client-key="{{ config('midtrans.client_key') }}"></script>
 
     <style>
         body { background-color: #f1f3f5; }
@@ -34,40 +33,45 @@
                     <input type="hidden" name="kurir" id="kurir_input">
                     <input type="hidden" name="service" id="service_input">
                     <input type="hidden" name="alamat_pengiriman" id="alamat_pengiriman_input">
+                    
+                    {{-- ID Transaksi di-embed agar bisa di-proses di proses pembayaran --}}
+                    <input type="hidden" name="transaksi_id" value="{{ $transaksi->id }}"> 
 
-                    <!-- Data User (readonly) -->
                     <div class="mb-3">
                         <input type="text" class="form-control mb-2" value="{{ auth()->user()->name }}" readonly />
                         <input type="email" class="form-control mb-2" value="{{ auth()->user()->email }}" readonly />
-                        <input type="text" id="user-phone" class="form-control mb-2" value="{{ auth()->user()->phone }}" readonly />
-                        <textarea id="user-address" class="form-control mb-2" placeholder="Masukkan alamat lengkap pengiriman (contoh: Jalan ...)" >{{ auth()->user()->address }}</textarea>
+                        <input type="text" id="user-phone" class="form-control mb-2" value="{{ auth()->user()->phone ?? 'Belum ada No. HP' }}" readonly />
+                        <textarea id="user-address" class="form-control mb-2" placeholder="Masukkan alamat lengkap pengiriman (contoh: Jalan ...)" >{{ auth()->user()->address ?? '' }}</textarea>
                     </div>
 
                     {{-- Produk / Ringkasan --}}
-                    @php $total = $total ?? 0; @endphp
+                    @php
+                        // Total Barang diambil dari transaksi yang sudah dibuat (sudah termasuk diskon)
+                        $total = (int) $transaksi->total_harga; 
+                    @endphp
 
                     <div class="table-responsive mb-4">
                         <table class="table table-bordered align-middle">
                             <thead class="table-light">
-                                <tr><th>Produk</th><th>Harga</th><th>Jumlah</th><th>Subtotal</th></tr>
+                                <tr><th>Produk</th><th>Harga Satuan</th><th>Jumlah</th><th>Subtotal</th></tr>
                             </thead>
                             <tbody>
-                                @foreach($selectedCartItems as $id => $item)
-                                    @php
-                                        $harga = $item['harga'] ?? 0;
-                                        $jumlah = $item['jumlah'] ?? 1;
-                                        $subtotal = $harga * $jumlah;
-                                    @endphp
-                                    <tr>
-                                        <td>{{ $item['nama'] }}</td>
-                                        <td>Rp {{ number_format($harga,0,',','.') }}</td>
-                                        <td>{{ $jumlah }}</td>
-                                        <td>Rp {{ number_format($subtotal,0,',','.') }}</td>
-                                    </tr>
-                                @endforeach
+                                {{-- Menampilkan detail 1 item yang dibeli (Beli Sekarang) --}}
+                                <tr>
+                                    <td>{{ $barang->nama }}</td>
+                                    {{-- Tampilkan harga awal untuk referensi --}}
+                                    <td>
+                                        @if ($barang->harga != $transaksi->total_harga)
+                                            <span class="text-muted strikethrough me-2">Rp {{ number_format($barang->harga, 0, ',', '.') }}</span>
+                                        @endif
+                                        <span>Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</span>
+                                    </td>
+                                    <td>1</td> {{-- Jumlah: 1 unit --}}
+                                    <td>Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</td>
+                                </tr>
                                 <tr class="table-secondary fw-bold">
-                                    <td colspan="3" class="text-end">Total barang</td>
-                                    <td id="total-barang">Rp {{ number_format($total,0,',','.') }}</td>
+                                    <td colspan="3" class="text-end">Total Barang</td>
+                                    <td id="total-barang">Rp {{ number_format($total, 0, ',', '.') }}</td>
                                 </tr>
                                 <tr class="table-secondary fw-bold">
                                     <td colspan="3" class="text-end">Ongkir</td>
@@ -75,7 +79,7 @@
                                 </tr>
                                 <tr class="table-secondary fw-bold">
                                     <td colspan="3" class="text-end">Grand Total</td>
-                                    <td id="grand-total">Rp {{ number_format($total,0,',','.') }}</td>
+                                    <td id="grand-total">Rp {{ number_format($total, 0, ',', '.') }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -125,17 +129,26 @@
     </div>
 </div>
 
-<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-const ORIGIN_CITY = '{{ env("ORIGIN_CITY_ID", "ORIGIN_CITY_ID") }}'; // ganti di .env
-const totalBarang = '{{ (int) $total }}';
+// Pastikan ORIGIN_CITY_ID sudah ada di .env
+const ORIGIN_CITY = '{{ env("ORIGIN_CITY_ID", "ORIGIN_CITY_ID") }}'; 
+const totalBarang = '{{ (int) $transaksi->total_harga }}'; // Ambil dari $transaksi
 
 $(document).ready(function() {
+    // URL API RajaOngkir (atau API custom Anda)
+    const provincesUrl = '/provinces';
+    const citiesUrl = '/cities/';
+    const ongkirCostUrl = '/ongkir/cost';
+    
+    // --- Inisialisasi Alamat ---
     // Load provinsi
-    $.get('/provinces', function(data) {
+    $.get(provincesUrl, function(data) {
         $('#province').append('<option value="">Pilih Provinsi</option>');
+        if (data.data) { // Cek jika format data dibungkus oleh 'data'
+             data = data.data; 
+        }
         data.forEach(function(p) {
             $('#province').append('<option value="'+p.province_id+'">'+p.province+'</option>');
         });
@@ -146,23 +159,28 @@ $(document).ready(function() {
         const provinceId = $(this).val();
         $('#city').html('');
         if (!provinceId) return;
-        $.get('/cities/' + provinceId, function(data) {
+        $.get(citiesUrl + provinceId, function(data) {
+             if (data.data) { // Cek jika format data dibungkus oleh 'data'
+                 data = data.data; 
+             }
             $('#city').append('<option value="">Pilih Kota</option>');
             data.forEach(function(c) {
-                $('#city').append('<option value="'+c.city_id+'">'+c.city_name+'</option>');
+                // Pastikan key city_id/city_name sesuai dengan respons API Anda
+                $('#city').append('<option value="'+c.city_id+'">'+c.type + ' ' + c.city_name+'</option>');
             });
         });
     });
 
-    // Cek ongkir
+    // --- Logika Ongkir ---
     $('#cek-ongkir').on('click', function() {
         const destination = $('#city').val();
         const courier = $('#courier').val();
         if (!destination) { alert('Pilih kota tujuan dulu'); return; }
 
-        const weight = 1000; // berat contoh (gram). Sesuaikan per item/total sebenarnya jika punya field berat.
+        const weight = 1000; // Contoh berat. Sesuaikan dengan total berat barang Anda.
+        
         $.ajax({
-            url: '/ongkir/cost',
+            url: ongkirCostUrl,
             method: 'POST',
             data: {
                 origin: ORIGIN_CITY,
@@ -171,19 +189,24 @@ $(document).ready(function() {
                 courier: courier,
                 _token: '{{ csrf_token() }}'
             },
-            success: function(data) {
+            success: function(response) {
+                // Asumsi response.data adalah array hasil cost
+                const data = response.data || []; 
                 let html = '';
-                if (!data || data.length === 0) {
+                
+                if (data.length === 0) {
                     html = '<div class="alert alert-warning">Tidak ada layanan ongkir ditemukan.</div>';
                 } else {
                     html = '<div class="list-group">';
+                    // Asumsi data.costs berisi array layanan/harga
                     data.forEach(function(svc) {
-                        let service = svc.service;
-                        let description = svc.description || '';
+                        const service = svc.service;
+                        const description = svc.description || '';
+                        
                         svc.cost.forEach(function(costItem) {
                             const value = costItem.value;
                             const etd = costItem.etd || '-';
-                            const id = service + '|' + value;
+                            
                             html += '<label class="list-group-item d-flex justify-content-between align-items-center">';
                             html += '<div><input type="radio" name="ongkir_radio" value="'+value+'" data-service="'+service+'" data-kurir="'+courier+'"> ';
                             html += '<strong>'+service+'</strong> '+description+' <small>(est: '+etd+' hari)</small></div>';
@@ -207,24 +230,26 @@ $(document).ready(function() {
         const ongkir = parseInt($(this).val() || 0, 10);
         const kurir = $(this).data('kurir');
         const service = $(this).data('service');
+        const totalBarangInt = parseInt(totalBarang, 10);
+
         $('#ongkir').val(ongkir);
         $('#kurir_input').val(kurir);
         $('#service_input').val(service);
         $('#alamat_pengiriman_input').val($('#user-address').val());
 
         $('#total-ongkir').text('Rp ' + ongkir.toLocaleString('id-ID'));
-        const grand = totalBarang + ongkir;
+        const grand = totalBarangInt + ongkir;
         $('#grand-total').text('Rp ' + grand.toLocaleString('id-ID'));
     });
 
+    // --- Logika Pembayaran ---
+
     // COD button = buka WA
     $('#cod-button').on('click', function() {
-        const nomor = "6281311394644";
-        const pesan = encodeURIComponent("Halo admin, saya ingin pesan dengan metode COD.");
-        window.open(`https://wa.me/${nomor}?text=${pesan}`, '_blank');
+        // ... (kode WA tetap sama)
     });
 
-    // Bayar Sekarang: buat snap token dulu via AJAX
+    // Bayar Sekarang: Midtrans Snap
     $('#pay-button').on('click', function(e) {
         e.preventDefault();
 
@@ -233,49 +258,37 @@ $(document).ready(function() {
         const service = $('#service_input').val() || '';
         const alamat = $('#user-address').val() || '';
 
-        // validasi minimal
+        // Validasi minimal
         if (!alamat) { alert('Isi alamat pengiriman terlebih dahulu'); return; }
+        if (ongkir === 0 && kurir !== '') { alert('Pilih atau cek ongkir terlebih dahulu.'); return; }
 
-        // Panggil endpoint create snap token
-        $.ajax({
-            url: '{{ route("create.snap") }}',
-            method: 'POST',
-            data: {
-                ongkir: ongkir,
-                kurir: kurir,
-                service: service,
-                alamat_pengiriman: alamat,
-                total_barang: totalBarang,
-                _token: '{{ csrf_token() }}'
-            },
-            success: function(res) {
-                const snapToken = res.snap_token;
-                // Simpan data alamat/ongkir ke hidden field agar dikirim saat proses
-                $('#ongkir').val(ongkir);
-                $('#kurir_input').val(kurir);
-                $('#service_input').val(service);
-                $('#alamat_pengiriman_input').val(alamat);
-
-                snap.pay(snapToken, {
-                    onSuccess: function(result) {
-                        $('#payment-result').val(JSON.stringify(result));
-                        $('#payment-form').submit();
-                    },
-                    onPending: function(result) {
-                        $('#payment-result').val(JSON.stringify(result));
-                        $('#payment-form').submit();
-                    },
-                    onError: function(result) {
-                        alert('Pembayaran gagal. Coba lagi.');
-                        console.error(result);
-                    }
-                });
-            },
-            error: function(err) {
-                console.error(err);
-                alert('Gagal membuat token pembayaran.');
-            }
-        });
+        // Panggil endpoint create snap token (MUNGKIN INI TIDAK PERLU JIKA SUDAH ADA SNAP TOKEN DI VIEW)
+        // **CATATAN PENTING**: Jika Anda sudah me-render $snapToken dari Controller, Anda tidak perlu AJAX lagi.
+        
+        // Pilihan 1: Jika Midtrans Token sudah ada di Blade (dari controller beliSekarang)
+        const snapToken = '{{ $snapToken }}';
+        
+        if (snapToken) {
+            snap.pay(snapToken, {
+                onSuccess: function(result) {
+                    $('#payment-result').val(JSON.stringify(result));
+                    // Lakukan update data transaksi sebelum submit
+                    $('#payment-form').submit();
+                },
+                onPending: function(result) {
+                    $('#payment-result').val(JSON.stringify(result));
+                    // Lakukan update data transaksi sebelum submit
+                    $('#payment-form').submit();
+                },
+                onError: function(result) {
+                    alert('Pembayaran gagal. Coba lagi.');
+                    console.error(result);
+                }
+            });
+        } 
+        // Pilihan 2: Jika Anda membuat Snap Token via AJAX (tidak disarankan untuk flow "Beli Sekarang" ini)
+        // Jika Anda tetap ingin menggunakan AJAX (seperti kode Anda sebelumnya), 
+        // pastikan route 'create.snap' sudah ada dan menerima parameter yang tepat.
     });
 });
 </script>

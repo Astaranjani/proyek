@@ -263,58 +263,105 @@ class PembayaranController extends Controller
 
         return redirect()->route('dashboard')->with('success', 'Pembayaran berhasil!');
     }
-    public function beliSekarang(Request $request, $barang_id)
+   
+    public function beliSekarang(Request $request)
     {
-        // Ambil data barang yang akan dibeli
-        $barang = \App\Models\Barang::findOrFail($barang_id);
+        // --- Langkah 1: Pengecekan ID Produk ---
+        $barang_id = $request->input('product_id');
 
-        /** @var \App\Models\User $user */
-        $user = $request->user(); 
-
-        // Cek apakah user sudah login
-        if (!$user) {
-            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu untuk membeli barang.');
+        if (!$barang_id) {
+            // Redirect jika 'product_id' tidak terkirim dari form
+            Log::error('DEBUG ERROR: beliSekarang gagal - product_id kosong.');
+            return redirect()->back()->with('error', 'DEBUG-1: Gagal memproses. ID Produk **(product_id)** tidak ditemukan di form.');
         }
 
-        // Hitung total harga (sementara tanpa ongkir)
-        $total_harga = $barang->harga;
+        // --- Langkah 2: Pengecekan Barang di Database ---
+        try {
+            $barang = Barang::findOrFail($barang_id);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Redirect jika Barang tidak ada di database
+            Log::error('DEBUG ERROR: beliSekarang gagal - Barang ID:' . $barang_id . ' tidak ditemukan.');
+            return redirect()->back()->with('error', 'DEBUG-2: Gagal memproses. Barang dengan ID **' . $barang_id . '** tidak ditemukan di database.');
+        }
 
-        // Buat data transaksi
-        $transaksi = \App\Models\Transaksi::create([
-            'user_id' => $user->id,
-            'nama_user' => $user->name,
-            'barang_id' => $barang->id,
-            'nama_barang' => $barang->nama_barang ?? $barang->nama ?? 'Barang',
-            'total_harga' => $total_harga,
-            'status_pembayaran' => 'pending',
-            'tanggal_transaksi' => now(),
-            'alamat_pengiriman' => $request->alamat_pengiriman ?? null,
-            'ongkir' => $request->ongkir ?? 0,
-            'kurir' => $request->kurir ?? null,
-        ]);
+        /** @var \App\Models\User $user */
+        $user = $request->user();
 
-        // Kirim data transaksi ke Midtrans
+        // --- Langkah 3: Pengecekan Status Login ---
+        if (!$user) {
+            // Redirect jika user belum login (Middleware Auth mungkin sudah menanganinya, tapi ini adalah safety check)
+            Log::warning('DEBUG WARNING: beliSekarang gagal - User belum login.');
+            return redirect()->route('login')->with('error', 'DEBUG-3: Anda harus login untuk melanjutkan pembelian.');
+        }
+
+        // --- Langkah 4: Hitung Total Harga (Opsional: Logging Harga) ---
+        $total_harga = $request->input('harga') ?? $barang->harga;
+        if ($total_harga <= 0) {
+            Log::error('DEBUG ERROR: beliSekarang gagal - Total harga 0 atau kurang.');
+            return redirect()->back()->with('error', 'DEBUG-4: Gagal memproses. Harga barang tidak valid atau nol: ' . $total_harga);
+        }
+
+        // --- Langkah 5: Pembuatan Transaksi (Jika gagal, mungkin karena validasi/relasi) ---
+        try {
+            $transaksi = Transaksi::create([
+                'user_id' => $user->id,
+                'nama_user' => $user->name,
+                'barang_id' => $barang->id,
+                'nama_barang' => $barang->nama_barang ?? $barang->nama ?? 'Barang',
+                'total_harga' => $total_harga,
+                'status_pembayaran' => 'pending',
+                'tanggal_transaksi' => now(),
+                'alamat_pengiriman' => $request->alamat_pengiriman ?? null,
+                'ongkir' => $request->ongkir ?? 0,
+                'kurir' => $request->kurir ?? null,
+            ]);
+            // Log keberhasilan pembuatan transaksi
+            Log::info('DEBUG INFO: Transaksi ID ' . $transaksi->id . ' berhasil dibuat.');
+
+        } catch (\Exception $e) {
+            Log::error('DEBUG ERROR: beliSekarang gagal pada pembuatan Transaksi: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'DEBUG-5: Gagal membuat entri Transaksi di database. Pesan: ' . $e->getMessage());
+        }
+
+        // --- Langkah 6: Konfigurasi dan Inisialisasi Midtrans ---
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = false;
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
+
         $midtransParams = [
             'transaction_details' => [
                 'order_id' => $transaksi->id,
-                'gross_amount' => $total_harga, // bisa + ongkir kalau sudah aktif RajaOngkir
+                'gross_amount' => (int) $total_harga,
             ],
             'customer_details' => [
                 'first_name' => $user->name,
                 'email' => $user->email,
             ],
+            'item_details' => [
+                [
+                    'id' => $barang->id,
+                    'price' => (int) $total_harga, // Gunakan harga akhir yang sudah dihitung
+                    'quantity' => 1,
+                    'name' => $barang->nama,
+                ]
+            ]
         ];
 
-        // Inisialisasi Midtrans
-        \Midtrans\Config::$serverKey = config('midtrans.server_key');
-        \Midtrans\Config::$isProduction = false;
-        \Midtrans\Config::$isSanitized = true;
-        \Midtrans\Config::$is3ds = true;
+        try {
+            $snapToken = Snap::getSnapToken($midtransParams);
+            // Log keberhasilan mendapatkan token
+            Log::info('DEBUG INFO: Snap Token berhasil didapatkan untuk Transaksi ID ' . $transaksi->id);
 
-        $snapToken = \Midtrans\Snap::getSnapToken($midtransParams);
+        } catch (\Exception $e) {
+            // Redirect jika Midtrans gagal (misalnya Server Key salah, koneksi bermasalah)
+            Log::error('DEBUG ERROR: beliSekarang gagal mendapatkan Snap Token: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'DEBUG-6: Gagal mendapatkan Snap Token Midtrans. Pesan: ' . $e->getMessage());
+        }
 
-        // Kirim ke view pembayaran
-        return view('user.transaksi.pembayaran', [
+        // --- Langkah 7: Berhasil, Lanjutkan ke View Pembayaran ---
+        Log::info('DEBUG INFO: Redirecting to pembayaran view. Transaksi ID ' . $transaksi->id);
+            return view('pembayaran', [
             'transaksi' => $transaksi,
             'barang' => $barang,
             'snapToken' => $snapToken

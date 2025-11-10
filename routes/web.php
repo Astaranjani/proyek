@@ -114,7 +114,7 @@ Route::middleware('auth')->group(function () {
     // Pembayaran (User)
     Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
     Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
-    Route::post('/beli-sekarang/{id}', [PembayaranController::class, 'beliSekarang'])->name('beli.sekarang');
+    Route::post('/beli-sekarang', [PembayaranController::class, 'beliSekarang'])->name('beli.sekarang');
     Route::post('/pembayaran/beli-sekarang/proses', [PembayaranController::class, 'beliSekarangProses'])->name('pembayaran.beliSekarang.proses');
     Route::post('/cod', [PembayaranController::class, 'cod'])->name('pembayaran.cod');
 
