@@ -8,40 +8,19 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
 
-    <!-- Midtrans Snap -->
+    <!-- Midtrans Snap (tidak akan dipanggil snap.pay sebelum token dibuat) -->
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" 
         data-client-key="{{ config('services.midtrans.client_key') }}"></script>
 
     <style>
         body { background-color: #f1f3f5; }
-        .card-custom {
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            padding: 30px;
-            margin-top: 40px;
-            margin-bottom: 40px;
-        }
-        h2 { font-weight: bold; color: #343a40; }
-        .table th, .table td { vertical-align: middle; }
-        .btn-primary {
-            background-color: #0bc455;
-            border: none;
-            font-weight: 600;
-            padding: 12px 24px;
-            border-radius: 10px;
-            transition: background-color 0.3s ease;
-        }
+        .card-custom { background: #fff; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); padding: 30px; margin-top: 40px; margin-bottom: 40px; }
+        .btn-primary { background-color: #0bc455; border: none; font-weight: 600; padding: 12px 24px; border-radius: 10px; transition: background-color 0.3s ease; }
         .btn-primary:hover { background-color: #0aa64b; }
-        .alert { border-radius: 10px; }
-        .text-end { text-align: right; }
-        .form-control[readonly] { background-color: #e9ecef; opacity: 1; }
-        .text-danger { font-weight: bold; }
         .text-muted.strikethrough { text-decoration: line-through; }
     </style>
 </head>
 <body>
-
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-10 col-lg-8">
@@ -51,176 +30,254 @@
                 <form id="payment-form" method="POST" action="{{ route('pembayaran.proses') }}">
                     @csrf
                     <input type="hidden" name="payment_result" id="payment-result">
+                    <input type="hidden" name="ongkir" id="ongkir" value="0">
+                    <input type="hidden" name="kurir" id="kurir_input">
+                    <input type="hidden" name="service" id="service_input">
+                    <input type="hidden" name="alamat_pengiriman" id="alamat_pengiriman_input">
 
-                    <!-- Data User -->
+                    <!-- Data User (readonly) -->
                     <div class="mb-3">
                         <input type="text" class="form-control mb-2" value="{{ auth()->user()->name }}" readonly />
                         <input type="email" class="form-control mb-2" value="{{ auth()->user()->email }}" readonly />
-                        <input type="text" class="form-control mb-2" value="{{ auth()->user()->phone }}" readonly />
-                        <input type="text" class="form-control" value="{{ auth()->user()->address }}" readonly />
+                        <input type="text" id="user-phone" class="form-control mb-2" value="{{ auth()->user()->phone }}" readonly />
+                        <textarea id="user-address" class="form-control mb-2" placeholder="Masukkan alamat lengkap pengiriman (contoh: Jalan ...)" >{{ auth()->user()->address }}</textarea>
                     </div>
 
-                    @php 
-                        use Carbon\Carbon;
-                        $total = 0;
-                    @endphp
+                    {{-- Produk / Ringkasan --}}
+                    @php $total = $total ?? 0; @endphp
 
-                    {{-- ==================== PRODUK TUNGGAL ==================== --}}
-                    @if(isset($barang))
-                        @php 
-                            $voucherAktif = $barang->vouchers
-                                ->filter(fn($v) => 
-                                    $v->aktif &&
-                                    (!$v->masa_berlaku || now()->lte(Carbon::parse($v->masa_berlaku))) &&
-                                    (!$v->batas_penggunaan || $v->jumlah_digunakan < $v->batas_penggunaan)
-                                )
-                                ->first();
-
-                            $harga = $barang->harga;
-                            $hargaDiskon = $voucherAktif ? $harga * (1 - $voucherAktif->diskon / 100) : $harga;
-                            $voucherText = $voucherAktif ? "(-{$voucherAktif->diskon}%)" : '';
-                            $total = $hargaDiskon;
-                        @endphp
-
-                        <div class="table-responsive mb-4">
-                            <table class="table table-bordered align-middle">
-                                <thead class="table-light">
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr><th>Produk</th><th>Harga</th><th>Jumlah</th><th>Subtotal</th></tr>
+                            </thead>
+                            <tbody>
+                                @foreach($selectedCartItems as $id => $item)
+                                    @php
+                                        $harga = $item['harga'] ?? 0;
+                                        $jumlah = $item['jumlah'] ?? 1;
+                                        $subtotal = $harga * $jumlah;
+                                    @endphp
                                     <tr>
-                                        <th>Produk</th>
-                                        <th>Harga</th>
-                                        <th>Jumlah</th>
-                                        <th>Subtotal</th>
+                                        <td>{{ $item['nama'] }}</td>
+                                        <td>Rp {{ number_format($harga,0,',','.') }}</td>
+                                        <td>{{ $jumlah }}</td>
+                                        <td>Rp {{ number_format($subtotal,0,',','.') }}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>{{ $barang->nama }}</td>
-                                        @if($voucherAktif)
-                                            <td class="text-muted strikethrough">Rp {{ number_format($harga,0,',','.') }}</td>
-                                            <td>1</td>
-                                            <td class="text-danger">Rp {{ number_format($hargaDiskon,0,',','.') }} {{ $voucherText }}</td>
-                                        @else
-                                            <td>Rp {{ number_format($harga,0,',','.') }}</td>
-                                            <td>1</td>
-                                            <td>Rp {{ number_format($harga,0,',','.') }}</td>
-                                        @endif
-                                    </tr>
-                                    <tr class="table-secondary fw-bold">
-                                        <td colspan="3" class="text-end">Total</td>
-                                        <td>Rp {{ number_format($total,0,',','.') }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                @endforeach
+                                <tr class="table-secondary fw-bold">
+                                    <td colspan="3" class="text-end">Total barang</td>
+                                    <td id="total-barang">Rp {{ number_format($total,0,',','.') }}</td>
+                                </tr>
+                                <tr class="table-secondary fw-bold">
+                                    <td colspan="3" class="text-end">Ongkir</td>
+                                    <td id="total-ongkir">Rp 0</td>
+                                </tr>
+                                <tr class="table-secondary fw-bold">
+                                    <td colspan="3" class="text-end">Grand Total</td>
+                                    <td id="grand-total">Rp {{ number_format($total,0,',','.') }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{-- Pilihan alamat & ongkir --}}
+                    <h5 class="fw-bold mb-2">Alamat & Ongkir</h5>
+                    <div class="row g-2 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label>Provinsi</label>
+                            <select id="province" class="form-control"></select>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label>Kota / Kabupaten</label>
+                            <select id="city" class="form-control"></select>
                         </div>
 
-                    {{-- ==================== PRODUK DARI KERANJANG ==================== --}}
-                    @elseif(session()->has('cart') && count(session('cart')) > 0)
-                        @php
-                            $cart = session('cart');
-                            $selectedCartItems = $selectedCartItems ?? $cart;
-                            $total = 0;
-                        @endphp
-
-                        <div class="table-responsive mb-4">
-                            <table class="table table-bordered align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Produk</th>
-                                        <th>Harga</th>
-                                        <th>Jumlah</th>
-                                        <th>Subtotal</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($selectedCartItems as $id => $item)
-                                        @php
-                                            $barang = \App\Models\Barang::with('vouchers')->find($id);
-                                            $harga = $item['harga'] ?? 0;
-                                            $voucherAktif = $barang?->vouchers
-                                                ->filter(fn($v) =>
-                                                    $v->aktif &&
-                                                    (!$v->masa_berlaku || now()->lte(Carbon::parse($v->masa_berlaku))) &&
-                                                    (!$v->batas_penggunaan || $v->jumlah_digunakan < $v->batas_penggunaan)
-                                                )
-                                                ->first();
-
-                                            $hargaDiskon = $voucherAktif ? $harga * (1 - $voucherAktif->diskon / 100) : $harga;
-                                            $voucherText = $voucherAktif ? "(-{$voucherAktif->diskon}%)" : '';
-                                            $jumlah = $item['jumlah'] ?? 1;
-                                            $subtotal = $hargaDiskon * $jumlah;
-                                            $total += $subtotal;
-                                        @endphp
-                                        <tr>
-                                            <td>{{ $item['nama'] }}</td>
-                                            @if($voucherAktif)
-                                                <td class="text-muted strikethrough">Rp {{ number_format($harga,0,',','.') }}</td>
-                                                <td>{{ $jumlah }}</td>
-                                                <td class="text-danger">Rp {{ number_format($subtotal,0,',','.') }} {{ $voucherText }}</td>
-                                            @else
-                                                <td>Rp {{ number_format($harga,0,',','.') }}</td>
-                                                <td>{{ $jumlah }}</td>
-                                                <td>Rp {{ number_format($subtotal,0,',','.') }}</td>
-                                            @endif
-                                        </tr>
-                                    @endforeach
-                                    <tr class="table-secondary fw-bold">
-                                        <td colspan="3" class="text-end">Total</td>
-                                        <td>Rp {{ number_format($total,0,',','.') }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="col-12 col-md-6">
+                            <label>Kurir</label>
+                            <select id="courier" class="form-control">
+                                <option value="jne">JNE</option>
+                                <option value="tiki">TIKI</option>
+                                <option value="pos">POS</option>
+                            </select>
                         </div>
-                    @else
-                        <div class="alert alert-warning text-center">
-                            Tidak ada produk untuk dibayar.
-                        </div>
-                    @endif
 
-                    {{-- ==================== TOMBOL PEMBAYARAN ==================== --}}
-                    @if(isset($snapToken))
-                        <h5 class="fw-bold mb-3">Metode Pembayaran</h5>
-                        <div class="row g-2 mb-3">
-                            <div class="col-12 col-md-6">
-                                <button type="button" class="btn btn-outline-dark w-100 py-2" id="cod-button">COD</button>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <button type="button" class="btn btn-primary w-100 py-2" id="pay-button">Bayar Sekarang</button>
-                            </div>
+                        <div class="col-12 col-md-6 d-flex align-items-end">
+                            <button type="button" id="cek-ongkir" class="btn btn-outline-primary w-100">Cek Ongkir</button>
                         </div>
-                    @endif
+
+                        <div class="col-12 mt-3" id="ongkir-results"></div>
+                    </div>
+
+                    {{-- Metode Pembayaran --}}
+                    <div class="row g-2 mb-3">
+                        <div class="col-12 col-md-6">
+                            <button type="button" class="btn btn-outline-dark w-100 py-2" id="cod-button">COD</button>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <button type="button" class="btn btn-primary w-100 py-2" id="pay-button">Bayar Sekarang</button>
+                        </div>
+                    </div>
+
                 </form>
             </div>
         </div>
     </div>
 </div>
 
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
-    const payButton = document.getElementById('pay-button');
-    payButton?.addEventListener('click', function(e) {
-        e.preventDefault();
-        snap.pay('{{ $snapToken }}', {
-            onSuccess: function(result) {
-                document.getElementById('payment-result').value = JSON.stringify(result);
-                document.getElementById('payment-form').submit();
+const ORIGIN_CITY = '{{ env("ORIGIN_CITY_ID", "ORIGIN_CITY_ID") }}'; // ganti di .env
+const totalBarang = '{{ (int) $total }}';
+
+$(document).ready(function() {
+    // Load provinsi
+    $.get('/provinces', function(data) {
+        $('#province').append('<option value="">Pilih Provinsi</option>');
+        data.forEach(function(p) {
+            $('#province').append('<option value="'+p.province_id+'">'+p.province+'</option>');
+        });
+    });
+
+    // Load kota saat province berubah
+    $('#province').on('change', function() {
+        const provinceId = $(this).val();
+        $('#city').html('');
+        if (!provinceId) return;
+        $.get('/cities/' + provinceId, function(data) {
+            $('#city').append('<option value="">Pilih Kota</option>');
+            data.forEach(function(c) {
+                $('#city').append('<option value="'+c.city_id+'">'+c.city_name+'</option>');
+            });
+        });
+    });
+
+    // Cek ongkir
+    $('#cek-ongkir').on('click', function() {
+        const destination = $('#city').val();
+        const courier = $('#courier').val();
+        if (!destination) { alert('Pilih kota tujuan dulu'); return; }
+
+        const weight = 1000; // berat contoh (gram). Sesuaikan per item/total sebenarnya jika punya field berat.
+        $.ajax({
+            url: '/ongkir/cost',
+            method: 'POST',
+            data: {
+                origin: ORIGIN_CITY,
+                destination: destination,
+                weight: weight,
+                courier: courier,
+                _token: '{{ csrf_token() }}'
             },
-            onPending: function(result) {
-                document.getElementById('payment-result').value = JSON.stringify(result);
-                document.getElementById('payment-form').submit();
+            success: function(data) {
+                let html = '';
+                if (!data || data.length === 0) {
+                    html = '<div class="alert alert-warning">Tidak ada layanan ongkir ditemukan.</div>';
+                } else {
+                    html = '<div class="list-group">';
+                    data.forEach(function(svc) {
+                        let service = svc.service;
+                        let description = svc.description || '';
+                        svc.cost.forEach(function(costItem) {
+                            const value = costItem.value;
+                            const etd = costItem.etd || '-';
+                            const id = service + '|' + value;
+                            html += '<label class="list-group-item d-flex justify-content-between align-items-center">';
+                            html += '<div><input type="radio" name="ongkir_radio" value="'+value+'" data-service="'+service+'" data-kurir="'+courier+'"> ';
+                            html += '<strong>'+service+'</strong> '+description+' <small>(est: '+etd+' hari)</small></div>';
+                            html += '<div>Rp '+Number(value).toLocaleString('id-ID')+'</div>';
+                            html += '</label>';
+                        });
+                    });
+                    html += '</div>';
+                }
+                $('#ongkir-results').html(html);
             },
-            onError: function(result) {
-                alert("Pembayaran gagal!");
-                console.error(result);
+            error: function(err) {
+                console.error(err);
+                alert('Gagal mengambil data ongkir');
             }
         });
     });
 
-    const codButton = document.getElementById('cod-button');
-    codButton?.addEventListener('click', function () {
-        const nomor = "6281311394644"; // Nomor admin
+    // Pilih layanan ongkir -> update total
+    $(document).on('change', 'input[name="ongkir_radio"]', function() {
+        const ongkir = parseInt($(this).val() || 0, 10);
+        const kurir = $(this).data('kurir');
+        const service = $(this).data('service');
+        $('#ongkir').val(ongkir);
+        $('#kurir_input').val(kurir);
+        $('#service_input').val(service);
+        $('#alamat_pengiriman_input').val($('#user-address').val());
+
+        $('#total-ongkir').text('Rp ' + ongkir.toLocaleString('id-ID'));
+        const grand = totalBarang + ongkir;
+        $('#grand-total').text('Rp ' + grand.toLocaleString('id-ID'));
+    });
+
+    // COD button = buka WA
+    $('#cod-button').on('click', function() {
+        const nomor = "6281311394644";
         const pesan = encodeURIComponent("Halo admin, saya ingin pesan dengan metode COD.");
         window.open(`https://wa.me/${nomor}?text=${pesan}`, '_blank');
     });
-</script>
 
+    // Bayar Sekarang: buat snap token dulu via AJAX
+    $('#pay-button').on('click', function(e) {
+        e.preventDefault();
+
+        const ongkir = parseInt($('#ongkir').val() || 0, 10);
+        const kurir = $('#kurir_input').val() || $('#courier').val();
+        const service = $('#service_input').val() || '';
+        const alamat = $('#user-address').val() || '';
+
+        // validasi minimal
+        if (!alamat) { alert('Isi alamat pengiriman terlebih dahulu'); return; }
+
+        // Panggil endpoint create snap token
+        $.ajax({
+            url: '{{ route("create.snap") }}',
+            method: 'POST',
+            data: {
+                ongkir: ongkir,
+                kurir: kurir,
+                service: service,
+                alamat_pengiriman: alamat,
+                total_barang: totalBarang,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(res) {
+                const snapToken = res.snap_token;
+                // Simpan data alamat/ongkir ke hidden field agar dikirim saat proses
+                $('#ongkir').val(ongkir);
+                $('#kurir_input').val(kurir);
+                $('#service_input').val(service);
+                $('#alamat_pengiriman_input').val(alamat);
+
+                snap.pay(snapToken, {
+                    onSuccess: function(result) {
+                        $('#payment-result').val(JSON.stringify(result));
+                        $('#payment-form').submit();
+                    },
+                    onPending: function(result) {
+                        $('#payment-result').val(JSON.stringify(result));
+                        $('#payment-form').submit();
+                    },
+                    onError: function(result) {
+                        alert('Pembayaran gagal. Coba lagi.');
+                        console.error(result);
+                    }
+                });
+            },
+            error: function(err) {
+                console.error(err);
+                alert('Gagal membuat token pembayaran.');
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>

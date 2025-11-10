@@ -17,6 +17,7 @@ use App\Http\Controllers\ManualTransaksiController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\OngkirController;
 
 /*
 |--------------------------------------------------------------------------
@@ -113,7 +114,7 @@ Route::middleware('auth')->group(function () {
     // Pembayaran (User)
     Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
     Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
-    Route::post('/beli-sekarang', [PembayaranController::class, 'beliSekarang'])->name('beli.sekarang');
+    Route::post('/beli-sekarang/{id}', [PembayaranController::class, 'beliSekarang'])->name('beli.sekarang');
     Route::post('/pembayaran/beli-sekarang/proses', [PembayaranController::class, 'beliSekarangProses'])->name('pembayaran.beliSekarang.proses');
     Route::post('/cod', [PembayaranController::class, 'cod'])->name('pembayaran.cod');
 
@@ -167,4 +168,14 @@ Route::put('/profile', [ProfileController::class, 'update'])->name('profile.upda
 });
 
 Route::post('/payment/midtrans-callback', [PaymentController::class, 'midtransCallback']);
+
+
+
+Route::get('/provinces', [OngkirController::class, 'getProvinces']);
+Route::get('/cities/{province_id}', [OngkirController::class, 'getCities']);
+Route::post('/ongkir/cost', [OngkirController::class, 'getCost']);
+
+// Endpoint untuk membuat Snap token dinamis dengan ongkir dan total
+Route::post('/create-snap-token', [PembayaranController::class, 'createSnapToken'])->name('create.snap');
+
 
