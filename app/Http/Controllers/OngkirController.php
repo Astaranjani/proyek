@@ -73,7 +73,7 @@ class OngkirController extends Controller
             return response()->json($data['rajaongkir']['results'][0]['costs'] ?? []);
         }
 
-        \Log::error('RajaOngkir getCost error', ['resp' => $resp->body()]);
+        Log::error('RajaOngkir getCost error', ['resp' => $resp->body()]);
         return response()->json([], 500);
     }
 }
