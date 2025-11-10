@@ -17,6 +17,7 @@ use App\Http\Controllers\ManualTransaksiController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\OngkirController;
 
 /*
 |--------------------------------------------------------------------------
@@ -167,4 +168,14 @@ Route::put('/profile', [ProfileController::class, 'update'])->name('profile.upda
 });
 
 Route::post('/payment/midtrans-callback', [PaymentController::class, 'midtransCallback']);
+
+
+
+Route::get('/provinces', [OngkirController::class, 'getProvinces']);
+Route::get('/cities/{province_id}', [OngkirController::class, 'getCities']);
+Route::post('/ongkir/cost', [OngkirController::class, 'getCost']);
+
+// Endpoint untuk membuat Snap token dinamis dengan ongkir dan total
+Route::post('/create-snap-token', [PembayaranController::class, 'createSnapToken'])->name('create.snap');
+
 
