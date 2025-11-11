@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\OngkirController;
 
 // ========================================================
 // 🔓 PUBLIC ROUTES (TIDAK PERLU LOGIN)
@@ -55,3 +56,7 @@ Route::fallback(function () {
         'message' => 'Endpoint tidak ditemukan. Periksa URL API Anda.',
     ], 404);
 });
+
+     Route::get('/provinces', [OngkirController::class, 'getProvinces']);
+     Route::get('/cities/{province_id}', [OngkirController::class, 'getCities']);
+     Route::post('/ongkir/cost', [OngkirController::class, 'getCost']);
