@@ -57,6 +57,14 @@ Route::fallback(function () {
     ], 404);
 });
 
-     Route::get('/provinces', [OngkirController::class, 'getProvinces']);
-     Route::get('/cities/{province_id}', [OngkirController::class, 'getCities']);
-     Route::post('/ongkir/cost', [OngkirController::class, 'getCost']);
+     Route::prefix('ongkir')->group(function () {
+    
+    // 1. Mengambil semua provinsi
+    // URL Final: /api/ongkir/provinces
+    Route::get('/provinces', [OngkirController::class, 'getProvinces']);
+    Route::get('/cities/{province_id}', [OngkirController::class, 'getCities']);
+    Route::post('/cost', [OngkirController::class, 'getCost']);
+});
+    Route::middleware('auth:sanctum')->get('/user', function (\Illuminate\Http\Request $request) {
+        return $request->user();
+});

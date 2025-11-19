@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    {{-- Tambahkan CSRF Token untuk POST AJAX --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- PASTIKAN config('midtrans.client_key') MENGAMBIL DARI config/midtrans.php --}}
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" 
@@ -17,6 +19,9 @@
         .btn-primary { background-color: #0bc455; border: none; font-weight: 600; padding: 12px 24px; border-radius: 10px; transition: background-color 0.3s ease; }
         .btn-primary:hover { background-color: #0aa64b; }
         .text-muted.strikethrough { text-decoration: line-through; }
+        /* Style untuk radio button hasil ongkir */
+        .list-group-item label { width: 100%; cursor: pointer; }
+        .list-group-item input[type="radio"] { margin-right: 10px; }
     </style>
 </head>
 <body>
@@ -29,10 +34,10 @@
                 <form id="payment-form" method="POST" action="{{ route('pembayaran.proses') }}">
                     @csrf
                     <input type="hidden" name="payment_result" id="payment-result">
-                    <input type="hidden" name="ongkir" id="ongkir" value="0">
+                    <input type="hidden" name="ongkir" id="ongkir_cost" value="0">
                     <input type="hidden" name="kurir" id="kurir_input">
                     <input type="hidden" name="service" id="service_input">
-                    <input type="hidden" name="alamat_pengiriman" id="alamat_pengiriman_input">
+                    {{-- Nilai alamat pengiriman akan di-set sebelum submit, tidak perlu hidden input --}}
                     
                     {{-- ID Transaksi di-embed agar bisa di-proses di proses pembayaran --}}
                     <input type="hidden" name="transaksi_id" value="{{ $transaksi->id }}"> 
@@ -41,7 +46,7 @@
                         <input type="text" class="form-control mb-2" value="{{ auth()->user()->name }}" readonly />
                         <input type="email" class="form-control mb-2" value="{{ auth()->user()->email }}" readonly />
                         <input type="text" id="user-phone" class="form-control mb-2" value="{{ auth()->user()->phone ?? 'Belum ada No. HP' }}" readonly />
-                        <textarea id="user-address" class="form-control mb-2" placeholder="Masukkan alamat lengkap pengiriman (contoh: Jalan ...)" >{{ auth()->user()->address ?? '' }}</textarea>
+                        <textarea id="user-address" name="alamat_pengiriman" class="form-control mb-2" placeholder="Masukkan alamat lengkap pengiriman (contoh: Jalan ...)" >{{ auth()->user()->address ?? '' }}</textarea>
                     </div>
 
                     {{-- Produk / Ringkasan --}}
@@ -71,7 +76,8 @@
                                 </tr>
                                 <tr class="table-secondary fw-bold">
                                     <td colspan="3" class="text-end">Total Barang</td>
-                                    <td id="total-barang">Rp {{ number_format($total, 0, ',', '.') }}</td>
+                                    {{-- Simpan total barang di data attribute untuk memudahkan JS --}}
+                                    <td id="total-barang" data-total="{{ $total }}">Rp {{ number_format($total, 0, ',', '.') }}</td>
                                 </tr>
                                 <tr class="table-secondary fw-bold">
                                     <td colspan="3" class="text-end">Ongkir</td>
@@ -90,11 +96,15 @@
                     <div class="row g-2 mb-3">
                         <div class="col-12 col-md-6">
                             <label>Provinsi</label>
-                            <select id="province" class="form-control"></select>
+                            <select id="province" class="form-control">
+                                <option value="">Loading...</option>
+                            </select>
                         </div>
                         <div class="col-12 col-md-6">
                             <label>Kota / Kabupaten</label>
-                            <select id="city" class="form-control"></select>
+                            <select id="city" class="form-control" disabled>
+                                <option value="">Pilih Kota / Kabupaten</option>
+                            </select>
                         </div>
 
                         <div class="col-12 col-md-6">
@@ -132,152 +142,199 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
+// Ambil CSRF Token
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+});
+
 // Pastikan ORIGIN_CITY_ID sudah ada di .env
-const ORIGIN_CITY = '{{ env("ORIGIN_CITY_ID", "ORIGIN_CITY_ID") }}'; 
-const totalBarang = '{{ (int) $transaksi->total_harga }}'; // Ambil dari $transaksi
+const ORIGIN_CITY = '{{ env("RAJAONGKIR_ORIGIN_CITY_ID") }}'; 
+const totalBarang = parseInt($('#total-barang').data('total'), 10); // Ambil total barang sebagai integer
 
 $(document).ready(function() {
-    // URL API RajaOngkir (atau API custom Anda)
-    const provincesUrl = '/provinces';
-    const citiesUrl = '/cities/';
-    const ongkirCostUrl = '/ongkir/cost';
     
+    // --- PERBAIKAN URL API ---
+    const API_BASE = '/api/ongkir';
+    const provincesUrl = API_BASE + '/provinces';
+    const citiesUrl = API_BASE + '/cities/';
+    const ongkirCostUrl = API_BASE + '/cost';
+    
+    // --- Helper function untuk format rupiah ---
+    function formatRupiah(angka) {
+        if (typeof angka === 'undefined' || isNaN(angka)) return 'Rp 0';
+        return 'Rp ' + Number(angka).toLocaleString('id-ID');
+    }
+
     // --- Inisialisasi Alamat ---
     // Load provinsi
-    $.get(provincesUrl, function(data) {
-        $('#province').append('<option value="">Pilih Provinsi</option>');
-        if (data.data) { // Cek jika format data dibungkus oleh 'data'
-             data = data.data; 
-        }
-        data.forEach(function(p) {
-            $('#province').append('<option value="'+p.province_id+'">'+p.province+'</option>');
+    $.get(provincesUrl)
+        .done(function(data) {
+            $('#province').html('<option value="">Pilih Provinsi</option>');
+            // Data sudah bersih dari wrapper 'rajaongkir' atau 'data' karena sudah difilter di Controller
+            data.forEach(function(p) {
+                $('#province').append('<option value="'+p.province_id+'">'+p.province+'</option>');
+            });
+        })
+        .fail(function(err) {
+            $('#province').html('<option value="">Gagal memuat provinsi</option>');
+            console.error("Gagal memuat Provinsi:", err);
         });
-    });
 
     // Load kota saat province berubah
     $('#province').on('change', function() {
         const provinceId = $(this).val();
-        $('#city').html('');
-        if (!provinceId) return;
-        $.get(citiesUrl + provinceId, function(data) {
-             if (data.data) { // Cek jika format data dibungkus oleh 'data'
-                 data = data.data; 
-             }
-            $('#city').append('<option value="">Pilih Kota</option>');
-            data.forEach(function(c) {
-                // Pastikan key city_id/city_name sesuai dengan respons API Anda
-                $('#city').append('<option value="'+c.city_id+'">'+c.type + ' ' + c.city_name+'</option>');
+        $('#city').html('<option value="">Loading...</option>').prop('disabled', true);
+        $('#ongkir-results').html(''); // Hapus hasil ongkir lama
+        updateGrandTotal(0); // Reset total ongkir
+        
+        if (!provinceId) {
+             $('#city').html('<option value="">Pilih Kota / Kabupaten</option>').prop('disabled', true);
+             return;
+        }
+
+        $.get(citiesUrl + provinceId)
+            .done(function(data) {
+                $('#city').html('<option value="">Pilih Kota / Kabupaten</option>');
+                data.forEach(function(c) {
+                    $('#city').append('<option value="'+c.city_id+'">'+c.type + ' ' + c.city_name+'</option>');
+                });
+                $('#city').prop('disabled', false);
+            })
+            .fail(function(err) {
+                $('#city').html('<option value="">Gagal memuat kota</option>').prop('disabled', false);
+                console.error("Gagal memuat Kota:", err);
             });
-        });
     });
+
+    // --- Logika Update Total ---
+    function updateGrandTotal(ongkirValue) {
+        const ongkir = parseInt(ongkirValue || 0, 10);
+        const grand = totalBarang + ongkir;
+
+        $('#ongkir_cost').val(ongkir);
+        $('#total-ongkir').text(formatRupiah(ongkir));
+        $('#grand-total').text(formatRupiah(grand));
+    }
 
     // --- Logika Ongkir ---
     $('#cek-ongkir').on('click', function() {
         const destination = $('#city').val();
         const courier = $('#courier').val();
+        
         if (!destination) { alert('Pilih kota tujuan dulu'); return; }
 
-        const weight = 1000; // Contoh berat. Sesuaikan dengan total berat barang Anda.
+        // Ganti 1000 dengan berat barang (misalnya dari $barang->weight atau input lain)
+        const weight = {{ $barang->weight ?? 1000 }}; // Ambil berat dari $barang->weight (dalam gram)
+        
+        // Nonaktifkan tombol saat loading
+        $('#cek-ongkir').prop('disabled', true).text('Cek Ongkir...');
+        $('#ongkir-results').html('<p class="text-center">Sedang mencari layanan...</p>');
         
         $.ajax({
             url: ongkirCostUrl,
             method: 'POST',
             data: {
-                origin: ORIGIN_CITY,
+                // Controller sudah menggunakan ORIGIN_CITY_ID dari .env, tapi kita kirim untuk jaga-jaga
+                origin: ORIGIN_CITY, 
                 destination: destination,
                 weight: weight,
                 courier: courier,
-                _token: '{{ csrf_token() }}'
             },
             success: function(response) {
-                // Asumsi response.data adalah array hasil cost
-                const data = response.data || []; 
+                $('#cek-ongkir').prop('disabled', false).text('Cek Ongkir');
+                
+                // Response adalah array of costs
+                const costs = response || []; 
                 let html = '';
                 
-                if (data.length === 0) {
+                if (costs.length === 0) {
                     html = '<div class="alert alert-warning">Tidak ada layanan ongkir ditemukan.</div>';
                 } else {
                     html = '<div class="list-group">';
-                    // Asumsi data.costs berisi array layanan/harga
-                    data.forEach(function(svc) {
-                        const service = svc.service;
-                        const description = svc.description || '';
+                    costs.forEach(function(svc) {
+                        // Di RajaOngkir Starter, cost[0] selalu ada
+                        const costItem = svc.cost[0];
+                        const value = costItem.value;
+                        const etd = costItem.etd || '-';
                         
-                        svc.cost.forEach(function(costItem) {
-                            const value = costItem.value;
-                            const etd = costItem.etd || '-';
-                            
-                            html += '<label class="list-group-item d-flex justify-content-between align-items-center">';
-                            html += '<div><input type="radio" name="ongkir_radio" value="'+value+'" data-service="'+service+'" data-kurir="'+courier+'"> ';
-                            html += '<strong>'+service+'</strong> '+description+' <small>(est: '+etd+' hari)</small></div>';
-                            html += '<div>Rp '+Number(value).toLocaleString('id-ID')+'</div>';
-                            html += '</label>';
-                        });
+                        // Gunakan data-cost, data-service, dan data-kurir untuk update total
+                        html += `
+                            <label class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <input type="radio" name="ongkir_radio" 
+                                        value="${value}" 
+                                        data-service="${svc.service}" 
+                                        data-kurir="${courier}"
+                                        data-cost="${value}">
+                                    <strong>${svc.service}</strong> 
+                                    <small class="text-muted">(Est: ${etd} hari)</small>
+                                </div>
+                                <div>${formatRupiah(value)}</div>
+                            </label>
+                        `;
                     });
                     html += '</div>';
                 }
                 $('#ongkir-results').html(html);
+                updateGrandTotal(0); // Reset total setelah hasil baru dimuat
             },
             error: function(err) {
-                console.error(err);
-                alert('Gagal mengambil data ongkir');
+                $('#cek-ongkir').prop('disabled', false).text('Cek Ongkir');
+                console.error(err.responseJSON || err.responseText);
+                $('#ongkir-results').html('<div class="alert alert-danger">Gagal mengambil data ongkir. Cek console untuk detail.</div>');
+                updateGrandTotal(0); // Reset total jika gagal
             }
         });
     });
 
     // Pilih layanan ongkir -> update total
     $(document).on('change', 'input[name="ongkir_radio"]', function() {
-        const ongkir = parseInt($(this).val() || 0, 10);
+        const ongkir = parseInt($(this).data('cost') || 0, 10);
         const kurir = $(this).data('kurir');
         const service = $(this).data('service');
-        const totalBarangInt = parseInt(totalBarang, 10);
-
-        $('#ongkir').val(ongkir);
+        
+        // Update hidden fields
         $('#kurir_input').val(kurir);
         $('#service_input').val(service);
-        $('#alamat_pengiriman_input').val($('#user-address').val());
-
-        $('#total-ongkir').text('Rp ' + ongkir.toLocaleString('id-ID'));
-        const grand = totalBarangInt + ongkir;
-        $('#grand-total').text('Rp ' + grand.toLocaleString('id-ID'));
+        
+        // Update total di tabel
+        updateGrandTotal(ongkir);
     });
-
+    
     // --- Logika Pembayaran ---
-
-    // COD button = buka WA
-    $('#cod-button').on('click', function() {
-        // ... (kode WA tetap sama)
-    });
-
-    // Bayar Sekarang: Midtrans Snap
+    
+    // Pastikan tombol pembayaran hanya bisa ditekan jika ongkir sudah dipilih
     $('#pay-button').on('click', function(e) {
         e.preventDefault();
 
-        const ongkir = parseInt($('#ongkir').val() || 0, 10);
-        const kurir = $('#kurir_input').val() || $('#courier').val();
-        const service = $('#service_input').val() || '';
-        const alamat = $('#user-address').val() || '';
-
-        // Validasi minimal
-        if (!alamat) { alert('Isi alamat pengiriman terlebih dahulu'); return; }
-        if (ongkir === 0 && kurir !== '') { alert('Pilih atau cek ongkir terlebih dahulu.'); return; }
-
-        // Panggil endpoint create snap token (MUNGKIN INI TIDAK PERLU JIKA SUDAH ADA SNAP TOKEN DI VIEW)
-        // **CATATAN PENTING**: Jika Anda sudah me-render $snapToken dari Controller, Anda tidak perlu AJAX lagi.
+        const ongkir = parseInt($('#ongkir_cost').val() || 0, 10);
+        const kurir = $('#kurir_input').val();
+        const service = $('#service_input').val();
+        const alamat = $('#user-address').val();
         
-        // Pilihan 1: Jika Midtrans Token sudah ada di Blade (dari controller beliSekarang)
-        const snapToken = '{{ $snapToken }}';
+        // Validasi
+        if (!alamat) {
+            alert('Isi alamat pengiriman terlebih dahulu.');
+            return;
+        }
+        if (ongkir === 0 || !kurir || !service) {
+            alert('Pilih layanan ongkir terlebih dahulu.');
+            return;
+        }
+        
+        // Lanjutkan ke Midtrans Snap
+        const snapToken = '{{ $snapToken ?? null }}'; // Ambil snap token
         
         if (snapToken) {
             snap.pay(snapToken, {
                 onSuccess: function(result) {
                     $('#payment-result').val(JSON.stringify(result));
-                    // Lakukan update data transaksi sebelum submit
-                    $('#payment-form').submit();
+                    $('#payment-form').submit(); 
                 },
                 onPending: function(result) {
                     $('#payment-result').val(JSON.stringify(result));
-                    // Lakukan update data transaksi sebelum submit
                     $('#payment-form').submit();
                 },
                 onError: function(result) {
@@ -285,10 +342,9 @@ $(document).ready(function() {
                     console.error(result);
                 }
             });
-        } 
-        // Pilihan 2: Jika Anda membuat Snap Token via AJAX (tidak disarankan untuk flow "Beli Sekarang" ini)
-        // Jika Anda tetap ingin menggunakan AJAX (seperti kode Anda sebelumnya), 
-        // pastikan route 'create.snap' sudah ada dan menerima parameter yang tepat.
+        } else {
+             alert('Error: Snap Token Midtrans tidak tersedia. Pastikan Controller sudah mengirimkan $snapToken.');
+        }
     });
 });
 </script>
