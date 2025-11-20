@@ -17,7 +17,9 @@ use App\Http\Controllers\ManualTransaksiController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\UserController;
 
+// Perhatikan: OngkirController TIDAK PERLU di-use di sini jika tidak dipakai di halaman web
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +45,12 @@ Route::get('/logout', function () {
     Auth::logout();
     return redirect('/');
 })->name('logout');
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('kelolapengguna', UserController::class);
+});
+
 
 // ===========================
 // ADMIN ROUTES
@@ -122,58 +130,30 @@ Route::middleware('auth')->group(function () {
     Route::get('/riwayat-pesanan', [RiwayatController::class, 'index'])->name('riwayat.pesanan');
 
     // Chat (User)
-    Route::get('/chat', [ChatController::class, 'index'])->name('chat');
-    Route::post('/chat', [ChatController::class, 'store'])->name('chat.store');
+    // Route::get('/chat', [ChatController::class, 'index'])->name('chat');
+    // Route::post('/chat', [ChatController::class, 'store'])->name('chat.store');
 });
+
 
 // ===========================
 // MIDTRANS CALLBACK (Global)
 // ===========================
-
-Route::post('/payment/midtrans-callback', [App\Http\Controllers\PaymentController::class, 'midtransCallback']);
-
-Route::post('/admin/voucher/store', [DashboardAdminController::class, 'storeVoucher'])->name('admin.voucher.store');
-// Voucher
-Route::prefix('admin')->middleware(['auth'])->group(function () {
-    Route::get('/voucher/create', [DashboardAdminController::class, 'createVoucher'])->name('admin.voucher.create');
-    Route::post('/voucher/store', [DashboardAdminController::class, 'storeVoucher'])->name('admin.voucher.store');
-    Route::get('/voucher/{voucher}/edit', [DashboardAdminController::class, 'editVoucher'])->name('admin.voucher.edit');
-    Route::put('/voucher/{voucher}', [DashboardAdminController::class, 'updateVoucher'])->name('admin.voucher.update');
-    Route::delete('/voucher/{voucher}', [DashboardAdminController::class, 'destroyVoucher'])->name('admin.voucher.destroy');
-    Route::delete('/admin/voucher/{id}', [DashboardAdminController::class, 'destroy'])
-    ->name('admin.voucher.destroy');
-
-Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran.index');
-Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
-Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
-
-// Proses pembayaran (POST)
-Route::post('/pembayaran', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
-Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
-Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
-
-Route::prefix('admin')->group(function () {
-    Route::get('/pembayaran', [PembayaranController::class, 'index'])->name('admin.pembayaran.index');
-    Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('admin.pembayaran.proses');
-Route::post('/pembayaran', [PembayaranController::class, 'index'])->name('pembayaran');
-
-// Proses pembayaran Midtrans Snap
-Route::post('/pembayaran/proses', [PembayaranController::class, 'proses'])->name('pembayaran.proses');
-
-// Callback (jika digunakan)
-Route::post('/pembayaran/callback', [PembayaranController::class, 'callback'])->name('pembayaran.callback');
-Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-
-});
-});
-
 Route::post('/payment/midtrans-callback', [PaymentController::class, 'midtransCallback']);
 
-
-
-
-
-// Endpoint untuk membuat Snap token dinamis dengan ongkir dan total
+// Endpoint untuk membuat Snap token dinamis
 Route::post('/create-snap-token', [PembayaranController::class, 'createSnapToken'])->name('create.snap');
 
 
+
+Route::get('/chat', [ChatController::class, 'index'])->name('chat');
+Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+Route::get('/cek-model', [App\Http\Controllers\ChatController::class, 'checkModels']);
+// Route untuk melihat tabel admin
+Route::get('/admin/chat-history', [ChatController::class, 'showHistory']);
+
+// Route untuk admin membalas pesan
+Route::post('/admin/reply', [ChatController::class, 'adminReply'])->name('admin.reply');
+Route::get('/chat/messages', [ChatController::class, 'getMessages'])->name('chat.messages');
+Route::delete('/admin/chat/{id}', [App\Http\Controllers\ChatController::class, 'destroy'])->name('chat.delete');
+// Tambahkan ->name('admin.chat') di ujungnya
+Route::get('/admin/chat-history', [App\Http\Controllers\ChatController::class, 'showHistory'])->name('admin.chat');

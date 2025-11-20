@@ -14,7 +14,8 @@ return new class extends Migration {
             $table->string('nama_barang')->nullable(false); 
             $table->string('status_pembayaran')->nullable();
             $table->string('kode_transaksi')->nullable();
-            $table->string('status')->default('pending'); // diperlukan untuk metode riwayat Anda di mana 'status' di-query
+            $table->string('status')->default('pending');
+            $table->dateTime('tanggal_transaksi')->useCurrent(); // diperlukan untuk metode riwayat Anda di mana 'status' di-query
             $table->timestamps();
         });
     }

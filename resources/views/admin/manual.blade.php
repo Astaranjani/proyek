@@ -83,6 +83,15 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
+                <li>
+                        <a href="{{ route('kelolapengguna.index') }}" 
+                           class="flex items-center px-4 py-2 rounded-md {{ request()->routeIs('kelolapengguna.*') ? 'text-white bg-primary/10' : 'text-gray-400 hover:bg-white/5' }}">
+                            <div class="w-5 h-5 flex items-center justify-center mr-3">
+                                <i class="ri-user-settings-line"></i>
+                            </div>
+                            <span>Kelola Pengguna</span>
+                        </a>
+                    </li>
 
                 <!-- Produk (submenu) -->
                 <li x-data="{ open: {{ request()->routeIs('admin.barang.index') || request()->routeIs('admin.barang.create') ? 'true' : 'false' }} }">

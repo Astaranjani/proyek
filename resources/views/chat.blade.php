@@ -1,190 +1,299 @@
-{{-- resources/views/chat.blade.php --}}
-@extends('layouts.app')
+<style>
+    /* Widget Container */
+    #chat-widget-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        font-family: 'Segoe UI', sans-serif;
+    }
 
-@section('title', 'Chat Customer Service')
+    /* Tombol Bulat (Toggle) */
+    #chat-toggle-btn {
+        background-color: #8B5E3C;
+        color: white;
+        border: none;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        cursor: pointer;
+        transition: transform 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    #chat-toggle-btn:hover { transform: scale(1.1); background-color: #6F4B30; }
 
-{{-- Bootstrap Icons --}}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css">
+    /* Kotak Chat */
+    #chat-box {
+        position: absolute;
+        bottom: 80px;
+        right: 0;
+        width: 350px;
+        height: 450px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    #chat-box.hidden { display: none !important; }
 
-@section('content')
-<div class="flex h-screen bg-gray-100">
-    <div class="flex-1 flex flex-col max-w-2xl mx-auto w-full shadow-lg border rounded-lg overflow-hidden">
+    /* Header */
+    .chat-header {
+        background-color: #8B5E3C;
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .chat-header h4 { margin: 0; font-size: 16px; font-weight: 600; }
+    .close-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
 
-        {{-- Header --}}
-        <div class="bg-primary text-white p-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <img src="{{ asset('images/logo.jpg') }}" 
-                     alt="Logo" 
-                     class="rounded-full object-cover border border-white shadow"
-                     style="height: 45px; width: 45px;">
-                <div>
-                    <h2 class="text-lg font-semibold">Toko Mebel Online</h2>
-                    <p class="text-sm text-gray-200">Customer Service</p>
-                </div>
+    /* Area Pesan */
+    #chat-messages {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background-color: #f3f4f6;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    /* Bubble Chat */
+    .message {
+        max-width: 80%;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 13px;
+        line-height: 1.4;
+        word-wrap: break-word;
+    }
+    
+    /* Pesan User (Kanan) */
+    .user-message { 
+        background-color: #8B5E3C; 
+        color: white; 
+        align-self: flex-end; 
+        border-bottom-right-radius: 2px;
+    }
+    
+    /* Pesan Bot (Kiri) */
+    .bot-message { 
+        background-color: white; 
+        color: #333; 
+        align-self: flex-start; 
+        border: 1px solid #e5e7eb;
+        border-bottom-left-radius: 2px;
+    }
+
+    /* Pesan Admin (Kiri - Spesial) */
+    .admin-message {
+        background-color: #e8f5e9; /* Hijau Muda */
+        color: #333;
+        align-self: flex-start;
+        border: 1px solid #c3e6cb;
+        border-left: 4px solid #28a745;
+        border-bottom-left-radius: 2px;
+    }
+
+    /* Input Area */
+    .chat-input-area {
+        padding: 12px;
+        border-top: 1px solid #e5e7eb;
+        background: white;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    #chat-input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid #d1d5db;
+        border-radius: 25px;
+        outline: none;
+        font-size: 14px;
+    }
+    .send-btn {
+        background-color: #8B5E3C;
+        color: white;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .typing-indicator { font-size: 11px; color: #888; font-style: italic; margin-left: 10px; margin-bottom: 5px; }
+</style>
+
+<div id="chat-widget-container">
+    <button id="chat-toggle-btn" onclick="toggleChat()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    </button>
+
+    <div id="chat-box" class="hidden">
+        <div class="chat-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <h4>CS E-Mebel</h4>
             </div>
-            <a href="{{ url()->previous() }}" 
-               class="text-white hover:text-gray-200 font-medium text-lg">
-                <i class="bi bi-x-circle-fill"></i>
-            </a>
+            <button class="close-btn" onclick="toggleChat()">&times;</button>
         </div>
 
-        {{-- Chat Messages --}}
-        <div id="chatMessages" 
-             class="flex-1 flex flex-col justify-end overflow-y-auto p-4 space-y-3 bg-gray-50">
-
-            {{-- Pesan awal dari CS --}}
-            <div class="flex items-start gap-2">
-                <div class="bg-gray-200 p-3 rounded-2xl max-w-xs shadow">
-                    <p>Halo 👋, selamat datang di <b>E-Mebel</b>.<br>
-                       Ada yang bisa kami bantu?</p>
-                </div>
+        <div id="chat-messages">
             </div>
 
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Tulis pesan..." autocomplete="off" onkeypress="handleEnter(event)">
+            <button class="send-btn" onclick="sendMessage()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
         </div>
-
-        {{-- Input Message --}}
-        <div class="bg-white border-t border-gray-300 p-3 flex items-center gap-2">
-            <div class="relative flex-1">
-                <input id="messageInput" 
-                       type="text" 
-                       placeholder="Tulis pesan..." 
-                       class="w-full border border-gray-300 rounded-full px-4 py-2 pr-12 focus:outline-none focus:ring-2 focus:ring-primary">
-                
-                {{-- Tombol kirim (ikon) --}}
-                <button id="sendButton" 
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-primary hover:text-indigo-700">
-                    <i class="bi bi-cursor-fill text-xl"></i>
-                </button>
-            </div>
-        </div>
-
     </div>
 </div>
-@endsection
 
-{{-- Script Chat --}}
-@push('scripts')
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-    const socket = io("http://localhost:3000"); // Hubungkan ke server WebSocket
-    const chatMessages = document.getElementById('chatMessages');
-    const messageInput = document.getElementById('messageInput');
-    const sendButton = document.getElementById('sendButton');
+    let pollingInterval = null; // Variabel untuk menyimpan Timer otomatis
 
-    // Tambahkan pesan ke chat
-    function addMessage(text, sender = 'customer') {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('flex', sender === 'customer' ? 'justify-end' : 'items-start', 'gap-2');
+    // --- A. BUKA / TUTUP CHAT ---
+    function toggleChat() {
+        const chatBox = document.getElementById('chat-box');
+        
+        if (chatBox.classList.contains('hidden')) {
+            chatBox.classList.remove('hidden');
+            
+            // 1. Load data saat dibuka
+            loadChatHistory();
 
-        messageDiv.innerHTML = `
-            <div class="${sender === 'customer' 
-                ? 'bg-primary text-white' 
-                : 'bg-gray-200 text-black'} 
-                p-3 rounded-2xl max-w-xs shadow text-sm leading-relaxed">
-                ${text}
-            </div>
-        `;
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+            // 2. Mulai cek pesan baru setiap 3 detik (Realtime Sederhana)
+            if (!pollingInterval) {
+                pollingInterval = setInterval(loadChatHistory, 3000);
+            }
+            
+            setTimeout(() => document.getElementById('chat-input').focus(), 100);
+        } else {
+            chatBox.classList.add('hidden');
+            
+            // Matikan pengecekan otomatis saat ditutup (biar hemat resource)
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+            }
+        }
     }
 
-<<<<<<< HEAD
-    // Event kirim pesan
-sendButton.addEventListener('click', () => {
-    const text = messageInput.value.trim();
-    if (text === '') return;
+    // --- B. LOAD RIWAYAT CHAT (AUTO REFRESH) ---
+    function loadChatHistory() {
+        const container = document.getElementById('chat-messages');
 
-    addMessage(text, 'customer');
-    messageInput.value = '';
+        fetch("{{ route('chat.messages') }}")
+            .then(response => response.json())
+            .then(data => {
+                // Cek apakah user sedang scroll ke atas? (biar gak keganggu autoscroll)
+                const isScrolledToBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
 
-    // Kirim ke server Laravel
-    fetch("{{ route('chat.store') }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        },
-        body: JSON.stringify({ message: text })
-    })
-    .then(res => res.json())
-    .then(data => {
-        addMessage(data.reply, 'cs'); // balasan dari OpenAI
-    })
-    .catch(() => {
-        addMessage("⚠️ Terjadi kesalahan. Coba lagi.", 'cs');
-=======
-    // Kirim pesan ke server
-    sendButton.addEventListener('click', () => {
-        const text = messageInput.value.trim();
-        if (text === '') return;
+                // Simpan elemen loading jika sedang ada (biar gak hilang saat refresh)
+                const loadingElem = document.getElementById('bot-typing');
 
-        addMessage(text, 'customer'); // tampilkan pesan di sisi user
-        socket.emit('chatMessage', text); // kirim ke server
-        messageInput.value = '';
->>>>>>> 9f85850690eb7d4153c67133167936168a2b612b
-    });
-});
+                // Reset isi container
+                let html = `
+                    <div class="message bot-message">
+                        Halo! 👋<br>Selamat datang di E-Mebel. Ada yang bisa saya bantu?
+                    </div>
+                `;
 
+                data.forEach(chat => {
+                    // LOGIKA: Membedakan Chat User, Bot, dan Admin
+                    
+                    if (chat.message === '(Pesan Admin)') {
+                        // 1. INI PESAN MANUAL DARI ADMIN
+                        html += `
+                            <div class="message admin-message">
+                                <b style="font-size:11px; color:#155724;">ADMIN SUPPORT:</b><br>
+                                ${chat.reply.replace(/\n/g, '<br>')}
+                            </div>
+                        `;
+                    } else {
+                        // 2. INI PESAN USER BIASA
+                        html += `<div class="message user-message">${chat.message}</div>`;
+                        
+                        // 3. INI BALASAN BOT (JIKA ADA)
+                        if (chat.reply) {
+                            html += `<div class="message bot-message">${chat.reply.replace(/\n/g, '<br>')}</div>`;
+                        }
+                    }
+                });
 
-    // Tekan Enter untuk kirim
-    messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendButton.click();
-        }
-    });
+                container.innerHTML = html;
 
-    // Terima pesan dari server
-    socket.on('chatMessage', (msg) => {
-        addMessage(msg, 'cs');
-    });
-</script>
+                // Kembalikan loading indicator jika tadi ada
+                if (loadingElem) container.appendChild(loadingElem);
 
-<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-<script>
-    const socket = io("http://localhost:3000");
-
-    const chatMessages = document.getElementById('chatMessages');
-    const messageInput = document.getElementById('messageInput');
-    const sendButton = document.getElementById('sendButton');
-
-    // Tambahkan pesan ke chat
-    function addMessage(text, sender = 'customer') {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('flex', sender === 'customer' ? 'justify-end' : 'items-start', 'gap-2');
-
-        messageDiv.innerHTML = `
-            <div class="${sender === 'customer' 
-                ? 'bg-primary text-white' 
-                : 'bg-gray-200 text-black'} 
-                p-3 rounded-2xl max-w-xs shadow text-sm leading-relaxed">
-                ${text}
-            </div>
-        `;
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+                // Auto Scroll ke bawah hanya jika user memang ada di bawah
+                if (isScrolledToBottom) {
+                    scrollToBottom();
+                }
+            })
+            .catch(err => console.error('Gagal load history:', err));
     }
 
-    // Kirim pesan ke server
-    sendButton.addEventListener('click', () => {
-        const text = messageInput.value.trim();
-        if (text === '') return;
+    // --- C. KIRIM PESAN ---
+    function handleEnter(e) {
+        if (e.key === 'Enter') sendMessage();
+    }
 
-        addMessage(text, 'customer'); // tampil di layar
-        socket.emit("chat message", text); // kirim ke server
-        messageInput.value = '';
-    });
+    function sendMessage() {
+        const inputField = document.getElementById('chat-input');
+        const message = inputField.value.trim();
+        
+        if (message === "") return;
 
-    // Tekan Enter untuk kirim
-    messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendButton.click();
-        }
-    });
+        // Tampilkan manual di layar biar instan
+        const container = document.getElementById('chat-messages');
+        container.insertAdjacentHTML('beforeend', `<div class="message user-message">${message}</div>`);
+        inputField.value = '';
+        scrollToBottom();
 
-    // Terima pesan dari server
-    socket.on("chat message", (msg) => {
-        addMessage(msg, 'cs');
-    });
+        // Tampilkan Loading
+        container.insertAdjacentHTML('beforeend', `<div id="bot-typing" class="typing-indicator">Bot sedang mengetik...</div>`);
+        scrollToBottom();
+
+        // Kirim ke Laravel
+        fetch("{{ route('chat.send') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hapus loading
+            const loadingElem = document.getElementById('bot-typing');
+            if (loadingElem) loadingElem.remove();
+
+            // Paksa refresh history agar balasan (Bot/Admin) sinkron
+            loadChatHistory();
+        })
+        .catch(error => {
+            console.error(error);
+            const loadingElem = document.getElementById('bot-typing');
+            if (loadingElem) loadingElem.remove();
+            container.insertAdjacentHTML('beforeend', `<div class="message bot-message">Maaf, error koneksi.</div>`);
+        });
+    }
+
+    function scrollToBottom() {
+        const container = document.getElementById('chat-messages');
+        container.scrollTop = container.scrollHeight;
+    }
 </script>
-
-@endpush
