@@ -28,11 +28,26 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ================== CART ==================
     Route::prefix('cart')->group(function () {
+        // Get cart
         Route::get('/', [CartController::class, 'index'])->name('api.cart.index');
+        
+        // Add to cart
         Route::post('/add', [CartController::class, 'store'])->name('api.cart.add');
+        
+        // ✅ FIXED: Update quantity dengan PUT & PATCH support
+        Route::put('/{id}', [CartController::class, 'update'])->name('api.cart.update.put');
+        Route::patch('/{id}', [CartController::class, 'update'])->name('api.cart.update.patch');
+        
+        // Alternative update route (backward compatibility)
         Route::put('/update/{id}', [CartController::class, 'update'])->name('api.cart.update');
+        Route::patch('/update/{id}', [CartController::class, 'update'])->name('api.cart.update.alt');
+        
+        // Delete cart item
+        Route::delete('/{id}', [CartController::class, 'destroy'])->name('api.cart.destroy');
         Route::delete('/remove/{id}', [CartController::class, 'destroy'])->name('api.cart.remove');
-        Route::delete('/clear', [CartController::class, 'clear'])->name('api.cart.clear'); // ✅ tambahan
+        
+        // Clear all cart
+        Route::delete('/clear', [CartController::class, 'clear'])->name('api.cart.clear');
     });
 
     // ================== PROFILE ==================
@@ -40,18 +55,49 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('api.profile.update');
 
     // ================== CHECKOUT & PAYMENT ==================
-    Route::post('/checkout', [CheckoutController::class, 'store'])->name('api.checkout.store');
-    Route::get('/checkout/history', [CheckoutController::class, 'history'])->name('api.checkout.history');
-
-    Route::post('/payment', [PaymentController::class, 'processPayment'])->name('api.payment.process');
-    Route::get('/payment/status/{orderId}', [PaymentController::class, 'checkStatus'])->name('api.payment.status');
+    Route::prefix('payment')->group(function () {
+        Route::post('/create', [PaymentController::class, 'create'])->name('api.payment.create');
+        Route::get('/status/{orderId}', [PaymentController::class, 'checkStatus'])->name('api.payment.status');
+    });
 });
 
 // ========================================================
-// 🚫 HANDLE ROUTE TIDAK DITEMUKAN
+// 🌐 WEBHOOK ROUTES (NO AUTH REQUIRED)
+// ========================================================
+// Payment notification webhook from payment gateway
+Route::post('/payment/notification', [PaymentController::class, 'notification'])->name('api.payment.notification');
+
+// ========================================================
+// 🚫 HANDLE ROUTE TIDAK DITEMUKAN (404)
 // ========================================================
 Route::fallback(function () {
     return response()->json([
+        'success' => false,
         'message' => 'Endpoint tidak ditemukan. Periksa URL API Anda.',
+        'available_endpoints' => [
+            'auth' => [
+                'POST /api/register',
+                'POST /api/login',
+                'POST /api/logout (auth required)',
+            ],
+            'products' => [
+                'GET /api/products',
+                'GET /api/products/{id}',
+            ],
+            'cart' => [
+                'GET /api/cart (auth required)',
+                'POST /api/cart/add (auth required)',
+                'PUT /api/cart/{id} (auth required)',
+                'DELETE /api/cart/{id} (auth required)',
+            ],
+            'profile' => [
+                'GET /api/profile (auth required)',
+                'PUT /api/profile/update (auth required)',
+            ],
+            'payment' => [
+                'POST /api/payment/create (auth required)',
+                'GET /api/payment/status/{orderId} (auth required)',
+            ],
+        ],
     ], 404);
 });
