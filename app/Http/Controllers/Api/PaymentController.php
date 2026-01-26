@@ -78,4 +78,17 @@ class PaymentController extends Controller
             'payments' => $order->payments
         ]);
     }
+    public function paymentSuccess(Request $request)
+    {
+        // tergantung Midtrans, biasanya kamu ambil order_id dari notifikasi:
+        $order = Order::with('items')->findOrFail($request->order_id);
+
+        if ($order->promo_kode) {
+            $promo = Promo::where('kode', $order->promo_kode)->first();
+
+            if ($promo && $order->promo_qty_diskon > 0) {
+                $promo->increment('jumlah_digunakan', $order->promo_qty_diskon);
+            }
+        }
+}
 }

@@ -64,83 +64,9 @@
 
 {{-- Script Chat --}}
 @push('scripts')
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<script>
-    const socket = io("http://localhost:3000"); // Hubungkan ke server WebSocket
-    const chatMessages = document.getElementById('chatMessages');
-    const messageInput = document.getElementById('messageInput');
-    const sendButton = document.getElementById('sendButton');
-
-    // Tambahkan pesan ke chat
-    function addMessage(text, sender = 'customer') {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('flex', sender === 'customer' ? 'justify-end' : 'items-start', 'gap-2');
-
-        messageDiv.innerHTML = `
-            <div class="${sender === 'customer' 
-                ? 'bg-primary text-white' 
-                : 'bg-gray-200 text-black'} 
-                p-3 rounded-2xl max-w-xs shadow text-sm leading-relaxed">
-                ${text}
-            </div>
-        `;
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-<<<<<<< HEAD
-    // Event kirim pesan
-sendButton.addEventListener('click', () => {
-    const text = messageInput.value.trim();
-    if (text === '') return;
-
-    addMessage(text, 'customer');
-    messageInput.value = '';
-
-    // Kirim ke server Laravel
-    fetch("{{ route('chat.store') }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        },
-        body: JSON.stringify({ message: text })
-    })
-    .then(res => res.json())
-    .then(data => {
-        addMessage(data.reply, 'cs'); // balasan dari OpenAI
-    })
-    .catch(() => {
-        addMessage("⚠️ Terjadi kesalahan. Coba lagi.", 'cs');
-=======
-    // Kirim pesan ke server
-    sendButton.addEventListener('click', () => {
-        const text = messageInput.value.trim();
-        if (text === '') return;
-
-        addMessage(text, 'customer'); // tampilkan pesan di sisi user
-        socket.emit('chatMessage', text); // kirim ke server
-        messageInput.value = '';
->>>>>>> 9f85850690eb7d4153c67133167936168a2b612b
-    });
-});
-
-
-    // Tekan Enter untuk kirim
-    messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendButton.click();
-        }
-    });
-
-    // Terima pesan dari server
-    socket.on('chatMessage', (msg) => {
-        addMessage(msg, 'cs');
-    });
-</script>
-
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script>
+    // Hubungkan ke server WebSocket
     const socket = io("http://localhost:3000");
 
     const chatMessages = document.getElementById('chatMessages');
@@ -169,22 +95,22 @@ sendButton.addEventListener('click', () => {
         const text = messageInput.value.trim();
         if (text === '') return;
 
-        addMessage(text, 'customer'); // tampil di layar
-        socket.emit("chat message", text); // kirim ke server
+        addMessage(text, 'customer');        // tampil di sisi user
+        socket.emit("chat message", text);   // kirim ke server
         messageInput.value = '';
     });
 
     // Tekan Enter untuk kirim
     messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
+            e.preventDefault();
             sendButton.click();
         }
     });
 
-    // Terima pesan dari server
+    // Terima pesan dari server (balasan CS / bot)
     socket.on("chat message", (msg) => {
         addMessage(msg, 'cs');
     });
 </script>
-
 @endpush

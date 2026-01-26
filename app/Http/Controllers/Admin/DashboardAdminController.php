@@ -44,7 +44,9 @@ class DashboardAdminController extends Controller
             ->sum('total_harga');
 
         // Total semua pemasukan
-        $totalSemuaPembayaran = DB::table('transaksis')->sum('total_harga');
+        $totalSemuaPembayaran = DB::table('transaksis')
+        ->where('status_pembayaran', 'Lunas')
+        ->sum('total_harga');
 
         // Chart: Pemasukan per hari sepanjang tahun
         $pemasukanBulan = DB::table('transaksis')
@@ -159,7 +161,8 @@ class DashboardAdminController extends Controller
 
         $voucher->barangs()->sync($request->barang_ids);
 
-        return redirect()->route('admin.dashboard')->with('success', 'Voucher berhasil ditambahkan!');
+        return redirect()->back()->with('success_voucher', 'Voucher berhasil ditambahkan!');
+
     }
 
     public function createVoucher()
@@ -232,25 +235,44 @@ class DashboardAdminController extends Controller
     }
 
     public function promoStore(Request $request)
-    {
-        $request->validate([
-            'kode' => 'required|unique:promos,kode',
-            'percent' => 'nullable|numeric',
-            'amount' => 'nullable|numeric',
-            'expired_at' => 'nullable|date',
-        ]);
+{
+    $request->validate([
+        'kode' => 'required|unique:promos,kode',
+        'percent' => 'nullable|numeric|min:1|max:100',
+        'amount' => 'nullable|numeric|min:1',
+        'tanggal_mulai' => 'nullable|date',
+        'tanggal_berakhir' => 'nullable|date|after_or_equal:tanggal_mulai',
+        'batas_penggunaan' => 'nullable|integer|min:1',
+    ]);
 
-        Promo::create($request->all());
-
-        return back()->with('success', 'Promo berhasil ditambahkan');
+    // ❗ Pastikan salah satu saja (percent ATAU amount)
+    if (!$request->percent && !$request->amount) {
+        return back()->withErrors(['promo' => 'Isi diskon persen atau nominal.'])->withInput();
     }
 
-    public function promoDestroy($id)
+    if ($request->percent && $request->amount) {
+        return back()->withErrors(['promo' => 'Pilih salah satu: persen atau nominal.'])->withInput();
+    }
+
+    Promo::create([
+        'kode' => $request->kode,
+        'percent' => $request->percent,
+        'amount' => $request->amount,
+        'tanggal_mulai' => $request->tanggal_mulai,
+        'tanggal_berakhir' => $request->tanggal_berakhir,
+        'batas_penggunaan' => $request->batas_penggunaan,
+        'jumlah_digunakan' => 0,
+        'aktif' => true,
+    ]);
+
+    return back()->with('success_promo', 'Promo berhasil ditambahkan!');
+}
+public function promoDestroy($id)
 {
     $promo = Promo::findOrFail($id);
     $promo->delete();
 
-    return redirect()->back()->with('success', 'Promo berhasil dihapus.');
+    return redirect()->back()->with('success', 'Promo berhasil dihapus!');
 }
 
 }

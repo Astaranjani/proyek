@@ -106,20 +106,33 @@
     <div class="row justify-content-center">
         @forelse ($semuaProduk as $barang)
             @php
-                $voucherAktif = $barang->vouchers
-                    ->filter(fn($v) =>
-                        $v->aktif &&
-                        (
-                            !$v->masa_berlaku ||
-                            \Carbon\Carbon::now()->lte(\Carbon\Carbon::parse($v->masa_berlaku))
-                        ) &&
-                        (
-                            !$v->batas_penggunaan ||
-                            $v->jumlah_digunakan < $v->batas_penggunaan
-                        )
-                    )
-                    ->first();
-
+               $voucherAktif = $barang->vouchers
+                ->filter(function($v) {
+                    $now = \Carbon\Carbon::now();
+                    
+                    // Cek apakah voucher masih aktif
+                    if (!$v->aktif) {
+                        return false;
+                    }
+                    
+                    // Cek tanggal mulai (harus sudah dimulai)
+                    if ($v->tanggal_mulai && $now->lt(\Carbon\Carbon::parse($v->tanggal_mulai))) {
+                        return false;
+                    }
+                    
+                    // Cek tanggal berakhir (belum kedaluwarsa)
+                    if ($v->tanggal_berakhir && $now->gt(\Carbon\Carbon::parse($v->tanggal_berakhir))) {
+                        return false;
+                    }
+                    
+                    // Cek batas penggunaan
+                    if ($v->batas_penggunaan && $v->jumlah_digunakan >= $v->batas_penggunaan) {
+                        return false;
+                    }
+                    
+                    return true;
+                })
+                ->first();
                 $hargaAwal = $barang->harga;
                 $diskonPersen = $voucherAktif ? $voucherAktif->diskon : 0;
                 $hargaAkhir = $hargaAwal - ($hargaAwal * $diskonPersen / 100);

@@ -98,89 +98,142 @@ alt="Nature-inspired workspace"
 class="w-full h-auto rounded-2xl shadow-lg object-cover object-top">
 </div>
 </section>
-<section id="about" class="w-full px-6 md:px-12 py-16 bg-gray-50">
+<section id="about" class="bg-gray-50 py-20 px-6 md:px-12">
+
   <div class="text-center mb-16">
-    <h2 class="text-3xl md:text-4xl font-bold mb-4">About me</h2>
-    <p class="text-gray-600 max-w-2xl mx-auto">proyek ini untuk sebagai memenuhi tugas project yang telah kampus berikan kepada kami</p>
+    <h2 class="text-4xl font-bold mb-4">About Us</h2>
+    <p class="text-gray-600 max-w-2xl mx-auto">
+      Proyek ini dibuat untuk memenuhi tugas project kampus sekaligus
+      menjadi dasar pengembangan E-mebel.
+    </p>
   </div>
-  
-<section class="py-12">
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-    
-    <!-- Designer Engineer -->
-   <!-- Web Developer -->
-<div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
-  <div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl mb-6">
-    <i class="ri-global-line text-2xl text-primary"></i> <!-- Ikon Web -->
-  </div>
-  <h3 class="text-xl font-semibold mb-3">Web Developer</h3>
-  <p class="text-gray-600">Putri Ayu Fadhillah 2305022</p>
-</div>
 
-<!-- Mobile Developer -->
-<div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
-  <div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl mb-6">
-    <i class="ri-smartphone-line text-2xl text-primary"></i> <!-- Ikon Mobile -->
-  </div>
-  <h3 class="text-xl font-semibold mb-3">Mobile Developer</h3>
-  <p class="text-gray-600">Khoerul Paroid 2305013</p>
-</div>
+  <!-- OWNER SECTION (MOBILE STYLE) -->
+  <div class="max-w-4xl mx-auto mb-24">
+    <div class="bg-primary/10 p-10 rounded-3xl text-center shadow-md">
 
-<!-- All Role -->
-<div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-all">
-  <div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-xl mb-6">
-    <i class="ri-team-line text-2xl text-primary"></i> <!-- Ikon Teamwork -->
-  </div>
-  <h3 class="text-xl font-semibold mb-3">All Role</h3>
-  <p class="text-gray-600">Pahril Lesmana 2305021</p>
-</div>
+      <!-- Badge -->
+      <div class="flex justify-center items-center gap-2 mb-6">
+        <i class="ri-award-line text-primary"></i>
+        <span class="text-primary text-sm font-semibold uppercase tracking-widest">
+          Trusted By
+        </span>
+      </div>
 
+      <!-- Avatar -->
+      <div class="relative inline-block mb-6">
+        <div class="w-32 h-32 rounded-full border-4 border-primary p-1">
+          <img src="{{ asset('images/Ownerr.jpg') }}"
+               class="w-full h-full rounded-full object-cover">
+        </div>
+        <div class="absolute bottom-2 right-2 w-7 h-7 bg-primary rounded-full flex items-center justify-center border-2 border-white">
+          <i class="ri-check-line text-white text-sm"></i>
+        </div>
+      </div>
+
+      <p class="text-xs uppercase tracking-widest text-gray-500 mb-1">
+        Proudly Owned By
+      </p>
+      <h3 class="text-3xl font-bold mb-4">Salman Property</h3>
+
+      <!-- Tags -->
+      <div class="flex justify-center gap-3 mb-6 flex-wrap">
+        <span class="bg-white px-4 py-1 rounded-full shadow text-sm flex items-center gap-2">
+          <i class="ri-home-4-line text-primary"></i> Property Expert
+        </span>
+        <span class="bg-white px-4 py-1 rounded-full shadow text-sm flex items-center gap-2">
+          <i class="ri-star-line text-primary"></i> 10+ Years
+        </span>
+      </div>
+
+      <p class="text-gray-600 max-w-xl mx-auto mb-8">
+        Menyediakan solusi furnitur berkualitas premium dengan dedikasi
+        penuh terhadap kepuasan pelanggan.
+      </p>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-3 border-t border-primary/20 pt-6">
+        <div>
+          <h4 class="text-2xl font-bold text-primary">1000+</h4>
+          <p class="text-sm text-gray-500">Happy Clients</p>
+        </div>
+        <div>
+          <h4 class="text-2xl font-bold text-primary">500+</h4>
+          <p class="text-sm text-gray-500">Products</p>
+        </div>
+        <div>
+          <h4 class="text-2xl font-bold text-primary">98%</h4>
+          <p class="text-sm text-gray-500">Satisfaction</p>
+        </div>
+      </div>
+
+    </div>
   </div>
+
+  <!-- TEAM -->
+  <div class="text-center mb-10">
+    <h3 class="text-3xl font-bold mb-4">Meet Our Team</h3>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+    <div class="bg-white p-8 rounded-2xl shadow">
+      <h4 class="font-bold mb-2">Web Developer</h4>
+      <p class="text-gray-600">Putri Ayu Fadhillah</p>
+    </div>
+    <div class="bg-white p-8 rounded-2xl shadow">
+      <h4 class="font-bold mb-2">Mobile Developer</h4>
+      <p class="text-gray-600">Khoerul Paroid</p>
+    </div>
+    <div class="bg-white p-8 rounded-2xl shadow">
+      <h4 class="font-bold mb-2">All Role</h4>
+      <p class="text-gray-600">Pahril Lesmana</p>
+    </div>
+  </div>
+
 </section>
-
-</div>
-</section>
-<section class="w-full px-6 md:px-12 py-16">
+<section class="w-full px-6 md:px-12 py-20 bg-white">
   <div class="text-center mb-16">
-    <h3 class="text-3xl md:text-4xl font-bold mb-4">mau tau kami?</h3>
-    <p class="text-gray-600 max-w-2xl mx-auto">nih yang mau kenal sama kitaa</p>
+    <h3 class="text-3xl md:text-4xl font-bold mb-4">Mau Tau Kami?</h3>
+    <p class="text-gray-600 max-w-2xl mx-auto">Kenalan dulu sama tim kece dibalik E-mebel</p>
   </div>
-  
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-  <!-- Khoerul Paroid -->
-  <div class="group relative overflow-hidden rounded-2xl shadow-md">
-    <img src="{{ asset('images/amo.jpg') }}" alt="Khoerul Paroid" class="w-full h-64 object-cover">
-    <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-      <div class="text-center text-white p-6">
-        <h3 class="text-xl font-semibold mb-2">Khoerul Paroid</h3>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+
+    <!-- Card -->
+    <div class="group relative rounded-3xl overflow-hidden shadow-md bg-white hover:shadow-xl transition-all duration-300">
+      <img src="{{ asset('images/amo.jpg') }}" class="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 text-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300">
+        <h3 class="text-xl font-semibold">Khoerul Paroid</h3>
         <p class="text-sm">Mobile Developer</p>
       </div>
     </div>
-  </div>
 
-  <!-- Putri Ayu Fadhillah -->
-  <div class="group relative overflow-hidden rounded-2xl shadow-md">
-    <img src="{{ asset('images/puyu cantik.jpg') }}" alt="Putri Ayu Fadhillah" class="w-full h-64 object-cover">
-    <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-      <div class="text-center text-white p-6">
-        <h3 class="text-xl font-semibold mb-2">Putri Ayu Fadhillah</h3>
+    <!-- Card -->
+    <div class="group relative rounded-3xl overflow-hidden shadow-md bg-white hover:shadow-xl transition-all duration-300">
+      <img src="{{ asset('images/puyu cantik.jpg') }}" class="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 text-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300">
+        <h3 class="text-xl font-semibold">Putri Ayu Fadhillah</h3>
         <p class="text-sm">Web Developer</p>
       </div>
     </div>
-  </div>
 
-  <!-- Orang Baru -->
-  <div class="group relative overflow-hidden rounded-2xl shadow-md">
-    <img src="{{ asset('images/pahril2.jpg') }}" alt="Orang Baru" class="w-full h-64 object-cover">
-    <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-      <div class="text-center text-white p-6">
-        <h3 class="text-xl font-semibold mb-2">Pahril Lesmana</h3>
-        <p class="text-sm">All Roll</p>
+    <!-- Card -->
+    <div class="group relative rounded-3xl overflow-hidden shadow-md bg-white hover:shadow-xl transition-all duration-300">
+      <img src="{{ asset('images/pahril2.jpg') }}" class="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 text-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300">
+        <h3 class="text-xl font-semibold">Pahril Lesmana</h3>
+        <p class="text-sm">All Role</p>
       </div>
     </div>
-  </div>
-</div>
 
+  </div>
+</section>
 
         <div class="md:col-span-2">
     <div

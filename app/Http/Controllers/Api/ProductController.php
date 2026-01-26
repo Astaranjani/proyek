@@ -1,62 +1,81 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-use Illuminate\Http\Request;
+
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
+use Carbon\Carbon;
 
 class ProductController extends Controller
 {
+    // ============================
+    // GET LIST PRODUK
+    // ============================
     public function index()
-{
-    $barang = Barang::with(['vouchers' => function($q) {
-        $q->where('aktif', 1)
-          ->whereDate('tanggal_mulai', '<=', now())
-          ->whereDate('tanggal_berakhir', '>=', now());
-    }])->get()->map(function($b) {
-        $voucher = $b->vouchers->first();
-        $discount = $voucher?->diskon ?? 0;
+    {
+        $products = Barang::with('vouchers')->get();
 
-        $priceAfterDiscount = $discount ? $b->harga - ($b->harga * $discount / 100) : $b->harga;
+        // mapping setiap barang menjadi format yang sudah berisi discount efektif
+        $mapped = $products->map(function ($barang) {
+            return $this->mapProductWithEffectiveDiscount($barang);
+        });
+
+        return response()->json([
+            'data' => $mapped
+        ]);
+    }
+
+    // ============================
+    // GET DETAIL PRODUK
+    // ============================
+    public function show($id)
+    {
+        $barang = Barang::with('vouchers')->findOrFail($id);
+
+        return response()->json([
+            'data' => $this->mapProductWithEffectiveDiscount($barang)
+        ]);
+    }
+
+    // ============================
+    // HELPER DISKON EFEKTIF
+    // ============================
+    protected function mapProductWithEffectiveDiscount($barang)
+    {
+        $now = Carbon::now();
+
+        // diskon bawaan produk
+        $baseDiscount = (int) ($barang->discount ?? 0);
+
+        $voucherAktif = $barang->vouchers
+            ? $barang->vouchers->filter(function ($v) use ($now) {
+                return $v->aktif
+                    && (!$v->tanggal_mulai || $now->gte(Carbon::parse($v->tanggal_mulai)))
+                    && (!$v->tanggal_berakhir || $now->lte(Carbon::parse($v->tanggal_berakhir)))
+                    && (!$v->batas_penggunaan || $v->jumlah_digunakan < $v->batas_penggunaan);
+            })->sortByDesc('diskon')->first()
+            : null;
+
+        if ($voucherAktif) {
+            $effectiveDiscount = (int) $voucherAktif->diskon;
+            $hasActiveVoucher = true;
+        } else {
+            $effectiveDiscount = $baseDiscount;
+            $hasActiveVoucher = false;
+        }
 
         return [
-            'id' => $b->id,
-            'nama' => $b->nama,
-            'harga' => $b->harga,
-            'harga_diskon' => $priceAfterDiscount, // harga setelah diskon
-            'gambar' => $b->gambar,
-            'kategori' => $b->kategori,
-            'discount' => $discount,
+            'id'       => $barang->id,
+            'nama'     => $barang->nama,
+            'harga'    => $barang->harga,
+            'stok'     => $barang->stok,
+            'kategori' => $barang->kategori,
+            'gambar'   => $barang->gambar,
+            'deskripsi'=> $barang->deskripsi,
+
+            // mobile hanya baca ini
+            'discount'          => $effectiveDiscount,
+            'has_active_voucher'=> $hasActiveVoucher,
         ];
-    });
-
-    return response()->json($barang);
-}
-
-public function show($id)
-{
-    $b = Barang::with(['vouchers' => function($q) {
-        $q->where('aktif', 1)
-          ->whereDate('tanggal_mulai', '<=', now())
-          ->whereDate('tanggal_berakhir', '>=', now());
-    }])->find($id);
-
-    if (!$b) return response()->json(['message' => 'Produk tidak ditemukan'], 404);
-
-    $voucher = $b->vouchers->first();
-    $discount = $voucher?->diskon ?? 0;
-    $priceAfterDiscount = $discount ? $b->harga - ($b->harga * $discount / 100) : $b->harga;
-
-   return response()->json([
-    'id' => $b->id,
-    'nama' => $b->nama,
-    'deskripsi' => $b->deskripsi,   // ✅ tambahkan
-    'stok' => $b->stok,             // ✅ tambahkan
-    'harga' => $b->harga,
-    'harga_diskon' => $priceAfterDiscount,
-    'gambar' => $b->gambar,
-    'kategori' => $b->kategori,
-    'discount' => $discount,
-]);
-}
+    }
 }

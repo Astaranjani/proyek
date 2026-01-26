@@ -74,13 +74,32 @@
             @php
                 // Ambil voucher aktif berdasarkan masa berlaku dan batas penggunaan
                 $voucherAktif = $barang->vouchers
-                    ->filter(fn($v) =>
-                        $v->aktif &&
-                        (!$v->masa_berlaku || \Carbon\Carbon::now()->lte(\Carbon\Carbon::parse($v->masa_berlaku))) &&
-                        (!$v->batas_penggunaan || $v->jumlah_digunakan < $v->batas_penggunaan)
-                    )
-                    ->first();
-
+                ->filter(function($v) {
+                    $now = \Carbon\Carbon::now();
+                    
+                    // Cek apakah voucher masih aktif
+                    if (!$v->aktif) {
+                        return false;
+                    }
+                    
+                    // Cek tanggal mulai (harus sudah dimulai)
+                    if ($v->tanggal_mulai && $now->lt(\Carbon\Carbon::parse($v->tanggal_mulai))) {
+                        return false;
+                    }
+                    
+                    // Cek tanggal berakhir (belum kedaluwarsa)
+                    if ($v->tanggal_berakhir && $now->gt(\Carbon\Carbon::parse($v->tanggal_berakhir))) {
+                        return false;
+                    }
+                    
+                    // Cek batas penggunaan
+                    if ($v->batas_penggunaan && $v->jumlah_digunakan >= $v->batas_penggunaan) {
+                        return false;
+                    }
+                    
+                    return true;
+                })
+                ->first();
                 $hargaAwal = $barang->harga;
                 $hargaAkhir = $voucherAktif
                     ? $hargaAwal - ($hargaAwal * $voucherAktif->diskon / 100)
@@ -118,32 +137,33 @@
                 <p><strong>Merek:</strong> {{ $barang->merek }}</p>
                 <p class="mt-3">{!! nl2br(e($barang->deskripsi)) !!}</p>
 
-                <div class="d-flex gap-2 mt-4">
-                    {{-- Tambah ke Keranjang --}}
-                    <form action="{{ route('keranjang.tambah') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="barang_id" value="{{ $barang->id }}">
-                        <button class="btn btn-custom animate__animated animate__bounceIn" type="submit">
-                            + Keranjang
-                        </button>
-                    </form>
+                <div class="d-flex flex-wrap gap-2 mt-4">
 
-                    {{-- Beli Sekarang --}}
-                    <form action="{{ route('beli.sekarang') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="product_id" value="{{ $barang->id }}">
-                        <input type="hidden" name="harga" value="{{ $hargaAkhir }}">
-                        <button type="submit" class="btn btn-primary animate__animated animate__bounceIn">
-                            Beli Sekarang
-                        </button>
-                    </form>
+    {{-- Tambah ke Keranjang --}}
+    <form action="{{ route('keranjang.tambah') }}" method="POST">
+        @csrf
+        <input type="hidden" name="barang_id" value="{{ $barang->id }}">
+        <button class="btn btn-custom px-4">
+            <i class="bi bi-cart-plus"></i> Keranjang
+        </button>
+    </form>
 
-                    {{-- Chat --}}
-                    <a href="{{ route('chat') }}" class="btn btn-warning btn-sm d-flex align-items-center gap-1">
-                        <i class="bi bi-chat-dots"></i> Chat
-                    </a>
-                </div>
+    {{-- Beli Sekarang --}}
+    <form action="{{ route('beli.sekarang') }}" method="POST">
+        @csrf
+        <input type="hidden" name="product_id" value="{{ $barang->id }}">
+        <button class="btn btn-primary px-4">
+            <i class="bi bi-bag-check"></i> Beli Sekarang
+        </button>
+    </form>
 
+    {{-- Chat --}}
+    <a href="{{ route('chat') }}"
+       class="btn btn-warning px-4 d-flex align-items-center gap-1">
+        <i class="bi bi-chat-dots"></i> Chat
+    </a>
+
+</div>
             </div>
         </div>
     </div>

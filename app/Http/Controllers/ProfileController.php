@@ -3,41 +3,56 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
-    public function show()
+    public function __construct()
     {
-        $user = Auth::user();
+        $this->middleware('auth');
+    }
+
+    /**
+     * Tampilkan halaman profil (Blade)
+     */
+    public function show(Request $request)
+    {
+        $user = $request->user();
         return view('profile', compact('user'));
     }
 
+    /**
+     * Update profil pengguna
+     */
     public function update(Request $request)
     {
-        /** @var User $user */
-        $user = Auth::user();
+        $user = $request->user();
 
+        // Validasi input
         $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string|max:20',
-            'gender' => 'nullable|string|in:Laki-laki,Perempuan',
-            'address' => 'nullable|string|max:255',
-        ],
-        [
-            // Custom error messages
-            'name.required' => 'Nama wajib diisi.',
-            'name.max' => 'Nama maksimal 100 karakter.',
-            'email.required' => 'Email wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
-            'email.unique' => 'Email sudah digunakan.',
-            'phone.max' => 'Nomor telepon maksimal 20 karakter.',
-            'gender.in' => 'Jenis kelamin harus Laki-laki atau Perempuan.',
-            'address.max' => 'Alamat maksimal 255 karakter.',
+            'name' => ['required','string','max:255'],
+            'email' => ['required','email','max:255', Rule::unique('users','email')->ignore($user->id)],
+            'phone' => ['nullable','string','max:20'],
+            'gender' => ['nullable','in:Laki-laki,Perempuan'],
+            'address' => ['nullable','string','max:1000'],
+            'profile_image' => ['nullable','image','mimes:jpeg,png,jpg','max:2048'], // 2048 KB = 2MB
         ]);
 
+        // Tangani upload foto (hapus foto lama jika ada)
+        if ($request->hasFile('profile_image')) {
+            $file = $request->file('profile_image');
+            $path = $file->store('profile_images', 'public'); // menyimpan -> 'profile_images/abcd.png'
+
+            // Hapus file lama jika ada
+            if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+                Storage::disk('public')->delete($user->profile_image);
+            }
+
+            $validated['profile_image'] = $path;
+        }
+
+        // Update data user
         $user->update($validated);
 
         return redirect()->route('profile')->with('success', 'Profil berhasil diperbarui.');

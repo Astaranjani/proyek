@@ -16,7 +16,13 @@ class Barang extends Model
         'harga',
         'gambar',
         'kategori',
+        'berat'
     ];
+    protected $casts = [
+        // ... casts lainnya
+        'berat' => 'integer', // Tambahkan ini untuk casting otomatis
+    ];
+
 
     // Semua voucher yang pernah terkait
     public function vouchers() {

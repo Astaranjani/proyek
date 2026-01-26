@@ -1,0 +1,184 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
+class OngkirController extends Controller
+{
+    /**
+     * Data Ongkos Kirim Manual Khusus Indramayu.
+     * Format: 'Nama Kecamatan' => Harga (Rupiah)
+     */
+    protected $dataOngkir = [
+        'Indramayu'      => 10000,
+        'Balongan'       => 12000,
+        'Sindang'        => 10000,
+        'Jatibarang'     => 15000,
+        'Lohbener'       => 15000,
+        'Juntinyuat'     => 18000,
+        'Karangampel'    => 20000,
+        'Kertasemaya'    => 22000,
+        'Kandanghaur'    => 25000,
+        'Losarang'       => 25000,
+        'Haurgeulis'     => 30000,
+        'Gantar'         => 35000,
+        'Patrol'         => 30000,
+        'Sukra'          => 35000,
+        'Anjatan'        => 32000,
+        'Bongas'         => 32000,
+        'Gabuswetan'     => 30000,
+        'Cikedung'       => 28000,
+        'Lelea'          => 20000,
+        'Widasari'       => 18000,
+        'Tukdana'        => 22000,
+        'Bangodua'       => 22000,
+        'Krangkeng'      => 25000,
+        'Cantigi'        => 15000,
+        'Arahan'         => 18000,
+        'Pasekan'        => 15000,
+        'Sliyeg'         => 18000,
+        'Kedokan Bunder' => 20000,
+        'Kroya'          => 30000,
+        'Terisi'         => 28000,
+    ];
+
+    /**
+     * Ambil list kecamatan untuk dropdown
+     */
+    public function getDistricts()
+    {
+        $kecamatan = array_keys($this->dataOngkir);
+        sort($kecamatan);
+
+        return response()->json([
+            'success' => true,
+            'data' => $kecamatan
+        ]);
+    }
+
+    /**
+     * Method untuk route 'ongkir.cost' (dipanggil dari blade)
+     * Menghitung ongkir berdasarkan kecamatan tujuan
+     */
+    public function getCost(Request $request)
+    {
+        try {
+            // Validasi input
+            $destination = $request->input('destination');
+            
+            Log::info('OngkirController getCost dipanggil', [
+                'destination' => $destination,
+                'all_input' => $request->all()
+            ]);
+
+            if (!$destination) {
+                Log::warning('Destination kosong');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kecamatan tujuan harus diisi'
+                ], 400);
+            }
+
+            // Cek apakah kecamatan ada di daftar
+            if (!array_key_exists($destination, $this->dataOngkir)) {
+                Log::warning('Kecamatan tidak ditemukan', ['destination' => $destination]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pengiriman ke kecamatan ' . $destination . ' belum tersedia'
+                ], 404);
+            }
+
+            $hargaOngkir = $this->dataOngkir[$destination];
+
+            // Format response sesuai yang diharapkan frontend
+            $response = [
+                [
+                    'service' => 'KURIR TOKO',
+                    'description' => 'Pengiriman ke ' . $destination,
+                    'cost' => [
+                        [
+                            'value' => $hargaOngkir,
+                            'etd' => '1-2 hari',
+                            'note' => 'Pengiriman lokal area Indramayu'
+                        ]
+                    ]
+                ]
+            ];
+
+            Log::info('Ongkir berhasil dihitung', [
+                'destination' => $destination,
+                'cost' => $hargaOngkir
+            ]);
+
+            return response()->json($response);
+
+        } catch (\Exception $e) {
+            Log::error('Error di OngkirController getCost', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menghitung ongkir: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Method alternatif dengan perhitungan berat (jika diperlukan)
+     */
+    public function getCostWithWeight(Request $request)
+    {
+        try {
+            $request->validate([
+                'destination' => 'required|string',
+                'weight' => 'nullable|numeric|min:0',
+            ]);
+
+            $destination = $request->destination;
+            $weight = $request->weight ?? 1000; // Default 1kg
+
+            if (!array_key_exists($destination, $this->dataOngkir)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pengiriman ke ' . $destination . ' belum tersedia'
+                ], 404);
+            }
+
+            $hargaPerKg = $this->dataOngkir[$destination];
+            
+            // Hitung berdasarkan berat (pembulatan ke atas per kg)
+            $beratKg = ceil($weight / 1000);
+            $totalHarga = $hargaPerKg * $beratKg;
+
+            $response = [
+                [
+                    'service' => 'KURIR TOKO',
+                    'description' => 'Pengiriman ke ' . $destination,
+                    'cost' => [
+                        [
+                            'value' => $totalHarga,
+                            'etd' => '1-2 hari',
+                            'note' => 'Tarif: Rp ' . number_format($hargaPerKg, 0, ',', '.') . ' per kg (Berat: ' . $beratKg . ' kg)'
+                        ]
+                    ]
+                ]
+            ];
+
+            return response()->json($response);
+
+        } catch (\Exception $e) {
+            Log::error('Error di getCostWithWeight', [
+                'message' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+}

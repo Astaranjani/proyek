@@ -119,96 +119,116 @@
                 <div class="alert alert-info">Keranjang Anda kosong.</div>
             @else
                 @foreach($cart as $id => $item)
-                   @php
+                    @php
                         $barang = \App\Models\Barang::with('vouchers')->find($id);
                         if (!$barang) continue;
 
                         $hargaAsli = $barang->harga;
 
                         $voucherAktif = $barang->vouchers
-                            ->filter(fn($v) =>
-                                $v->aktif &&
-                                (!$v->masa_berlaku || \Carbon\Carbon::now()->lte(\Carbon\Carbon::parse($v->masa_berlaku))) &&
-                                (!$v->batas_penggunaan || $v->jumlah_digunakan < $v->batas_penggunaan)
-                            )
-                            ->sortByDesc('diskon')
+                            ->filter(function($v) {
+                                $now = \Carbon\Carbon::now();
+                                
+                                // Cek apakah voucher masih aktif
+                                if (!$v->aktif) {
+                                    return false;
+                                }
+                                
+                                // Cek tanggal mulai (harus sudah dimulai)
+                                if ($v->tanggal_mulai && $now->lt(\Carbon\Carbon::parse($v->tanggal_mulai))) {
+                                    return false;
+                                }
+                                
+                                // Cek tanggal berakhir (belum kedaluwarsa)
+                                if ($v->tanggal_berakhir && $now->gt(\Carbon\Carbon::parse($v->tanggal_berakhir))) {
+                                    return false;
+                                }
+                                
+                                // Cek batas penggunaan
+                                if ($v->batas_penggunaan && $v->jumlah_digunakan >= $v->batas_penggunaan) {
+                                    return false;
+                                }
+                                
+                                return true;
+                            })
                             ->first();
 
-                        $jumlah = $item['jumlah'] ?? 1;
+                        $jumlah       = $item['jumlah'] ?? 1;
+                        $voucherText  = '';
+                        $diskonNominal = 0;
+
+                        // harga per unit untuk tampilan setelah diskon
                         $hargaDiskon = $hargaAsli;
-                        $voucherText = '';
-                        $subtotalDiskon = $hargaAsli * $jumlah;
 
                         if ($voucherAktif) {
-                            $voucherText = "(-{$voucherAktif->diskon}%)";
-
-                            // Hitung jumlah barang yang bisa diskon sesuai batas penggunaan
-                            $eligibleQty = $jumlah;
-                            if ($voucherAktif->batas_penggunaan) {
-                                $sisaVoucher = $voucherAktif->batas_penggunaan - $voucherAktif->jumlah_digunakan;
-                                $eligibleQty = min($jumlah, max(0, $sisaVoucher));
-                            }
-
-                            $hargaDiskon = $hargaAsli * (1 - $voucherAktif->diskon / 100);
-                            $subtotalDiskon = $hargaDiskon * $eligibleQty + $hargaAsli * ($jumlah - $eligibleQty);
+                            $voucherText   = "(-{$voucherAktif->diskon}%)";
+                            // diskon voucher 1x per item (per baris)
+                            $diskonNominal = $hargaAsli * ($voucherAktif->diskon / 100);
+                            $hargaDiskon   = max(0, $hargaAsli - $diskonNominal);
                         }
 
-                        $subtotalAsli = $hargaAsli * $jumlah;
+                        $subtotalAsli   = $hargaAsli * $jumlah;
+                        $subtotalDiskon = max(0, $subtotalAsli - $diskonNominal);
+
                         $stokTerbaru = $barang->stok;
                     @endphp
                     <div class="d-flex align-items-center border-bottom py-3 justify-content-between item-container" 
-                    data-item-id="{{ $id }}" 
-                    data-subtotal-asli="{{ $subtotalAsli }}"
-                    data-subtotal-diskon="{{ $subtotalDiskon }}"
-                    data-stok="{{ $stokTerbaru }}">
+                        data-item-id="{{ $id }}" 
+                        data-subtotal-asli="{{ $subtotalAsli }}"
+                        data-subtotal-diskon="{{ $stokTerbaru > 0 ? $subtotalDiskon : 0 }}"
+                        data-stok="{{ $stokTerbaru }}">
 
-                    <div class="d-flex align-items-center">
-                        <div class="select-btn" onclick="toggleSelectItem(this, '{{ $id }}')">
-                            <i class="bi bi-check-lg"></i>
+                        <div class="d-flex align-items-center">
+                            <div class="select-btn" onclick="toggleSelectItem(this, '{{ $id }}')">
+                                <i class="bi bi-check-lg"></i>
+                            </div>
+                            <img src="{{ asset('storage/' . $barang->gambar) }}" 
+                                alt="{{ $barang->nama }}" 
+                                class="item-image me-3">
+                            <div>
+                               <div class="item-name">{{ $barang->nama }}</div>
+
+                                @if($voucherAktif && $stokTerbaru > 0)
+                                    <div class="text-muted" style="text-decoration: line-through;">
+                                        Rp. {{ number_format($hargaAsli, 0, ',', '.') }}
+                                    </div>
+                                    <div class="item-price-discount">
+                                        Rp. {{ number_format($hargaDiskon, 0, ',', '.') }} {{ $voucherText }}
+                                    </div>
+                                @else
+                                    <div class="item-price">
+                                        Rp. {{ number_format($hargaAsli, 0, ',', '.') }}
+                                    </div>
+                                @endif
+
+                                <div class="text-muted">
+                                    Subtotal: Rp. {{ number_format($stokTerbaru > 0 ? $subtotalDiskon : 0, 0, ',', '.') }}
+                                </div>
+
+                                <form action="{{ route('keranjang.update') }}" method="POST" class="d-flex align-items-center mt-2">
+                                    @csrf
+                                    <input type="hidden" name="barang_id" value="{{ $id }}">
+                                    <button type="submit" name="action" value="decrease" class="btn btn-outline-secondary btn-sm me-2" @if($stokTerbaru <= 0) disabled @endif>-</button>
+                                    <span class="mx-2">{{ $stokTerbaru > 0 ? $jumlah : 0 }}</span>
+                                    <button type="submit" name="action" value="increase" class="btn btn-outline-secondary btn-sm" @if($stokTerbaru <= 0) disabled @endif>+</button>
+                                </form>
+
+                                @if($stokTerbaru <= 0)
+                                    <span class="text-danger fw-bold mt-2">
+                                        <i class="bi bi-exclamation-triangle-fill"></i> Stok Habis
+                                    </span>
+                                @endif
+                            </div>
                         </div>
-                        <img src="{{ asset('storage/' . $item['gambar']) }}" alt="{{ $item['nama'] }}" class="item-image me-3">
-                        <div>
-                            <div class="item-name">{{ $item['nama'] }}</div>
 
-                            @if($voucherAktif && $stokTerbaru > 0)
-                                <div class="text-muted" style="text-decoration: line-through;">
-                                    Rp. {{ number_format($hargaAsli, 0, ',', '.') }}
-                                </div>
-                                <div class="item-price-discount">
-                                    Rp. {{ number_format($hargaDiskon, 0, ',', '.') }} {{ $voucherText }}
-                                </div>
-                            @else
-                                <div class="item-price">
-                                    Rp. {{ number_format($hargaAsli, 0, ',', '.') }}
-                                </div>
-                            @endif
-
-                            <div class="text-muted">Subtotal: Rp. {{ number_format($stokTerbaru > 0 ? $subtotalDiskon : 0, 0, ',', '.') }}</div>
-
-                            <form action="{{ route('keranjang.update') }}" method="POST" class="d-flex align-items-center mt-2">
-                                @csrf
-                                <input type="hidden" name="barang_id" value="{{ $id }}">
-                                <button type="submit" name="action" value="decrease" class="btn btn-outline-secondary btn-sm me-2" @if($stokTerbaru <= 0) disabled @endif>-</button>
-                                <span class="mx-2">{{ $stokTerbaru > 0 ? $jumlah : 0 }}</span>
-                                <button type="submit" name="action" value="increase" class="btn btn-outline-secondary btn-sm" @if($stokTerbaru <= 0) disabled @endif>+</button>
-                            </form>
-
-                            @if($stokTerbaru <= 0)
-                                <span class="text-danger fw-bold mt-2">
-                                    <i class="bi bi-exclamation-triangle-fill"></i> Stok Habis
-                                </span>
-                            @endif
-                        </div>
+                        <form action="{{ route('keranjang.hapus') }}" method="POST" 
+                            onsubmit="return confirm('Yakin ingin menghapus barang ini dari keranjang?');" 
+                            class="ms-auto">
+                            @csrf
+                            <input type="hidden" name="barang_id" value="{{ $id }}">
+                            <button class="btn btn-danger btn-sm">Hapus</button>
+                        </form>
                     </div>
-
-                    <form action="{{ route('keranjang.hapus') }}" method="POST" 
-                        onsubmit="return confirm('Yakin ingin menghapus barang ini dari keranjang?');" 
-                        class="ms-auto">
-                        @csrf
-                        <input type="hidden" name="barang_id" value="{{ $id }}">
-                        <button class="btn btn-danger btn-sm">Hapus</button>
-                    </form>
-                </div>
                 @endforeach
 
                 {{-- Input Voucher Promo --}}
@@ -276,7 +296,7 @@
                     <div id="selected-items-container"></div>
                     <input type="hidden" name="applied_promo" id="applied-promo-input" value="{{ session('promo_code') }}">
                     <button type="button" id="checkout-button" onclick="submitCheckout()" class="checkout-btn" disabled>
-                        Checkout (<span id="selected-count">0</span> item)
+                        Checkout
                     </button>
                 </form>
             @endif
@@ -287,6 +307,35 @@
     <script>
         let selectedItems = [];
         let promoData = @json(session('promo', null));
+
+        // Auto-check promo validity on page load
+        window.addEventListener('load', function() {
+            @if(session('promo'))
+                // Cek apakah promo masih valid via AJAX
+                fetch('{{ route('keranjang.checkPromoValidity') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        promo_id: {{ session('promo')['promo_id'] ?? 'null' }}
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.valid) {
+                        // Clear promo data
+                        promoData = null;
+                        updateTotals();
+                        
+                        // Show alert
+                        alert('Promo yang Anda gunakan sudah tidak berlaku dan telah dihapus.');
+                        window.location.reload();
+                    }
+                });
+            @endif
+        });
 
         // Load selectedItems from localStorage on page load
         window.onload = function() {
@@ -334,11 +383,9 @@
 
         function updateCheckoutButton() {
             const checkoutButton = document.getElementById('checkout-button');
-            const selectedCount = document.getElementById('selected-count');
-            const promoSection = document.getElementById('promo-section');
-            const totalSection = document.getElementById('total-section');
+            const promoSection   = document.getElementById('promo-section');
+            const totalSection   = document.getElementById('total-section');
             
-            selectedCount.textContent = selectedItems.length;
             checkoutButton.disabled = selectedItems.length === 0;
 
             // Tampilkan section promo dan total hanya jika ada item yang dipilih
@@ -354,63 +401,63 @@
             container.innerHTML = '';
             selectedItems.forEach(itemId => {
                 const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'produk[]';
+                input.type  = 'hidden';
+                input.name  = 'produk[]';
                 input.value = itemId;
                 container.appendChild(input);
             });
         }
 
         function updateTotals() {
-    let subtotalAsli = 0;
-    let subtotalDiskon = 0;
-    
-    selectedItems.forEach(itemId => {
-        const itemContainer = document.querySelector(`[data-item-id="${itemId}"]`);
-        if (itemContainer) {
-            const itemSubtotalAsli = parseFloat(itemContainer.getAttribute('data-subtotal-asli')) || 0;
-            const itemSubtotalDiskon = parseFloat(itemContainer.getAttribute('data-subtotal-diskon')) || 0;
-            const stok = parseInt(itemContainer.getAttribute('data-stok')) || 0;
+            let subtotalAsli   = 0;
+            let subtotalDiskon = 0;
+            
+            selectedItems.forEach(itemId => {
+                const itemContainer = document.querySelector(`[data-item-id="${itemId}"]`);
+                if (itemContainer) {
+                    const itemSubtotalAsli   = parseFloat(itemContainer.getAttribute('data-subtotal-asli')) || 0;
+                    const itemSubtotalDiskon = parseFloat(itemContainer.getAttribute('data-subtotal-diskon')) || 0;
+                    const stok               = parseInt(itemContainer.getAttribute('data-stok')) || 0;
 
-            subtotalAsli += stok > 0 ? itemSubtotalAsli : 0;
-            subtotalDiskon += stok > 0 ? itemSubtotalDiskon : 0;
+                    subtotalAsli   += stok > 0 ? itemSubtotalAsli   : 0;
+                    subtotalDiskon += stok > 0 ? itemSubtotalDiskon : 0;
+                }
+            });
+
+            const voucherDiscount = subtotalAsli - subtotalDiskon;
+
+            document.getElementById('subtotal-asli-display').textContent      = "Rp. " + subtotalAsli.toLocaleString('id-ID');
+            document.getElementById('voucher-discount-display').textContent  = "- Rp. " + voucherDiscount.toLocaleString('id-ID');
+            document.getElementById('subtotal-display').textContent          = "Rp. " + subtotalDiskon.toLocaleString('id-ID');
+
+            let promoDiscount = 0;
+            let finalTotal    = subtotalDiskon;
+
+            if (promoData) {
+                if (promoData.percent > 0) {
+                    promoDiscount = subtotalDiskon * (promoData.percent / 100);
+                } else if (promoData.amount > 0) {
+                    promoDiscount = Math.min(promoData.amount, subtotalDiskon);
+                }
+                finalTotal = subtotalDiskon - promoDiscount;
+
+                document.getElementById('discount-row').style.display        = 'block';
+                document.getElementById('promo-code-display').textContent    = promoData.kode || '';
+                document.getElementById('discount-display').textContent      = "- Rp. " + promoDiscount.toLocaleString('id-ID');
+            } else {
+                document.getElementById('discount-row').style.display = 'none';
+            }
+
+            document.getElementById('grand-total').textContent = "Rp. " + finalTotal.toLocaleString('id-ID');
         }
-    });
-
-    const voucherDiscount = subtotalAsli - subtotalDiskon;
-
-    document.getElementById('subtotal-asli-display').textContent = "Rp. " + subtotalAsli.toLocaleString('id-ID');
-    document.getElementById('voucher-discount-display').textContent = "- Rp. " + voucherDiscount.toLocaleString('id-ID');
-    document.getElementById('subtotal-display').textContent = "Rp. " + subtotalDiskon.toLocaleString('id-ID');
-
-    let promoDiscount = 0;
-    let finalTotal = subtotalDiskon;
-
-    if (promoData) {
-        if (promoData.percent > 0) {
-            promoDiscount = subtotalDiskon * (promoData.percent / 100);
-        } else if (promoData.amount > 0) {
-            promoDiscount = Math.min(promoData.amount, subtotalDiskon);
-        }
-        finalTotal = subtotalDiskon - promoDiscount;
-
-        document.getElementById('discount-row').style.display = 'block';
-        document.getElementById('promo-code-display').textContent = promoData.kode || '';
-        document.getElementById('discount-display').textContent = "- Rp. " + promoDiscount.toLocaleString('id-ID');
-    } else {
-        document.getElementById('discount-row').style.display = 'none';
-    }
-
-    document.getElementById('grand-total').textContent = "Rp. " + finalTotal.toLocaleString('id-ID');
-}
 
         function updatePromoForm() {
             const container = document.getElementById('promo-selected-items-container');
             container.innerHTML = '';
             selectedItems.forEach(itemId => {
                 const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'produk[]';
+                input.type  = 'hidden';
+                input.name  = 'produk[]';
                 input.value = itemId;
                 container.appendChild(input);
             });
@@ -425,12 +472,14 @@
         // Load promo data dari session
         @if(session('promo'))
             promoData = {
-                kode: '{{ session('promo')['kode'] ?? '' }}',
-                percent: {{ session('promo')['percent'] ?? 0 }},
-                amount: {{ session('promo')['amount'] ?? 0 }},
-                min_pembelian: {{ session('promo')['min_pembelian'] ?? 0 }}
+                kode          : '{{ session('promo')['kode'] ?? '' }}',
+                percent       : {{ session('promo')['percent'] ?? 0 }},
+                amount        : {{ session('promo')['amount'] ?? 0 }},
+                min_pembelian : {{ session('promo')['min_pembelian'] ?? 0 }}
             };
         @endif
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

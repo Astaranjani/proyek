@@ -20,11 +20,11 @@ class ProfileController extends Controller
             return response()->json(['message' => 'User tidak ditemukan'], 404);
         }
 
-        return response()->json($user);
+        return response()->json(['user' => $user]);
     }
 
     /**
-     * Memperbarui profil user (API)
+     * Memperbarui profil user (API) + FOTO
      */
     public function update(Request $request)
     {
@@ -35,12 +35,15 @@ class ProfileController extends Controller
             return response()->json(['message' => 'User tidak ditemukan'], 404);
         }
 
+        // kalau request JSON (tanpa foto), pakai validasi biasa
+        // kalau request multipart (dengan foto), tetap valid tapi profile_image ikut divalidasi
         $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string|max:20',
+            'name'   => 'required|string|max:100',
+            'email'  => 'required|email|unique:users,email,' . $user->id,
+            'phone'  => 'nullable|string|max:20',
             'gender' => 'nullable|string|in:Laki-laki,Perempuan',
             'address' => 'nullable|string|max:255',
+            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ], [
             'name.required' => 'Nama wajib diisi.',
             'name.max' => 'Nama maksimal 100 karakter.',
@@ -50,13 +53,25 @@ class ProfileController extends Controller
             'phone.max' => 'Nomor telepon maksimal 20 karakter.',
             'gender.in' => 'Jenis kelamin harus Laki-laki atau Perempuan.',
             'address.max' => 'Alamat maksimal 255 karakter.',
+            'profile_image.image' => 'File harus berupa gambar.',
+            'profile_image.mimes' => 'Format gambar harus JPG atau PNG.',
+            'profile_image.max' => 'Ukuran gambar maksimal 2MB.',
         ]);
 
-        $user->update($validated);
+        $data = $validated;
+
+        // simpan file foto kalau ada
+        if ($request->hasFile('profile_image')) {
+            $path = $request->file('profile_image')->store('profile_images', 'public');
+            $data['profile_image'] = $path; // contoh: profile_images/abc.jpg
+        }
+
+        $user->update($data);
+        $user->refresh();
 
         return response()->json([
             'message' => 'Profil berhasil diperbarui.',
-            'user' => $user
+            'user'    => $user,
         ]);
     }
 }

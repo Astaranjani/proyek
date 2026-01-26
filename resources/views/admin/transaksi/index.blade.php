@@ -127,44 +127,58 @@
       <div class="bg-white shadow rounded-lg overflow-hidden">
         <div class="overflow-x-auto">
           <table class="min-w-full table-auto text-sm md:text-base">
-            <thead class="bg-gray-800 text-white">
-              <tr>
-                <th class="px-4 py-2 text-left">ID Transaksi</th>
-                <th class="px-4 py-2 text-left">Nama Pelanggan</th>
-                <th class="px-4 py-2 text-left">Nama Barang</th>
-                <th class="px-4 py-2 text-left">Total Pembayaran</th>
-                <th class="px-4 py-2 text-left">Status Pembayaran</th>
-                <th class="px-4 py-2 text-left">Tanggal Transaksi</th>
-                <th class="px-4 py-2 text-left">Aksi</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-              @foreach($transaksi as $t)
-              <tr class="hover:bg-gray-50">
-                <td class="px-4 py-2">{{ $t->id }}</td>
+    <thead class="bg-gray-800 text-white">
+        <tr>
+            <th class="px-4 py-2">No</th>
+            <th class="px-4 py-2">Pelanggan</th>
+            <th class="px-4 py-2">Barang</th>
+            <th class="px-4 py-2">Total</th>
+            <th class="px-4 py-2">Status</th>
+            <th class="px-4 py-2">Tanggal</th>
+            <th class="px-4 py-2">Aksi</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach($transaksi as $t)
+            <tr class="border-b hover:bg-gray-50">
+                {{-- ✅ NOMOR URUT DINAMIS --}}
+                <td class="px-4 py-2 font-semibold">
+                    {{ $loop->iteration }}
+                </td>
+
+
                 <td class="px-4 py-2">{{ $t->user->nama ?? $t->nama_user }}</td>
                 <td class="px-4 py-2">{{ $t->barang->nama ?? $t->nama_barang }}</td>
-                <td class="px-4 py-2">Rp{{ number_format($t->total_harga, 0, ',', '.') }}</td>
+
                 <td class="px-4 py-2">
-                  <span class="{{ $t->status_pembayaran == 'Lunas' ? 'text-green-500' : 'text-red-500' }}">
-                    {{ $t->status_pembayaran }}
-                  </span>
+                    Rp{{ number_format($t->total_harga, 0, ',', '.') }}
                 </td>
-                <td class="px-4 py-2">{{ date('d M Y', strtotime($t->created_at)) }}</td>
+
                 <td class="px-4 py-2">
-                  <form method="POST" action="{{ route('admin.transaksi.destroy', $t->id) }}">
-                    @csrf
-                    @method('DELETE')
-                    <button onclick="return confirm('Yakin ingin menghapus transaksi ini?')" class="px-3 py-1.5 text-sm font-medium rounded-md border border-red-500 text-red-500 hover:bg-red-50">
-                      Hapus
-                    </button>
-                  </form>
+                    <span class="{{ $t->status_pembayaran === 'Lunas' ? 'text-green-600' : 'text-red-500' }}">
+                        {{ $t->status_pembayaran }}
+                    </span>
                 </td>
-              </tr>
-              @endforeach
-            </tbody>
-          </table>
-        </div>
+
+                <td class="px-4 py-2">{{ $t->created_at->format('d M Y') }}</td>
+
+                <td class="px-4 py-2">
+                    <form action="{{ route('admin.transaksi.destroy', $t->id) }}"
+                          method="POST"
+                          onsubmit="return confirm('Yakin ingin menghapus transaksi ini?')">
+                        @csrf
+                        @method('DELETE')
+                        <button class="text-red-500 hover:underline">
+                            Hapus
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+
 
         <div class="p-4 bg-gray-100 text-right font-bold">
   Total Pemasukan: Rp{{ number_format($totalSemuaPembayaran ?? 0, 0, ',', '.') }}
@@ -172,9 +186,10 @@
 
 
         <div class="flex justify-end flex-wrap gap-2 p-4 bg-gray-100">
-          <a href="/admin/transaksi/download/" class="px-4 py-2 bg-primary text-white rounded-md font-bold hover:bg-primary/90 w-full sm:w-auto text-center">
-            Unduh PDF
-          </a>
+          <a href="{{ route('admin.transaksi.download') }}"
+          class="px-4 py-2 bg-primary text-white rounded-md font-bold hover:bg-primary/90 w-full sm:w-auto text-center">
+          Unduh PDF
+        </a>
         </div>
       </div>
     </div>

@@ -214,167 +214,218 @@
 
 
       <!-- Tambah Voucher Diskon -->
+
 <!-- Tambah Voucher Diskon -->
 <div class="bg-white rounded-lg p-4 md:p-6 shadow-sm mt-6">
     <h2 class="text-lg font-semibold mb-4">Tambah Voucher Diskon</h2>
 
-    @if(session('success'))
+    {{-- Notifikasi sukses voucher --}}
+    @if(session('success_voucher'))
         <div class="p-2 mb-3 bg-green-100 text-green-700 rounded">
-            {{ session('success') }}
+            {{ session('success_voucher') }}
         </div>
     @endif
 
-    @if(!empty($notifikasiStokHabis))
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-        <strong class="font-bold">⚠️ Stok Habis!</strong>
-        <span class="block sm:inline">{{ $notifikasiStokHabis }}</span>
-    </div>
-@endif
+    {{-- PERBAIKAN: Error validasi - hapus ->voucher, gunakan $errors langsung --}}
+    @if($errors->any())
+        <div class="p-2 mb-3 bg-red-100 text-red-700 rounded">
+            <ul class="list-disc list-inside mb-0">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <form action="{{ route('admin.voucher.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         @csrf
 
         <!-- Kode Voucher -->
         <div>
-            <label class="block text-sm font-medium mb-1">Kode Voucher</label>
-            <input type="text" name="kode" class="w-full border rounded px-3 py-2" required>
+            <label class="block text-sm font-medium mb-1">Kode Voucher <span class="text-red-500">*</span></label>
+            <input type="text" 
+                   name="kode" 
+                   value="{{ old('kode') }}"
+                   class="w-full border rounded px-3 py-2 @error('kode') border-red-500 @enderror"
+                   placeholder="Contoh: DISKON10"
+                   required>
+            @error('kode')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
         <!-- Diskon -->
         <div>
-            <label class="block text-sm font-medium mb-1">Diskon (%)</label>
-            <input type="number" name="diskon" class="w-full border rounded px-3 py-2" min="1" max="100" required>
+            <label class="block text-sm font-medium mb-1">Diskon (%) <span class="text-red-500">*</span></label>
+            <input type="number" 
+                   name="diskon" 
+                   value="{{ old('diskon') }}" 
+                   min="1" 
+                   max="100"
+                   class="w-full border rounded px-3 py-2 @error('diskon') border-red-500 @enderror"
+                   placeholder="1-100"
+                   required>
+            @error('diskon')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
         <!-- Tanggal Mulai -->
         <div>
-            <label class="block text-sm font-medium mb-1">Tanggal Mulai</label>
-            <input type="date" name="tanggal_mulai" class="w-full border rounded px-3 py-2">
+            <label class="block text-sm font-medium mb-1">Tanggal Mulai (opsional)</label>
+            <input type="date" 
+                   name="tanggal_mulai" 
+                   value="{{ old('tanggal_mulai') }}"
+                   min="{{ date('Y-m-d') }}"
+                   class="w-full border rounded px-3 py-2 @error('tanggal_mulai') border-red-500 @enderror">
+            @error('tanggal_mulai')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
         <!-- Tanggal Berakhir -->
         <div>
-            <label class="block text-sm font-medium mb-1">Tanggal Berakhir</label>
-            <input type="date" name="tanggal_berakhir" class="w-full border rounded px-3 py-2">
+            <label class="block text-sm font-medium mb-1">Tanggal Berakhir (opsional)</label>
+            <input type="date" 
+                   name="tanggal_berakhir" 
+                   value="{{ old('tanggal_berakhir') }}"
+                   min="{{ date('Y-m-d') }}"
+                   class="w-full border rounded px-3 py-2 @error('tanggal_berakhir') border-red-500 @enderror">
+            @error('tanggal_berakhir')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
         <!-- Batas Penggunaan -->
         <div>
-            <label class="block text-sm font-medium mb-1">Batas Penggunaan</label>
-            <input type="number" name="batas_penggunaan" class="w-full border rounded px-3 py-2" min="1" placeholder="Contoh: 100">
+            <label class="block text-sm font-medium mb-1">Batas Penggunaan (opsional)</label>
+            <input type="number" 
+                   name="batas_penggunaan" 
+                   value="{{ old('batas_penggunaan') }}" 
+                   min="1"
+                   class="w-full border rounded px-3 py-2 @error('batas_penggunaan') border-red-500 @enderror" 
+                   placeholder="Contoh: 100">
+            @error('batas_penggunaan')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
+            <p class="text-xs text-gray-500 mt-1">Kosongkan jika tidak ada batas</p>
         </div>
 
         <!-- Pilih Produk -->
         <div class="md:col-span-2">
-            <label class="block text-sm font-medium mb-1">Pilih Produk (Voucher Berlaku)</label>
-            <select name="barang_ids[]" multiple class="w-full border rounded px-3 py-2 h-40">
-               <div id="notifStokHabis" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-2">
-                <strong class="font-bold">⚠️ Stok Habis!</strong>
-                <span id="listBarangHabis" class="block sm:inline"></span>
-            </div>
-
+            <label class="block text-sm font-medium mb-1">Pilih Produk (Voucher Berlaku) <span class="text-red-500">*</span></label>
+            <select name="barang_ids[]" 
+                    multiple 
+                    class="w-full border rounded px-3 py-2 h-40 @error('barang_ids') border-red-500 @enderror"
+                    required>
                 @foreach($barangs as $barang)
-                   <option value="{{ $barang->id }}" data-stok="{{ $barang->stok }}">
-                    {{ $barang->nama }} (Stok: {{ $barang->stok }})
-                </option>
-
+                    <option value="{{ $barang->id }}" 
+                            data-stok="{{ $barang->stok }}"
+                            {{ in_array($barang->id, old('barang_ids', [])) ? 'selected' : '' }}
+                            {{ $barang->stok <= 0 ? 'disabled' : '' }}>
+                        {{ $barang->nama }} (Stok: {{ $barang->stok }}) {{ $barang->stok <= 0 ? '- HABIS' : '' }}
+                    </option>
                 @endforeach
             </select>
-            <p class="text-xs text-gray-500 mt-1">Tekan Ctrl (Windows) / Cmd (Mac) untuk memilih lebih dari satu produk.</p>
+            @error('barang_ids')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
+            <p class="text-xs text-gray-500 mt-1">
+                <i class="ri-information-line"></i> 
+                Tekan <kbd class="px-1 bg-gray-200 rounded">Ctrl</kbd> (Windows) / 
+                <kbd class="px-1 bg-gray-200 rounded">Cmd</kbd> (Mac) untuk memilih lebih dari satu produk.
+            </p>
         </div>
 
         <!-- Tombol Simpan -->
-        <div class="md:col-span-2 flex justify-end">
-            <button type="submit" class="px-4 py-2 bg-primary text-white rounded">Simpan</button>
+        <div class="md:col-span-2 flex justify-end gap-2">
+            <button type="reset" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+                Reset
+            </button>
+            <button type="submit" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90">
+                <i class="ri-save-line mr-1"></i> Simpan Voucher
+            </button>
         </div>
     </form>
 </div>
-
 <!-- Daftar Voucher -->
-<!-- Daftar Voucher -->
+<<div class="bg-white rounded-lg p-4 md:p-6 shadow-sm mt-6">
+   <!-- Daftar Voucher -->
 <div class="bg-white rounded-lg p-4 md:p-6 shadow-sm mt-6">
     <h2 class="text-lg font-semibold mb-4">Daftar Voucher</h2>
 
-    <table class="w-full border-collapse">
-        <thead>
-            <tr class="bg-gray-100 text-left">
+    <table class="w-full border">
+        <thead class="bg-gray-100">
+            <tr>
                 <th class="p-2 border">Kode</th>
                 <th class="p-2 border">Diskon</th>
-                <th class="p-2 border">Masa Berlaku</th>
-                <th class="p-2 border">Batas Penggunaan</th>
+                <th class="p-2 border">Produk</th>
+                <th class="p-2 border">Penggunaan</th>
                 <th class="p-2 border">Status</th>
-                <th class="p-2 border">Produk Berlaku</th>
                 <th class="p-2 border">Aksi</th>
             </tr>
         </thead>
         <tbody>
             @foreach($vouchers as $voucher)
-            <tr>
-                <td class="p-2 border font-semibold">{{ $voucher->kode }}</td>
-                <td class="p-2 border">{{ $voucher->diskon }}%</td>
-                <td class="p-2 border">
-                    @if($voucher->tanggal_mulai && $voucher->tanggal_berakhir)
-                        {{ $voucher->tanggal_mulai }} s.d {{ $voucher->tanggal_berakhir }}
-                    @else
-                        <span class="text-gray-400 text-sm">Tidak ditentukan</span>
-                    @endif
-                </td>
-                <td class="p-2 border">
-                    @if($voucher->batas_penggunaan)
-                        {{ $voucher->jumlah_digunakan ?? 0 }} / {{ $voucher->batas_penggunaan }}
-                    @else
-                        <span class="text-gray-400 text-sm">Tanpa batas</span>
-                    @endif
-                </td>
+                @php
+                    [$statusText, $statusClass] = $voucher->statusLabel();
+                @endphp
+                <tr>
+                    <td class="p-2 border font-semibold">{{ $voucher->kode }}</td>
+                    <td class="p-2 border">{{ $voucher->diskon }}%</td>
 
-                <!-- Status -->
-                <td class="p-2 border">
-                    @if($voucher->status === 'Habis')
-                        <span class="px-2 py-1 bg-red-100 text-red-600 rounded text-xs">Habis</span>
-                    @elseif($voucher->status === 'Kadaluarsa')
-                        <span class="px-2 py-1 bg-yellow-100 text-yellow-600 rounded text-xs">Kadaluarsa</span>
-                    @else
-                        <span class="px-2 py-1 bg-green-100 text-green-600 rounded text-xs">Aktif</span>
-                    @endif
-                </td>
+                    <td class="p-2 border text-sm">
+                        @foreach($voucher->barangs as $barang)
+                            <div>{{ $barang->nama }} (Stok: {{ $barang->stok }})</div>
+                        @endforeach
+                    </td>
 
-                <td class="p-2 border">
-                    @foreach($voucher->barangs as $barang)
-                        <span class="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs">{{ $barang->nama }}</span>
-                    @endforeach
-                </td>
+                    <td class="p-2 border text-sm">
+                        @if($voucher->batas_penggunaan)
+                            {{ $voucher->jumlah_digunakan }} / {{ $voucher->batas_penggunaan }}
+                        @else
+                            Tidak terbatas
+                        @endif
+                    </td>
 
-                <td class="p-2 border">
-                    <form action="{{ route('admin.voucher.destroy', $voucher->id) }}" 
-                          method="POST" class="inline-block"
-                          onsubmit="return confirm('Yakin ingin menghapus voucher ini?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="px-3 py-1 bg-red-600 text-white rounded">Hapus</button>
-                    </form>
-                </td>
-            </tr>
+                    <td class="p-2 border">
+                        <span class="px-2 py-1 text-xs rounded {{ $statusClass }}">
+                            {{ $statusText }}
+                        </span>
+                    </td>
+
+                    <td class="p-2 border">
+                        <form method="POST" action="{{ route('admin.voucher.destroy', $voucher->id) }}">
+                            @csrf
+                            @method('DELETE')
+                            <button class="bg-red-600 text-white px-3 py-1 rounded text-sm">
+                                Hapus
+                            </button>
+                        </form>
+                    </td>
+                </tr>
             @endforeach
         </tbody>
     </table>
 </div>
 
+
+<!-- Tambah Promo -->
+<!-- Tambah Promo -->
 <!-- Tambah Promo -->
 <div class="bg-white rounded-lg p-6 shadow-sm mt-6">
     <h2 class="text-lg font-semibold mb-4">Tambah Promo</h2>
 
-    <!-- Pesan sukses -->
-    @if(session('success'))
+    @if(session('success_promo'))
         <div class="p-2 mb-3 bg-green-100 text-green-700 rounded">
-            {{ session('success') }}
+            {{ session('success_promo') }}
         </div>
     @endif
 
-    <!-- Error -->
-    @if ($errors->any())
+    @if($errors->any())
         <div class="p-2 mb-3 bg-red-100 text-red-700 rounded">
-            <ul class="list-disc list-inside mb-0">
-                @foreach ($errors->all() as $error)
+            <ul class="list-disc list-inside">
+                @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
@@ -384,105 +435,116 @@
     <form action="{{ route('admin.promo.store') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         @csrf
 
-        <!-- Kode Promo -->
         <div>
-            <label for="kode" class="block text-sm font-medium mb-1">Kode Promo</label>
-            <input type="text" name="kode" id="kode" placeholder="Masukkan kode promo" 
-                   class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
-                   value="{{ old('kode') }}" required>
+            <label class="block text-sm font-medium mb-1">Kode Promo *</label>
+            <input type="text" name="kode" value="{{ old('kode') }}"
+                   class="w-full border rounded px-3 py-2" required>
         </div>
 
-        <!-- Diskon Persen -->
         <div>
-            <label for="percent" class="block text-sm font-medium mb-1">Diskon Persen (%)</label>
-            <input type="number" name="percent" id="percent" placeholder="Opsional" 
-                   class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
-                   value="{{ old('percent') }}" min="0" max="100">
+            <label class="block text-sm font-medium mb-1">Diskon Persen (%) *</label>
+            <input type="number" name="percent" value="{{ old('percent') }}"
+                   min="1" max="100"
+                   class="w-full border rounded px-3 py-2" required>
         </div>
 
-        <!-- Diskon Nominal -->
         <div>
-            <label for="amount" class="block text-sm font-medium mb-1">Diskon Nominal (Rp)</label>
-            <input type="number" name="amount" id="amount" placeholder="Opsional" 
-                   class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
-                   value="{{ old('amount') }}" min="0">
+            <label class="block text-sm font-medium mb-1">Batas Penggunaan</label>
+            <input type="number" name="batas_penggunaan" min="1"
+                   value="{{ old('batas_penggunaan') }}"
+                   class="w-full border rounded px-3 py-2"
+                   placeholder="Kosongkan jika tanpa batas">
         </div>
 
-        <!-- Tanggal Kadaluarsa -->
         <div>
-            <label for="expired_at" class="block text-sm font-medium mb-1">Tanggal Kadaluarsa</label>
-            <input type="date" name="expired_at" id="expired_at" 
-                   class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
-                   value="{{ old('expired_at') }}">
+            <label class="block text-sm font-medium mb-1">Tanggal Mulai</label>
+            <input type="date" name="tanggal_mulai"
+                   value="{{ old('tanggal_mulai') }}"
+                   class="w-full border rounded px-3 py-2">
         </div>
 
-        <!-- Tombol Submit -->
-        <div class="md:col-span-2 flex justify-end">
-            <button type="submit" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90">
+        <div>
+            <label class="block text-sm font-medium mb-1">Tanggal Berakhir</label>
+            <input type="date" name="tanggal_berakhir"
+                   value="{{ old('tanggal_berakhir') }}"
+                   class="w-full border rounded px-3 py-2">
+        </div>
+
+        <div class="md:col-span-2 flex justify-end gap-2">
+            <button type="reset" class="px-4 py-2 bg-gray-300 rounded">Reset</button>
+            <button type="submit" class="px-4 py-2 bg-primary text-white rounded">
                 Simpan Promo
             </button>
         </div>
     </form>
 </div>
+
+
+<!-- =================================================================== -->
+<!-- PERBAIKAN 4: Daftar Promo dengan Status -->
+<!-- =================================================================== -->
+
 <!-- Daftar Promo -->
-<div class="bg-white rounded-lg p-4 md:p-6 shadow-sm mt-6">
+<!-- Daftar Promo -->
+<div class="bg-white rounded-lg p-6 shadow-sm mt-6">
     <h2 class="text-lg font-semibold mb-4">Daftar Promo</h2>
 
-    @if(session('success'))
-        <div class="p-2 mb-3 bg-green-100 text-green-700 rounded">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    <table class="w-full border-collapse">
-        <thead>
-            <tr class="bg-gray-100 text-left">
-                <th class="p-2 border">Kode Promo</th>
-                <th class="p-2 border">Diskon Persen (%)</th>
-                <th class="p-2 border">Diskon Nominal (Rp)</th>
-                <th class="p-2 border">Tanggal Kadaluarsa</th>
+    <table class="w-full border">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="p-2 border">Kode</th>
+                <th class="p-2 border">Diskon</th>
+                <th class="p-2 border">Periode</th>
+                <th class="p-2 border">Penggunaan</th>
+                <th class="p-2 border">Status</th>
                 <th class="p-2 border">Aksi</th>
             </tr>
         </thead>
         <tbody>
             @foreach($promos as $promo)
-            <tr>
-                <td class="p-2 border font-semibold">{{ $promo->kode }}</td>
-                <td class="p-2 border">
-                    @if($promo->percent)
-                        {{ $promo->percent }}%
-                    @else
-                        <span class="text-gray-400 text-sm">-</span>
-                    @endif
-                </td>
-                <td class="p-2 border">
-                    @if($promo->amount)
-                        Rp{{ number_format($promo->amount, 0, ',', '.') }}
-                    @else
-                        <span class="text-gray-400 text-sm">-</span>
-                    @endif
-                </td>
-                <td class="p-2 border">
-                    @if($promo->expired_at)
-                        {{ \Carbon\Carbon::parse($promo->expired_at)->format('d M Y') }}
-                    @else
-                        <span class="text-gray-400 text-sm">Tidak ditentukan</span>
-                    @endif
-                </td>
-                <td class="p-2 border">
-                    <form action="{{ route('admin.promo.destroy', $promo->id) }}" method="POST" 
-                          class="inline-block"
-                          onsubmit="return confirm('Yakin ingin menghapus promo ini?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="px-3 py-1 bg-red-600 text-white rounded">Hapus</button>
-                    </form>
-                </td>
-            </tr>
+                @php
+                    [$statusText, $statusClass] = $promo->statusLabel();
+                @endphp
+                <tr>
+                    <td class="p-2 border font-semibold">{{ $promo->kode }}</td>
+                    <td class="p-2 border">{{ $promo->percent }}%</td>
+
+                    <td class="p-2 border text-sm">
+                        {{ $promo->tanggal_mulai?->format('d M Y') ?? '-' }}
+                        s.d
+                        {{ $promo->tanggal_berakhir?->format('d M Y') ?? '-' }}
+                    </td>
+
+                    <td class="p-2 border text-sm">
+                        @if($promo->batas_penggunaan)
+                            {{ $promo->jumlah_digunakan }} / {{ $promo->batas_penggunaan }}
+                        @else
+                            Tidak terbatas
+                        @endif
+                    </td>
+
+                    <td class="p-2 border">
+                        <span class="px-2 py-1 text-xs rounded {{ $statusClass }}">
+                            {{ $statusText }}
+                        </span>
+                    </td>
+
+                    <td class="p-2 border">
+                        <form method="POST" action="{{ route('admin.promo.destroy', $promo->id) }}">
+                            @csrf
+                            @method('DELETE')
+                            <button class="bg-red-600 text-white px-3 py-1 rounded text-sm">
+                                Hapus
+                            </button>
+                        </form>
+                    </td>
+                </tr>
             @endforeach
         </tbody>
     </table>
 </div>
+
+
         <!-- Charts Section -->
         <div class="bg-white rounded-lg p-4 md:p-6 shadow-sm w-full">
           <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js?v=1"></script>

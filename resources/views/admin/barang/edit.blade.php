@@ -112,29 +112,6 @@
             </ul>
         </div>
 
-        <!-- Report Section -->
-        <div class="px-4 py-2">
-            <p class="text-xs text-gray-400 font-medium mb-2">REPORTS</p>
-            <ul class="space-y-1">
-                <li>
-                    <a href="#" class="flex items-center px-4 py-2 text-gray-400 hover:bg-white/5 rounded-md">
-                        <div class="w-5 h-5 flex items-center justify-center mr-3">
-                            <i class="ri-bar-chart-line"></i>
-                        </div>
-                        <span>Grafik</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="flex items-center px-4 py-2 text-gray-400 hover:bg-white/5 rounded-md">
-                        <div class="w-5 h-5 flex items-center justify-center mr-3">
-                            <i class="ri-file-line"></i>
-                        </div>
-                        <span>Laporan</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
         <!-- Log Out Section -->
         <div class="px-4 py-2 mt-auto">
             <form action="/logout" method="GET">

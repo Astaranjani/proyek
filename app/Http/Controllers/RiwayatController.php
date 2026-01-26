@@ -24,10 +24,14 @@ class RiwayatController extends Controller
 
                 if (!$barang) {
                     // Kalau data barang hilang atau dihapus
-                    $order->nama_barang = '-';
-                    $order->harga_asli = 0;
-                    $order->diskon = 0;
-                    $order->harga_akhir = $order->total_harga;
+                    $order->nama_barang = $order->nama_barang ?? '-';
+                    $order->harga_asli = $order->harga_asli ?? 0;
+                    $order->diskon = $order->diskon ?? 0;
+                    $order->harga_akhir = $order->harga_akhir ?? $order->total_harga;
+                    $order->jumlah = $order->jumlah ?? 1;
+                    $order->ongkir = $order->ongkir ?? 0;
+                    $order->subtotal = ($order->total_harga ?? 0) - ($order->ongkir ?? 0);
+                    $order->total_bayar = $order->total_harga ?? 0;
                     return $order;
                 }
 
@@ -45,26 +49,26 @@ class RiwayatController extends Controller
 
                 $diskonPersen = $voucherAktif?->diskon ?? 0;
 
-                // Hitung harga akhir produk
+                // Hitung harga akhir produk per unit
                 $hargaAkhir = $voucherAktif
                     ? $harga * (1 - $diskonPersen / 100)
                     : $harga;
 
-                // Sinkronkan total transaksi sesuai jumlah produk
-                // Sinkronkan total transaksi sesuai jumlah produk
-            $jumlah = $order->jumlah ?? 1;
-            $subtotal = $hargaAkhir * $jumlah;
+                $jumlah = $order->jumlah ?? 1;
+                $subtotal = $hargaAkhir * $jumlah;
 
-            // Gunakan total dari database jika ada, atau subtotal yang dihitung
-            $totalBayar = $order->total_harga ?? $subtotal;
+                // Gunakan total dari database jika ada, atau subtotal yang dihitung ditambah ongkir
+                $totalBayar = $order->total_harga ?? ($subtotal + ($order->ongkir ?? 0));
 
-            // Tambahkan ke objek untuk ditampilkan di view
-            $order->nama_barang = $barang->nama;
-            $order->harga_asli = $harga;
-            $order->diskon = $diskonPersen;
-            $order->harga_akhir = $hargaAkhir;
-            $order->jumlah = $jumlah;
-            $order->total_bayar = $totalBayar;
+                // Tambahkan ke objek untuk ditampilkan di view
+                $order->nama_barang = $order->nama_barang ?? $barang->nama;
+                $order->harga_asli = $harga;
+                $order->diskon = $diskonPersen;
+                $order->harga_akhir = $hargaAkhir;
+                $order->jumlah = $jumlah;
+                $order->ongkir = $order->ongkir ?? 0;
+                $order->subtotal = $subtotal;
+                $order->total_bayar = $totalBayar;
 
                 return $order;
             });
