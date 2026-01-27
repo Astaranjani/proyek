@@ -1,6 +1,9 @@
 {
     "private": true,
     "type": "module",
+     "engines": {
+    "node": ">=18"
+     },
     "scripts": {
         "build": "vite build",
         "dev": "vite",
@@ -24,11 +27,8 @@
         "@popperjs/core": "^2.11.8",
         "bootstrap": "^5.3.3",
         "express": "^5.1.0",
-<<<<<<< HEAD
-        "socket.io": "^4.8.1"
-=======
+
         "socket.io": "^4.8.1",
         "socket.io-client": "^4.8.1"
->>>>>>> 9f85850690eb7d4153c67133167936168a2b612b
     }
 }
